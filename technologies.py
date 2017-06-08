@@ -7,6 +7,8 @@
 #
 #}
 
+
+
 technology_dict = {
 	"pre_industry_1": { "requirement": "any", "cost": 1},
 	"pre_industry_2": {"requirement": "pre_industry_1", "cost": 1},
@@ -34,5 +36,4 @@ technology_dict = {
 	"telegraph": {"requirement": "electricity", "cost": 3},
 	"radio": {"requirement": "electricity", "cost": 3},
 	"mechanical_reaper": {"requirement": "power_loom", "cost": 2},
-
 }

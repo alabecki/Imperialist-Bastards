@@ -23,10 +23,17 @@ information = {
 	"4": "View Military",
 	"5": "View Inventory",
 	"6": "View Needs",
-	"7": "View National Comparison",
+	"7": "View Other Nations",
 	"8": "View My Technologies",
-	"9": "View Relations"
+	"9": "View My Relations with Other Nations"
 }
+
+foreign_intelligence = {
+	"1": "View information on a particular nation",
+	"2": "View national comparisons"
+}
+
+
 
 produce_goods = {
 	"1": "Manifacture with Artisans",

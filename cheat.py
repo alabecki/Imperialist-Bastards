@@ -16,6 +16,8 @@ def Create_Uber_Player(player):
 
 	player.numMidPOP = 5.0
 
+	player.technologies.add("pre_industry_2")
+
 	player.resources["gold"] = 20.0
 	player.resources["food"] = 20.0
 	player.resources["iron"] = 20.0

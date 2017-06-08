@@ -12,7 +12,7 @@ class Old_minor(Player):
 		self.stability_mod = 0.0
         #General POP Attributes
 		self.production_modifier = 1.0
-
+		self.technologies = set("pre_industry_1")
 		self.POP = 2.425
 		self.freePOP = 2.0
 		self.milPOP = 0.3

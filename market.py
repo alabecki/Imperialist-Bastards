@@ -5,10 +5,10 @@ import player_class
 class Market(object):
 	def __init__ (self):
 
-		self.gold = 30
+		self.gold = 35
 
-		self.resources = {"food", "cotton", "iron", "wood", "coal", "spice"}
-		self.goods = {"parts", "cannons", "paper", "furniture", "clothing", "chemicals"}
+		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes"]
+		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals"]
 
 		self.market = {
 			"food": 3,
@@ -17,13 +17,14 @@ class Market(object):
 			"wood": 3,
 			"coal": 3,
 			"spice": 3,
+			"dyes": 3,
 
 			"parts": 0,
 			"clothing": 0,
 			"cannons": 0,
 			"furniture": 0,
 			"paper": 0,
-				"chemicals": 0
+			"chemicals": 0
 		}
 
 		self.resources_sell_price = {
@@ -47,7 +48,6 @@ class Market(object):
 		}
 
 		self.goods_sell_price = {
-			0: 7,
 			1: 7,
 			2: 6,
 			3: 6,
@@ -89,7 +89,7 @@ class Market(object):
 			return price
 		if(_type in self.goods):
 			amount = self.market[_type] + 1
-			if(amount < 1):
+			if(amount < 2):
 				price = 1000
 			if(amount >= 19):
 				price = 2
@@ -150,7 +150,7 @@ class Market(object):
 				if(_type == "spice"):
 					price += 1
 					return price
-			if(amount > 16):
+			if(amount >= 16):
 				price = 1
 				if(_type == "spice"):
 					price += 1
@@ -164,7 +164,8 @@ class Market(object):
 			amount = self.market[_type]
 			if(amount < 1):
 				price = 8
-			if(amount > 19):
+				return price
+			if(amount >= 19):
 				price = 2
 				return price
 			else:
@@ -172,6 +173,7 @@ class Market(object):
 			return price
 
 	def total_sell_price(self, _type, amount):
+		print("Sell type: %s" % (_type))
 		total = 0
 		for i in range(amount):
 			total += self.sell_price(_type)
@@ -198,27 +200,16 @@ class Market(object):
 					print("You now have %s gold and %s %s \n" % (player.resources["gold"], player.resources[_type], _type))
 					return
 				elif(_type in self.goods):
-					player.goods[_type] -= amount
+					if _type == "chemicals":
+						player.goods["chemicals"] -= 2 * amount
+					else:
+						player.goods[_type] -= amount
 					print("You now have %s gold and %s %s \n" % (player.resources["gold"], player.goods[_type], _type))
 					player.new_development += amount * 0.1
 					return
 
 
-			price = self.market[_type]
-			if(self.gold < price):
-				print("The market has insufficient gold, try selling something first \n")
-				return
-			else:
-				player.resources["gold"] += price
-				self.gold -= price
-				#self.market[_type] += 1
-				player.new_development += 0.2 * player.stability
-				if(_type == "chemicals"):
-					player.goods["chemicals"] -= 2
-					return
-				else:
-					player.goods[_type] -= 1
-					return
+
 
 
 	def show_market(self):

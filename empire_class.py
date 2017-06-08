@@ -3,10 +3,10 @@ from player_class import Player
 
 class Empire(Player):
 	def __init__(self, _name, _human, *args, **kwargs):
-		super(Empire, self).__init__(_name, _human, *args, **kwargs)
+		super(Empire, self).__init__(_name, _type, *args, **kwargs)
 
 		self.name = _name
-		self.human = _human
+		self.type = "Empire"
 		#Player.__init__(self, _name, _human)
 		#super(Player, self).__init__()
 		#super(Player, self).__init__(_name, _human)

@@ -36,7 +36,7 @@ def load_game(file_name):
 	market = Market()
 
 	for k, v in save.items():
-		if type(v) == Player or type(v) == Empire or type(v) == Old_minor :
+		if type(v) == Player:
 			players[v.name] = v
 		elif type(v) == Relation:
 			relations = v
