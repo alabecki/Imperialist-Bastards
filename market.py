@@ -5,19 +5,19 @@ import player_class
 class Market(object):
 	def __init__ (self):
 
-		self.gold = 35
+		self.gold = 100000
 
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals"]
 
 		self.market = {
-			"food": 3,
+			"food": 4,
 			"cotton": 3,
-			"iron": 3,
+			"iron": 4,
 			"wood": 3,
-			"coal": 3,
-			"spice": 3,
-			"dyes": 3,
+			"coal": 2,
+			"spice": 2,
+			"dyes": 2,
 
 			"parts": 0,
 			"clothing": 0,
@@ -27,45 +27,66 @@ class Market(object):
 			"chemicals": 0
 		}
 
+		self.global_factories = {
+
+			"parts": 0,
+			"cannons": 0,
+			"clothing": 0,
+			"furniture": 0,
+			"paper": 0,
+			"chemicals": 0
+		}
+
 		self.resources_sell_price = {
-			0: 5,
+			0: 6,
 			1: 5,
 			2: 5,
-			3: 4,
-			4: 4,
+			3: 5,
+			4: 5,
 			5: 4,
 			6: 4,
-			7: 3,
-			8: 3,
-			9: 3,
+			7: 4,
+			8: 4,
+			9: 4,
 			10: 3,
 			11: 3,
-			12: 2,
-			13: 2,
-			14: 2,
-			15: 2
+			12: 3,
+			13: 3,
+			14: 3,
+			15: 3,
+			16: 2,
+			17: 2,
+			18: 2,
+			19: 2,
+			20: 2,
+			21: 2
 			#if more than 15 goes to 1
 		}
 
 		self.goods_sell_price = {
 			1: 7,
-			2: 6,
+			2: 7,
 			3: 6,
 			4: 6,
 			5: 6,
-			6: 5,
-			7: 5,
+			6: 6,
+			7: 6,
 			8: 5,
 			9: 5,
 			10: 5,
 			11: 5,
-			12: 4,
+			12: 5,
 			13: 4,
 			14: 4,
 			15: 4,
-			16: 3,
-			17: 3,
-			18: 3
+			16: 4,
+			17: 4,
+			18: 3,
+			19: 3,
+			20: 3,
+			21: 3,
+			22: 3
+
 		#if more than 17 -> 1
 	}
 
@@ -73,25 +94,20 @@ class Market(object):
 		if(_type in self.resources):
 			amount = self.market[_type] + 1
 			if(amount < 1):
-				price = 10
-				if(_type == "spice"):
-					price += 1
+				price = 100000
 				return price
-			elif(amount >= 16):
+			elif(amount >= 20):
 				price = 1
-				if(_type == "spice"):
-					price += 1
 				return price
 			else:
 				price = self.resources_sell_price[amount]
-			if(_type == "spice"):
-				price += 1
 			return price
 		if(_type in self.goods):
 			amount = self.market[_type] + 1
 			if(amount < 2):
-				price = 1000
-			if(amount >= 19):
+				price = 10000
+				return price
+			if(amount >= 21):
 				price = 2
 				return price
 			else:
@@ -146,27 +162,30 @@ class Market(object):
 		if(_type in self.resources):
 			amount = self.market[_type]
 			if(amount < 1):
-				price = 6
-				if(_type == "spice"):
-					price += 1
-					return price
-			if(amount >= 16):
+				price = 7
+				return price
+			elif(amount > 21 and amount <= 26):
 				price = 1
-				if(_type == "spice"):
-					price += 1
+				return price
+			elif(amount > 26):
+				price = 0
 				return price
 			else:
 				price = self.resources_sell_price[amount]
-			if(_type == "spice"):
-				price += 1
-			return price
+				return price
 		if(_type in self.goods):
 			amount = self.market[_type]
 			if(amount < 1):
 				price = 8
 				return price
-			if(amount >= 19):
+			if(amount >= 22 and amount < 26):
 				price = 2
+				return price
+			if(amount >= 26 and amount <= 30):
+				price = 1
+				return price
+			if(amount > 30):
+				price = 0
 				return price
 			else:
 				price = self.goods_sell_price[amount]
@@ -183,6 +202,9 @@ class Market(object):
 	def sell_item(self, _type, player):
 		amount = int(input("How many %s do you wish to sell? \n" % (_type)))
 		price = self.total_sell_price(_type, amount)
+		if price == 0:
+			print("The market cannot buy any more of that resiurce at this time \n")
+			return
 		ok = input("Selling %s %s will make you %s gold, is this okay? (y/n) \n" % (amount, _type, price ))
 		if ok == "n":
 			self.market[_type] += amount

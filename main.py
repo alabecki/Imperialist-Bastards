@@ -67,17 +67,27 @@ while True:
 	_continue = True
 	while(_continue == True):
 		turn +=1
+		print("\n Turn: %s \n" % (turn))
 		print("Gold in market: %s \n" % (market.gold))
 		for k, v in market.market.items():
 			print (k, v)
+		print("Players len: %s " % (len(players)))
 		cont = input()
-		for player in players.values():
-			if type(player) == AI:
-				AI_turn(player, market, turn)
-			if type(player) == Human:
+		order = list(players.keys())
+		print("order len %s" % (len(order)))
+		shuffle(order)
+		for o in order:
+			if type(players[o]) == AI:
+				AI_turn(players, players[o], market, turn, uncivilized_minors)
+			else:
+				player = players[o]
+		#for player in players.values():
+		#	if type(player) == AI:
+		#		AI_turn(players, player, market, turn)
+		#	if type(player) == Human:
 
-				for k, v in player.goods_produced.items():
-					v = 0
+		#		for k, v in player.goods_produced.items():
+		#			v = 0
 
 				print("################################################################################################################### \n ")
 				print("%s, it is your turn to exploit the globe for the greatness of your nation \n" % (player.name))
@@ -185,9 +195,25 @@ while True:
 								if player.name in v.relata:
 									pprint(vars(v))
 					if command == "2":
-						player.assign_POP()
+						print("How would you like to manage your population? ################################################\n")
+						_choices = list(range(1, 4))
+						choices = ''.join(str(e) for e in _choices)
+						while (choice not in choices):
+							for k, v in manage_pops.items():
+								print("%s: %s" % (k,v))
+						choice = input()
+						if choice == "1":
+							player.increase_pop()
+						if choice == "2":
+							player.increase_middle_class()
+						if choice == "3": 
+							player.assign_POP()
+						if choice =="4":
+							player.setMiddleClassPriorities()
+
+
 					if command == "3":
-						print("What will be the means of production? #######################################################################################  \n")
+						print("What will be the means of production? \n")
 						means = " "
 						_choices = list(range(1, 5))
 						choices = ''.join(str(e) for e in _choices)
@@ -250,7 +276,7 @@ while True:
 							kind = " "
 							while kind not in build_factory.keys():
 								kind = input()
-							player.build_factory(build_factory[kind])
+							player.build_factory(build_factory[kind], market)
 						elif sort == "3":
 							player.improve_fortifications()
 						elif sort == "4":
@@ -269,13 +295,17 @@ while True:
 						if action == "1":
 							print("On what nation would you like to declare war? ############################################################################## \n")
 							for k , v1 in players.items():
-								print(v1.name)
+								if len(v1.provinces) > 0:
+									print(v1.name)
 							other = " "
 							while other not in player.keys():
 								other = input()
 							other = players[other]
 							if(other.name not in player.CB):
 								print("You do not have a casus belli againt %s \n" % (other.name))
+							if(other.type == "old_empire" or other.type == "old_minor"):
+								if player.colonization < 1 + player.num_colonies:
+									print("You are not yet able to gain a colony, so you will not be able to annex any territory")
 							else:
 								if(other.name in player.borders):
 									print("Since you border %s, you may attack directly by land \n" % (other.name))
@@ -348,18 +378,25 @@ while True:
 									players[other].stability += 1
 									player.relations["CB"].delete(other)
 
+				
 						if action == "3":
 							if(player.colonization < 1.0 + player.num_colonies):
-								print("You do not have enough colonization points to get a new colony ####################################################### \n")
+								print("You do not have enough colonization points to get a new colony \n")
 							else:
+								count = 0
 								for k, unciv in uncivilized_minors.items():
-									print(unciv.name)
-								print("On what minor uncivilized nation would you like to wage war? \n")
-								other = " "
-								while other not in uncivilized_minors.keys():
-									other = input()
-								combat_against_uncivilized(player, uncivilized_minors[other])
-								player.reputation -= 0.1
+									if len(unciv.provinces) > 0:
+										print(unciv.name)
+										count += 1
+								if count == 0:
+									print("All of the uncivilized nations have already been conquored!")
+								else:
+									print("On what minor uncivilized nation would you like to wage war? \n")
+									other = " "
+									while other not in uncivilized_minors.keys():
+										other = input()
+									combat_against_uncivilized(player, uncivilized_minors[other])
+									player.reputation -= 0.1
 
 					if command == "6":
 						print("Please choose a Nation: ###################################################################################################### \n" )
@@ -446,9 +483,16 @@ while True:
 							if player.diplo_action < 1:
 								print("You do not have any dioplomatic actions \n")
 							else:
-								amount = random.random()/2
+								amount = 0
+								if other.type == "old_empire" or other.type == "old_minor":
+									amount = random()/1.5
+								else:
+									amount = random()/3
 								other.stability -= amount
+								if other.stability < -3.0:
+									other.stability = -3.0
 								player.diplo_action -=1
+								player.reputation -= 0.1
 								print("The stability of %s has been reduced by %s and is now %s \n" % (other.name, amount, other.stability ))
 						else:
 								print ("This feathre has not been added yet \n")
@@ -469,10 +513,8 @@ while True:
 							while _type not in market.market.keys():
 								_type = input("What would you like to sell? \n")
 							market.sell_item(_type, player)
+			
 					if command == "9":
-						print(" ######################################################################################################################### \n ")
-						player.setMiddleClassPriorities()
-					if command == "10":
 						print("####################################################################################################################### \n ")
 						check = input("Are you sure you want to end your turn? y/n \n")
 						if check == "y":
@@ -480,7 +522,7 @@ while True:
 							break
 						else:
 							continue
-					if command == "11":
+					if command == "10":
 						print("Would you like to make a new save? (If you have not created a save for this game yet, you should certainly choose yes) (y/n) \n")
 						yn = input()
 						if yn == "y":
@@ -489,7 +531,7 @@ while True:
 							save_name = input("Please write in the name of the save file (without file extension) \n")
 							save_game(file_name, players, relations, uncivilized_minors, market)
 
-					if command == "12":
+					if command == "11":
 						_continue = False
 						break
 

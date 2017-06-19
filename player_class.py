@@ -45,19 +45,20 @@ class Player(object):
 		self.name = _name
 		self.number = number
 		self.stability = 0.0
-		self.stability_mod = 1.0
-		self.AP = 2.0
+		self.stability_mod = 0.0
+		self.AP = 0.0
 
 		self.provinces = {}
 		self.borders = set()
 
 		#General POP Attributes
-		self.POP = 6.1
+		self.POP = 5.8
 		self.POP_growth_mod = 1.0
 		self.freePOP = 5.0
 		self.proPOP = 0.0
 		self.production_modifier = 1.0
-		self.milPOP = 0.6
+		self.milPOP = 0.8
+		self.POP_increased = 0
 
 		self.midPOP = {
 		"researchers": {"number": 0.0, "priority": 0.2},
@@ -68,7 +69,7 @@ class Player(object):
 		}
 
 		self.midGrowth = True
-		self.numMidPOP = 0.5
+		self.numMidPOP = 0.0
 		self.numLowerPOP = 5.0
 
 		#Good and Resources
@@ -85,10 +86,10 @@ class Player(object):
 
 		self.goods = {
 			"parts": 0.0,
-			"clothing": 1.0,
-			"paper": 1.0,
-			"cannons": 0.5,
-			"furniture": 0.5,
+			"clothing": 0.0,
+			"paper": 0.0,
+			"cannons": 0.0,
+			"furniture": 0.0,
 			"chemicals": 0.0
 		}
 
@@ -172,7 +173,7 @@ class Player(object):
 			"ammo_use": 0.2
 			}
 
-		self.colonization = 0.5
+		self.colonization = 0.0
 		self.num_colonies = 0
 
 		self.fortification = 1.0
@@ -216,159 +217,56 @@ class Player(object):
 		for k, p in self.goods_produced.items():
 			print("%s: %s " % (k, p))
 			self.goods[k] += p
-		for k in goods_produced.keys():
+		for k in self.goods_produced.keys():
 			self.goods_produced[k] = 0
 		#self.goods_produced = dict.fromkeys(self.goods_produced, 0)
 
 
-	def calMaintenance(self):
-		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.3) + self.military["cavalry"] * 0.1
-		mClothing = (self.numLowerPOP * 0.1) + (self.numMidPOP * 0.2)
-		mFurniture = (self.numLowerPOP * 0.05) + (self.numMidPOP * 0.2)
-		mPaper = (self.numMidPOP * 0.4)
-		mSpice = (self.numMidPOP * 0.3)
-		mArms = (self.midPOP["officers"]["number"] * 0.3)
-		return [mFood, mClothing, mFurniture, mPaper, mSpice, mArms]
-
 	def payMaintenance(self):
-		temp = self.calMaintenance()
-		stab_change = 0
-		if(self.resources["food"] < temp[0]):
-			self.freePOP -= (self.resources["food"] - temp[0])
-			self.stability -= 0.1
-			stab_change -= 0.1
+		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.4) + self.military["cavalry"] * 0.1
+		if(self.resources["food"] < mFood ):
+			self.freePOP -= (self.resources["food"] - mFood)
+			self.stability -= 0.25
 			if self.stability < -3.0:
 				self.stability = -3.0
 			self.resources["food"] = 0.0
 			self.midGrowth = False
 		else:
-			self.resources["food"] -= temp[0]
-		if(self.goods["clothing"] < temp[1]):
-			self.stability -= 0.05
-			stab_change -= 0.05
-			if self.stability < -3.0:
-				self.stability = -3.0
-			self.goods["clothing"] = 0.0
-			self.midGrowth = False
-		else:
-			self.goods["clothing"] -= temp[1]
-			self.new_development += temp[1] * 0.1
-		if(self.goods["furniture"] < temp[2]):
-			self.stability -= 0.05
-			stab_change -= 0.05
-			if self.stability < -3.0:
-				self.stability = -3.0
-			self.midGrowth = False
-			self.goods["furniture"] = 0.0
-		else:
-			self.goods["furniture"] -= temp[2]
-			self.new_development += temp[2] * 0.1
-		if(self.goods["paper"] < temp[3]):
-			self.stability -= 0.05
-			stab_change -= 0.05
-			if self.stability < -3.0:
-				self.stability = -3.0
-			self.goods["paper"] = 0.0
-			self.midGrowth = False
-		else:
-			self.goods["paper"] -= temp[3]
-			self.new_development += temp[3] * 0.1
-		if(self.resources["spice"] < temp[4]):
-			stability -= 0.075
-			stab_change -= 0.075
-			if self.stability < -3.0:
-				self.stability = -3.0
-			self.resources["spice"] = 0.0
-			self.midGrowth = False
-		else:
-			self.resources["spice"] -= temp[4]
-			self.new_development += temp[4] * 0.1
-		if(self.goods["cannons"] < temp[5]):
-			temp = self.numMidPOP["officers"]["number"] * 0.9
-			self.numMidPOP["officers"]["number"] -= temp
-			self.numMidPOP -= temp
-			self.freePOP += temp
-		else:
-			self.goods["cannons"] -= temp[5]
-			self.new_development += temp[5] * 0.1
+			self.resources["food"] -= mFood
+
 		if(self.resources["coal"] < 0.25 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
-			while(self.resources["coal"] >= 0.3 ):
+			while(self.resources["coal"]  >= 0.3 ):
 				for k, prov in self.provinces.items():
 					if(prov.development_level == 1):
-						self.resources["coal"] -= 0.25
-						self.provinces[prov].powered = True
+						self.resources["coal"]  -= 0.25
+						self.provinces[k].powered = True
 					elif(prov.development_level == 2):
-						self.resources["coal"] -= 0.5
-						self.provinces(prov).powered = True
+						self.resources["coal"]  -= 0.5
+						self.provinces[k].powered = True
 		else:
 			self.resources["coal"] -= self.number_developments * 0.25
 			for k, prov in self.provinces.items():
-				prov.powered = True
+				self.provinces[k].powered = True
+
 		#return stab_change
 
-
-	def popChange(self):
-		if(self.resources["food"] > 0.5):
-			change =  self.POP * 0.02
-			if(self.stability > 0):
-				stab_rounds = round(self.stability * 2) / 2
-				change += (self.POP * 0.02) * (stability_map[stab_rounds] * self.POP_growth_mod)
-			mChemicals = (self.numMidPOP * 0.15)
-			if(self.goods["chemicals"] >= mChemicals):
-				self.goods["chemicals"] -= mChemicals
-				change += 0.1 * self.numMidPOP
-			self.freePOP += change
-			self.numLowerPOP += change
-			self.POP += change
-			print("Population changed by %s " % (change))
-
-	def popMidChange(self):
-		if(self.stability < -2):
-			return
-		if(self.midGrowth == False):
-			return
-		else:
-			stab_rounds = round(self.stability * 2) / 2
-			change = 0.1 + ((self.midPOP["bureaucrats"]["number"]/3) + (self.midPOP["researchers"]["number"]/5))* stability_map[stab_rounds]
-			self.numMidPOP += change
-			self.POP += change
-			print("Middle Class population change: %s \n" % (change))
-			for key, value in self.midPOP.items():
-				value["number"] += change * value["priority"]
-				print("%s increased by %s" % (key, change * value["priority"]))
-
-
-
-
 	def turn(self):
+		stab_rounds = round(self.stability * 2) / 2
 		self.collect_resources()
 		self.collect_goods()
 		self.payMaintenance()
-		stab_change1 = (self.numLowerPOP * 0.01) + (self.numMidPOP * 0.02)
-		print("Stab change 1 " + str(stab_change1))
-		self.stability -= (stab_change1)
-		print("Stab modifier: " + str(self.stability_mod))
-		stab_change2 = ((self.midPOP["bureaucrats"]["number"]/6) + (self.midPOP["artists"]["number"]/3)) * self.stability_mod
-		print("Stab change 2 " + str(stab_change2))
-		stab_rounds = round(self.stability * 2) / 2
-		self.stability += stab_change2
-		if self.stability < -3.0:
-			self.stability = -3.0
+		self.stability += self.midPOP["artists"]["number"] * 0.25
 		if self.stability > 3.0:
 			self.stability = 3.0
-		#total_stab_change = stab_change2 - (stab_change1 + stab_change0)
-		#print("Stability changes by: %s" % (total_stab_change))
-		self.popChange()
-		self.popMidChange()
 		self.AP = int(self.proPOP) * self.production_modifier
-		research_gain = ((0.2 + (self.midPOP["researchers"]["number"] * 1.0) + (self.midPOP["managers"]["number"] * 0.25))) * stability_map[stab_rounds]
-		research_gain = research_gain * self.techModifier
+		research_gain = 0.3 + self.midPOP["researchers"]["number"] * 0.6 * stability_map[stab_rounds] * self.techModifier
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
-		diplo_gain = 0.2 + (self.midPOP["bureaucrats"]["number"]) * self.reputation
+		diplo_gain = 0.15 + ((self.midPOP["bureaucrats"]["number"]) * self.reputation)/2
 		self.diplo_action += diplo_gain
 		print("Diplo_action gain: %s " % (diplo_gain))
-		col_gain =  ((self.military["frigates"] + self.military["iron_clad"])/5 + self.midPOP["bureaucrats"]["number"]/2)
+		col_gain =  ((self.military["frigates"] + self.military["iron_clad"])/6 + self.midPOP["bureaucrats"]["number"]/4)
 		self.colonization += col_gain
 		print("Colonization point gain: %s" % (col_gain))
+		self.POP_increased = 0

@@ -2,6 +2,9 @@
 from player_class import Player
 from empire_class import Empire
 from technologies import*
+from human import Human
+from AI import AI
+#from AI_foreign_affairs import*
 
 import random
 from pprint import pprint
@@ -9,6 +12,8 @@ from copy import deepcopy
 
 #
 def combat(p1, p2):
+	print("War has broken out between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
+	cont = input()
 	att_initial_army = calculate_number_of_units(p1)
 	def_initial_army = calculate_number_of_units(p2)
 	while(True):
@@ -48,9 +53,12 @@ def combat(p1, p2):
 		def_number_units_army = distribute_losses(p2, def_losses, def_number_units_army)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_army, p2.name, def_number_units_army))
 		done = False
+		print("att_initial_army: %s, def_initial_army: %s \n" % (att_initial_army, def_initial_army))
 		if(att_number_units_army < att_initial_army * 0.4):
 			done = True
 		if(def_number_units_army < def_initial_army * 0.3):
+			done = True
+		if att_number_units_army < 1 or def_number_units_army < 1:
 			done = True
 		if(done == True):
 			if att_number_units_army > def_number_units_army:
@@ -60,11 +68,16 @@ def combat(p1, p2):
 				combat_outcome(p2.name, p1, p2)
 				return
 		else:
-			if p1.human == "human":
+			if type(p1) == Human:
 				cont = input("%s, you currently have %s units, the enemy has %s units, would you like to continue the assult? (y,n)" \
 				% (p1.name, att_number_units_army, def_number_units_army))
 				if(cont == "n"):
 					print("%s has given up the assult in %s and has retreated \n" % (p1.name, p2.name))
+					return
+			if type(p1) == AI:
+				att_str = calculate_base_attack_strength(p1)
+				def_str = calculate_base_defense_strength(p2)
+				if att_str * 0.85 < def_str:
 					return
 
 
@@ -110,6 +123,7 @@ def distribute_losses(player, losses, num_units):
 		if(player.military["irregulars"] >= 0.5):
 			player.military["irregulars"] -= 0.5
 			num_units -= 0.5
+			#player.num_units -=0.5
 			player.POP -= 0.075
 			player.milPOP -= 0.075
 			player.numLowerPOP -= 0.075
@@ -119,6 +133,7 @@ def distribute_losses(player, losses, num_units):
 			if(player.military["infantry"] >= 0.5):
 				player.military["infantry"] -= 0.5
 				num_units -= 0.5
+				#player.num_units -=0.5
 				player.POP -= 0.075
 				player.milPOP -= 0.075
 				player.numLowerPOP -= 0.075
@@ -129,6 +144,7 @@ def distribute_losses(player, losses, num_units):
 			if(player.military["cavalry"] >= 0.5):
 				player.military["cavalry"] -= 0.5
 				num_units -= 0.5
+				#player.num_units -=0.5
 				player.POP -= 0.075
 				player.milPOP -= 0.075
 				player.numLowerPOP -= 0.075
@@ -139,6 +155,7 @@ def distribute_losses(player, losses, num_units):
 			if(player.military["artillery"] >= 0.5):
 				player.military["artillery"] -= 0.5
 				num_units -= 0.5
+				#player.num_units -=0.5
 				player.POP -= 0.075
 				player.milPOP -= 0.075
 				player.numLowerPOP -= 0.075
@@ -156,6 +173,7 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 				player.military["infantry"] -=0.5
 				current_makeup[0] -= 0.5
 				num_units -= 0.5
+				#player.num_units -=0.5
 				player.POP -= 0.075
 				player.milPOP -= 0.075
 				player.numLowerPOP -= 0.075
@@ -164,6 +182,7 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 			if(current_makeup[1] > 0.5):
 				player.military["cavalry"] -= 0.5
 				current_makeup[1] -= 0.5
+				#player.num_units -=0.5
 				#def_losses -= 1
 				player.POP -= 0.075
 				player.milPOP -= 0.075
@@ -174,6 +193,7 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 				player.military["artillery"] -= 0.5
 				current_makeup[2] -= 0.5
 				num_units -= 0.5
+				#player.num_units -=0.5
 				player.POP -= 0.075
 				player.milPOP -= 0.075
 				player.numLowerPOP -= 0.075
@@ -187,7 +207,7 @@ def combat_outcome(winner, p1, p2):
 		if p1.stability > 3:
 			p1.stability = 3
 		p1.CB.discard(p2.name)
-		if(type(p2) == Empire or type(p2) == Old_minor):
+		if(p2.type == "empire" or p2.type == "old_minor"):
 			old_empire_defeat(p1, p2)
 		loot = p2.resources["gold"]/2.0
 		p1.resources["gold"] += loot
@@ -202,25 +222,36 @@ def combat_outcome(winner, p1, p2):
 		if p1.stability > 3.0:
 			p1.stability = 3.0
 		print("%s has repelled %s's pitiful invasion! \n" % (p1.name, p2.name))
-		if p2.human == "yes":
+		if type(p2) == Human:
 			cont = input("Does %s wish to (1) remain at war with %s, or to make a white pease? " % (p2.name, p1.name))
 			if(cont == "1"):
 				return
 			if(cont == "2"):
-				if p1.human == "yes":
+				if type(p1) == Human:
 					res = input("Does %s accept %s's offer of a white pease? (y/n) \n" % (p2.name))
 					if(res == "y"):
 						Print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
 						p1.CB.remove(p2.name)
+		else:
+			Print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
+			p1.CB.remove(p2.name)
 
 
 def old_empire_defeat(p1, p2):
 	win_name = p1.name
 	loss_name = p2.name
-	print("%s has defeated the Old Empre (or Old_minor) %s and may now claim one of her provinces \n" % (win_name, loss_name))
-	for k, p in p2.provinces.items():
-		pprint (vars(p))
-	annex = input("Please type in the name of the province you would like to take \n")
+	annex = " "
+	if type(p1) == Human:
+		print("%s has defeated the Old Empre (or Old_minor) %s and may now claim one of her provinces \n" % (win_name, loss_name))
+		for k, p in p2.provinces.items():
+			pprint (vars(p))
+		annex = input("Please type in the name of the province you would like to take \n")
+	if type(p1) == AI:
+		priorities = sorted(p1.resource_priority, key= p1.resource_priority.get, reverse = True) 
+		for r in priorities:
+			for p, prov in p2.provinces.items():
+						if r == prov.resource:
+							annex = p 
 	new = deepcopy(p2.provinces[annex])
 	p1.provinces[new.name] = new
 	p1.provinces[new.name].type = "colony"
@@ -234,26 +265,21 @@ def old_empire_defeat(p1, p2):
 	p2.POP -= 1
 	p2.numLowerPOP -= 1
 	p2.stability -= 0.5
-	if p1.stability < -3.0:
-		p1.stability = -3.0
+	if p2.stability < -3.0:
+		p2.stability = -3.0
+	if len(p2.provinces) == 0:
+		print("%s no longer exists as a nation!")
 
-	print(annex + " is now in its proper place in your empire! \n")
+	print(annex + " is now part of " + p1.name)
 
 
 def combat_against_uncivilized(player, unciv):
-	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
-	correct = False
-	print("Your transport capacity is %s" % (transport_limit))
-	while correct == False:
-		amount = input("How many do you want to send of each of the following? \
-		infantry, cavalry, and artillery (three numbers seprated by a space each) \n").split()
-		amount = [int(x) for x in amount]
-		if sum(amount) > transport_limit:
-			print("The amount you specified exceeds your capacity \n")
-		elif amount[0] > player.military["infantry"] or amount[1] > player.military["cavalry"] or amount[2] > player.military["artillery"]:
-			print("You do not have have that many units \n")
-		else:
-			correct = True
+	print("The nation of %s is attacking %s !__________________________________________________" % (player.name, unciv.name))
+	cont = input()
+	if type(player) == Human:
+		amount = naval_transport(player)
+	if type(player) == AI:
+		amount = ai_transport_units(player)
 
 	player_initial_army = sum(amount)
 	player_initial_makeup = amount
@@ -304,9 +330,9 @@ def combat_against_uncivilized(player, unciv):
 					player.provinces[k] = prov
 					player.provinces[k].type = "colony"
 					player.provinces[k].worked = False
-					player.colonization -= 1 + player.num_colonies
-					player.num_colonies +=1
-					print("%s is now in possession of %s, which produces %s \n" % (player.name, prov.name, prov.resource))
+				player.colonization -= 1
+				player.num_colonies +=1
+				print("%s is now in possession of %s, which produces %s \n" % (player.name, prov.name, prov.resource))
 				unciv.provinces.clear()
 				return
 			else:
@@ -317,10 +343,15 @@ def combat_against_uncivilized(player, unciv):
 				unciv.number_irregulars += 1
 				return
 		else:
-			if player.human == "human":
+			if type(player) == Human:
 				cont = input("%s, you currently have %s units, the enemy has %s units, would you like to continue the assult? (y,n)" \
 				% (player.name, str(player_number_units_army), str(number_irregulars)))
 				if(cont == "n"):
+					return
+			if type(player) == AI:
+				player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
+				unciv_strength = unciv.number_irregulars * 0.65
+				if player_str * 0.85 < unciv_strength:
 					return
 
 
@@ -382,16 +413,20 @@ def amph_combat(p1, p2, p1_forces):
 				combat_outcome(p2.name, p1, p2)
 				return
 		else:
-			if p1.human == "human":
+			if type(p1) == Human:
 				cont = input("%s, you currently have %s units, the enemy has %s units, would you like to continue the assult? (y,n)" \
 				% (p1.name, att_number_units_army, def_number_units_army))
 				if(cont == "n"):
 					break
-
+			if type(p1) == AI:
+				player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
+				def_str = calculate_base_defense_strength(p2)
+				if player_str * 0.85 < def_str:
+					return
 
 
 def naval_transport(p1):
-	transport_limit = (p1.military["frigates"] * 2) + (p1.military["iron_clad"] *2)
+	transport_limit = int((p1.military["frigates"] * 2) + (p1.military["iron_clad"] *2))
 	correct = False
 	print("check")
 	print("Your transport capacity is %s" % (transport_limit))
@@ -406,6 +441,30 @@ def naval_transport(p1):
 		else:
 			correct = True
 	return amount
+
+
+def ai_transport_units(player):
+	transport_limit = int((player.military["frigates"] * 2) + (player.military["iron_clad"] *2))
+	forces = [0, 0, 0]
+	for i in range(transport_limit):
+		flag = False
+		tries = 0
+		while flag == False and tries < 12:
+			type = random.choice(["infantry", "cavalry", "artillery"])
+			if type == "infantry":
+				if player.military["infantry"] - forces[0] >= 1:
+					forces[0] += 1
+					flag = True
+			if type == "cavalry":
+				if player.military["cavalry"] - forces[1] >= 1:
+					forces[1] += 1
+					flag = True
+			if type == "artillery":
+				if player.military["artillery"] - forces[2] >= 1:
+					forces[2] += 1
+					flag = True
+			tries += 1
+	return forces
 
 
 def calculate_number_of_ships(player):
@@ -449,6 +508,7 @@ def calculate_ammo_needed_navy(player):
 
 
 def naval_battle(p1, p2):
+	print("Naval Battle!!!!__________________________________________________________________________________")
 	winner = ""
 	att_initial_navy = calculate_number_of_ships(p1)
 	def_initial_navy = calculate_number_of_ships(p2)
@@ -478,10 +538,19 @@ def naval_battle(p1, p2):
 			winner = p1.name
 			return winner
 		else:
-			if p1.human == "human":
+			if type(p1) == Human:
 				cont = input("%s, you currently have %s units, the enemy has %s units, would you like to continue the assult? (y,n)" \
 				% (p1.name, att_number_units_navy, def_number_units_navy))
-			if(cont == "n"):
-				return p2.name
-			if cont == "y":
-				continue
+				if(cont == "n"):
+					return p2.name
+				if cont == "y":
+					continue
+			if type(p2) == AI:
+				att_str = calculate_naval_strength(p1)
+				def_str = calculate_naval_strength(p2)
+				if att_str * 86 < def_str:
+					return p2.name
+				else:
+					continue
+
+

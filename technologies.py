@@ -10,8 +10,10 @@
 
 
 technology_dict = {
+
+	"professional_armies": {"requirement": "pre_industry_1", "cost": 1},
 	"pre_industry_1": { "requirement": "any", "cost": 1},
-	"pre_industry_2": {"requirement": "pre_industry_1", "cost": 1},
+	"pre_industry_2": {"requirement": "pre_industry_1", "cost": 2},
 	"high_pressure_steam_engine": {"requirement": "pre_industry_2", "cost": 1},
 	"square_timbering": {"requirement": "high_pressure_steam_engine", "cost": 1},
 	"cotton_gin": {"requirement": "pre_industry_2", "cost": 1},
@@ -19,7 +21,7 @@ technology_dict = {
 	"saw_mill": {"requirement": "high_pressure_steam_engine", "cost": 1},
 	"cement": {"requirement": "square_timbering", "cost": 1.5},
 	"bessemer_process": {"requirement": "high_pressure_steam_engine", "cost": 1.5},
-	"muzzle_loaded_arms": {"requirement": "pre_industry_2", "cost": 1.0},
+	"muzzle_loaded_arms": {"requirement": "professional_armies", "cost": 1.0},
 	"breach_loaded_arms": {"requirement": "bessemer_process", "cost": 2.0},
 	"machine_guns": {"requirement": "mechanical_reaper", "cost": 2.5},
 	"indirect_fire": {"requirement": "iron_clad", "cost": 3.0},

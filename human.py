@@ -31,6 +31,66 @@ class Human(Player):
 			"chemicals": 0.0
 		}
 
+	def increase_pop(self):
+		med = False
+		if(self.POP_increased > 1):
+			print("You have already increased your population as much as possible this turn \n")
+			return
+		if(self.POP_increased == 1.0):
+			print("You will need to consume a chemical (medicine) to increase your POP again \n")
+			if self.goods["chemicals"] < 1:
+				print("You do not have any chemicals")
+				return
+			else:
+				med = input("Are you willing to spend medicine to increase your population? (y/n)\n")
+				if med == "n":
+					return
+				else:
+					med = True
+		if(self.resources["food"] < 1.0):
+			print("You do not have enough food to increase your population \n")
+			return
+		if(self.goods["clothing"] < 1.0):
+			print("You do not have enough clothing to increase your population \n")
+			return
+		else:
+			self.POP += 1.0
+			self.freePOP += 1.0
+			self.numLowerPOP += 1
+			self.resources["food"] -= 1.0
+			self.goods["clothing"] -= 1.0
+			self.increase_pop += 1
+			if med == True:
+				self.goods["medicine"] -= 1.0
+			print("Your nation now has a population of %s with %s free POPS \n" % (self.POP), self.freePOP)
+			return
+
+	def increase_middle_class(self):
+		if(self.freePOP < 0.5):
+			print("You do not have any free POPs")
+			return
+		elif(self.goods["furniture"] < 1.0):
+			print("You do not have any furniture \n")
+			return
+		elif(self.resources["spice"] < 1.0):
+			print("You do not have any spice \n")
+			return
+		elif(self.goods["paper"] < 1.0):
+			print("You do not have any paper \n")
+
+		_type = input("What kind of middle class POP would you like to create?: researchers officers  \
+			bureaucrats artists managers \n")
+		if(self.midPOP[_type] > 1.6):
+			print("You have already created as many %s a permitted \n")
+			return
+		self.resources["spice"] -= 1.0
+		self.goods["furniture"] -= 1.0
+		self.numLowerPOP -= 0.5
+		self.numMidPOP += 0.5
+		self.midPOP[_type] += 0.5
+		self.freePOP -= 0.5
+		self.new_development += 1.0
+
 
 	def research_tech(self):
 			print("Which Technology would you like to develop? (Print entire name) \n")
@@ -99,6 +159,17 @@ class Human(Player):
 			if(choice == "radio"):
 				self.stability_mod += 0.15
 
+	def spice_to_stability(self):
+		if self.resources["spice"] > 2:
+			print("You do not have enough spice raise your stability")
+			return
+		if self.stability >= 3:
+			print("Your stability cannot be further increased")
+		else:
+			self.resources["spice"] -=2
+			self.stability +1
+			if self.stability > 3:
+				self.stability = 3
 
 	def assign_POP(self):
 		kind = " "
@@ -163,8 +234,18 @@ class Human(Player):
 					self.freePOP += 1
 					print("You now have %s free POPS  and %s POPs working in production\n " % (self.freePOP, self.proPOP))
 
+	def use_spice_stability(self):
+		if self.resources["spice"] < 2:
+			print("You do not have enough spice")
+		else:
+			self.resources["spice"] -=2
+			self.stability +1
+			if self.stability > 3:
+				self.stability = 3
+
+
 	def build_unit(self):
-		if(self.freePOP < 0.15):
+		if(self.freePOP < 0.2):
 			print("You do not have enugh free POPs to build a unit \n")
 			return
 			if(self.goods["cannons"] < 1):
@@ -190,44 +271,35 @@ class Human(Player):
 			return
 
 	def build_infantry(self):
-		if(self.goods["clothing"] < 0.15):
-			print("You do not have enough clothing to build Infantry \n")
-			return
-		self.goods["clothing"] -= 0.15
-		self.freePOP -= 0.15
-		self.milPOP += 0.15
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
 		self.goods["cannons"] -= 1.0
 		self.military["infantry"] += 1.0
+		self.num_units += 1.0
 		print("You now have %s Infantry \n" % (self.military["infantry"]))
 
 	def build_cavalry(self):
-		if(self.goods["clothing"] < 0.1):
-			print("You do not have enough clothing to build cavalry \n")
-			return
-		elif(self.resources["food"] < 0.1):
+		if(self.resources["food"] < 1):
 			print("You do not have enough Food to build cavalry \n")
 			return
 		else:
-			self.resources["food"] -= 0.15
-			self.freePOP -= 0.15
-			self.milPOP += 0.15
+			self.resources["food"] -= 1
+			self.freePOP -= 0.2
+			self.milPOP += 0.2
 			self.goods["cannons"] -= 1.0
-			self.goods["clothing"] -= 0.1
 			self.military["cavalry"] += 1.0
+			self.num_units += 1.0
 			print("You now have %s cavalry \n" % (self.military["cavalry"]))
 
 	def build_artillery(self):
-		if(self.goods["clothing"] < 0.1):
-			print("You do not have enough clothing to build artillery \n")
-			return
 		if(self.goods["cannons"] < 2.0):
 			print("You do not have enough cannons to build artillery \n")
 			return
 		self.goods["cannons"] -= 2.0
-		self.goods["clothing"] -= 0.1
-		self.freePOP -= 0.15
-		self.milPOP += 0.15
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
 		self.military["artillery"] += 1.0
+		self.num_units += 1.0
 		print("You now have %s artillery \n" % (self.military["artillery"]))
 
 	def build_frigates(self):
@@ -249,8 +321,9 @@ class Human(Player):
 			self.resources["cotton"] -= 1.0
 			self.resources["wood"] -= 1.0
 			self.military["frigates"] += 1.0
-			self.freePOP -= 0.15
-			self.milPOP += 0.15
+			self.freePOP -= 0.2
+			self.milPOP += 0.2
+
 			print("You now have %s frigates \n" % (self.military["frigates"]))
 			return
 
@@ -275,13 +348,13 @@ class Human(Player):
 			self.resources["iron"] -= 1.0
 			self.goods["parts"] -= 1.0
 			self.military["iron_clad"] += 1
-			self.freePOP -= 0.15
-			self.milPOP += 0.15
+			self.freePOP -= 0.2
+			self.milPOP += 0.2
 			print("You now have %s \n" % (self.military["iron_clad"]))
 			return
 
 
-	def build_factory(self, _type):
+	def build_factory(self, _type, market):
 		if(self.new_development < 1):
 			print("You do not have any Development Points to spend \n")
 			return
@@ -302,7 +375,8 @@ class Human(Player):
 			self.resources["iron"] -= 1.0
 			self.goods["parts"] -= 1.0
 			self.factories.add(_type)
-			self.stability_mod -= 0.05
+			market.global_factories[_type] += 1
+			self.stability -= 0.5
 			self.new_development -= 1
 			print("You have constructed a %s factory \n" % (_type))
 			return
@@ -447,13 +521,13 @@ class Human(Player):
 			print("You do not have enough %s with which to make %s \n" % (craft[_type], _type))
 			return
 		else:
-			self.resources[craft[_type]] -= 1.2
+			self.resources[craft[_type]] -= 1.1
 			self.goods_produced[_type] += 1.0
 			self.AP -= 1
 			self.new_development -= 0.05
 			print("The  %s will be ready next turn \n" % (_type))
 			return
-#cannon
+
 
 	def factory_production(self):
 		manufacture = {
@@ -476,7 +550,7 @@ class Human(Player):
 			return
 		else:
 			max_amount = self.factory_throughput * stability_map[stab_rounds]
-			material_mod = 1 - (self.midPOP["managers"]["number"])/(self.proPOP*2)
+			material_mod = 1 - (self.midPOP["managers"]["number"] / 5)
 			if(_type == "parts"):
 				if("bessemer_process" in self.technologies):
 					max_amount = (self.factory_throughput + 4) * stability_map[stab_rounds]
@@ -538,30 +612,3 @@ class Human(Player):
 				forecast = (self.resources[key] + current_production) - need
 				print("Resource: %s, Current Supply: %s, Current Consumption: %s, Current Production: %s, New Turn Forecast %s \n" % \
 				(key, self.resources[key], need, current_production, forecast))
-		need = {
-			"clothing": (self.numLowerPOP * 0.1) + (self.numMidPOP * 0.2),
-			"furniture":(self.numLowerPOP * 0.05) + (self.numMidPOP * 0.2),
-			"paper":(self.numMidPOP * 0.3),
-			"cannons":(self.midPOP["officers"]["number"] * 0.3)
-			}
-		for key, value in self.goods.items():
-			if(key == "clothing" or key == "furniture" or key == "paper" or key == "cannons"):
-				print("Good: %s, Current Supply: %s, Current Consumption %s, Current Production: %s, New Turn Forecast %s \n" % \
-				(key, self.goods[key], need[key], self.goods_produced[key], ((self.goods[key] + self.goods_produced[key]) - need[key]) ))
-
-
-
-	def setMiddleClassPriorities(self):
-		middletypes = []
-		for k in self.midPOP.keys():
-			middletypes.append(k)
-		ordinal = 1
-		while ordinal < 6:
-			for t in middletypes:
-				print(t)
-			p =  " "
-			while p not in middletypes:
-				p = input("What is your %s st priority? \n" % (ordinal))
-			self.midPOP[p]["priority"] = m_priority_map[str(ordinal)]
-			middletypes.remove(p)
-			ordinal += 1

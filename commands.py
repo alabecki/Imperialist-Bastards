@@ -3,17 +3,16 @@
 
 commands = {
 	"1": "Get Information on...",
-	"2": "Assign POPS",
+	"2": "Manage POPs",
 	"3": "Manifacture Goods",
 	"4": "Build",
 	"5": "Military Actions",
 	"6": "Diplomatic Action",
 	"7": "Research Technology",
 	"8": "Trade",
-	"9": "Set Middle Class Priorities",
-	"10": "End Turn",
-	"11": "Save Game",
-	"12": "End Game"
+	"9": "End Turn",
+	"10": "Save Game",
+	"11": "End Game"
 }
 
 information = {
@@ -26,6 +25,13 @@ information = {
 	"7": "View Other Nations",
 	"8": "View My Technologies",
 	"9": "View My Relations with Other Nations"
+}
+
+manage_pops = {
+	"1": "Increase Population",
+	"2": "Increase Middle Class",
+	"3": "Assign POPs",
+	"4": "Set Middle Class Priorities"
 }
 
 foreign_intelligence = {
@@ -63,8 +69,8 @@ build_factory = {
 }
 
 military_action = {
-	"1": "Declare War (Land)",
-	"2": "Declare War (Colonial)",
+	"1": "Declare War another Nation!",
+	"2": "Declare Colonial War on a Major Power",
 	"3": "Conquer Uncivilized Nation (Gain Colony)"
 }
 

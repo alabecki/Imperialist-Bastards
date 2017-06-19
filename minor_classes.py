@@ -24,7 +24,7 @@ class Uncivilized_minor(object):
 		provinces = {}
 		self.irregulars = {
 			"attack": 0.5,
-			"defense": 0.625,
+			"defense": 0.65,
 			"manouver": 0.75,
 			"ammo_use": 0.025
 			}
