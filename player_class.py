@@ -35,16 +35,24 @@ m_priority_map = {
 	"5": 0.1
 }
 
+government_map = {
+	"despotism": 		0.75,
+	"absolute monarchy": 1.0,
+	"oligarchy":  1.25
+}
+
 class Player(object):
 
 	player_count = 0
 
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
-		self.type = _type
-		self.name = _name
+		self.type = _type				# major, old_empire, old_minor
+		self.name = _name	
 		self.number = number
 		self.stability = 0.0
+		self.government = ""
+
 		self.stability_mod = 0.0
 		self.AP = 0.0
 
@@ -53,7 +61,6 @@ class Player(object):
 
 		#General POP Attributes
 		self.POP = 5.8
-		self.POP_growth_mod = 1.0
 		self.freePOP = 5.0
 		self.proPOP = 0.0
 		self.production_modifier = 1.0
@@ -121,6 +128,10 @@ class Player(object):
 		self.reputation = 1.0
 		self.diplo_action = 0.0
 		self.CB = set()
+
+		#culture
+		self.culture_points = 0.0
+		self.culture_level = 0.0
 
 			#Military
 
@@ -193,24 +204,23 @@ class Player(object):
 			if(p.worked == True):
 				quality = p.quality
 				dev = p.development_level
-				if p.resource == "gold":
-					if p.powered == True:
-						gain = development_map[dev] * stability_map[stab_rounds] * p.quality * 5
-						print("%s gains %s %s" % (self.name, gain, p.resource))
-						self.resources[p.resource] += gain
-					else:
-						gain = stability_map[stab_rounds] * p.quality * 5
-						print("%s gains %s %s" % (self.name, gain, p.resource))
-						self.resources[p.resource] += gain
+				c_mod = 1.0
+				if p.culture != self.name:
+					c_mod = 0.8
+
+
+				if p.powered == True:
+					gain = development_map[dev] * stability_map[stab_rounds] * p.quality
+					print("%s gains %s %s" % (self.name, gain, p.resource))
+					if p.resource == "gold":
+						gain == gain * 5
+					self.resources[p.resource] += gain
 				else:
-					if p.powered == True:
-						gain = development_map[dev] * stability_map[stab_rounds] * p.quality
-						print("%s gains %s %s" % (self.name, gain, p.resource))
-						self.resources[p.resource] += gain
-					else:
-						gain = stability_map[stab_rounds] * p.quality
-						print("%s gains %s %s" % (self.name, gain, p.resource))
-						self.resources[p.resource] += gain
+					gain = stability_map[stab_rounds] * p.quality
+					print("%s gains %s %s" % (self.name, gain, p.resource))
+					if p.resource == "gold":
+						gain == gain * 5
+					self.resources[p.resource] += gain
 
 	def collect_goods(self):
 		print("%s collects: " % (self.name))
@@ -259,14 +269,15 @@ class Player(object):
 		self.stability += self.midPOP["artists"]["number"] * 0.25
 		if self.stability > 3.0:
 			self.stability = 3.0
+		self.culture_points += (0.1 + self.midPOP["artists"]["number"])
 		self.AP = int(self.proPOP) * self.production_modifier
-		research_gain = 0.3 + self.midPOP["researchers"]["number"] * 0.6 * stability_map[stab_rounds] * self.techModifier
+		research_gain = 0.3 + self.midPOP["researchers"]["number"] * stability_map[stab_rounds] * self.techModifier
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
-		diplo_gain = 0.15 + ((self.midPOP["bureaucrats"]["number"]) * self.reputation)/2
+		diplo_gain = 0.15 + (self.midPOP["bureaucrats"]["number"] * self.reputation)
 		self.diplo_action += diplo_gain
 		print("Diplo_action gain: %s " % (diplo_gain))
-		col_gain =  ((self.military["frigates"] + self.military["iron_clad"])/6 + self.midPOP["bureaucrats"]["number"]/4)
+		col_gain =  ((self.military["frigates"] + self.military["iron_clad"])/7 + self.midPOP["bureaucrats"]["number"]/5)
 		self.colonization += col_gain
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0

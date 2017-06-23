@@ -53,12 +53,16 @@ class Human(Player):
 		if(self.goods["clothing"] < 1.0):
 			print("You do not have enough clothing to increase your population \n")
 			return
+		if(self.goods["furniture"] < 1.0):
+			print("You do not have enough furniture to increase your population \n")
+			return
 		else:
 			self.POP += 1.0
 			self.freePOP += 1.0
 			self.numLowerPOP += 1
 			self.resources["food"] -= 1.0
 			self.goods["clothing"] -= 1.0
+			self.furniture["furniture"] -= 1.0
 			self.increase_pop += 1
 			if med == True:
 				self.goods["medicine"] -= 1.0
@@ -75,8 +79,12 @@ class Human(Player):
 		elif(self.resources["spice"] < 1.0):
 			print("You do not have any spice \n")
 			return
-		elif(self.goods["paper"] < 1.0):
-			print("You do not have any paper \n")
+		elif(self.goods["paper"] < 2.0):
+			print("You do not have enough paper \n")
+			return
+		elif(self.goods["clothing"] < 1.0):
+			print("You do not have enough clothing \n")
+			return
 
 		_type = input("What kind of middle class POP would you like to create?: researchers officers  \
 			bureaucrats artists managers \n")
@@ -85,10 +93,12 @@ class Human(Player):
 			return
 		self.resources["spice"] -= 1.0
 		self.goods["furniture"] -= 1.0
-		self.numLowerPOP -= 0.5
-		self.numMidPOP += 0.5
-		self.midPOP[_type] += 0.5
-		self.freePOP -= 0.5
+		self.goods["paper"] -= 2.0
+		self.goods["clothing"] -= 1.0
+		self.numLowerPOP -= 0.25
+		self.numMidPOP += 0.25
+		self.midPOP[_type] += 0.25
+		self.freePOP -= 0.25
 		self.new_development += 1.0
 
 

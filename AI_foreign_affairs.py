@@ -28,7 +28,7 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 		return
 	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
 	priorities = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True) 
-	if player.colonization < 1 + player.num_colonies or player.diplo_action < 1 or transport_limit < 4:
+	if player.colonization < (1 + player.num_colonies) or player.diplo_action < 1 or transport_limit < 4:
 		return
 	self_strength = calculate_base_attack_strength(player)
 	if self_strength < 3:

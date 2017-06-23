@@ -233,7 +233,7 @@ def combat_outcome(winner, p1, p2):
 						Print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
 						p1.CB.remove(p2.name)
 		else:
-			Print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
+			print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
 			p1.CB.remove(p2.name)
 
 
@@ -260,7 +260,7 @@ def old_empire_defeat(p1, p2):
 	p1.POP += 1
 	p1.numLowerPOP += 1
 	p1.reputation -= 0.1
-	p1.colonization -= 1
+	p1.colonization -= (1 + p1.num_colonies)
 	p1.num_colonies += 1
 	p2.POP -= 1
 	p2.numLowerPOP -= 1

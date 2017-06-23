@@ -12,7 +12,7 @@ class Province(object):
 		self.powered = False
 		self.quality = _quality
 		self.type = _type  # core or colony
-		self.original_owner = player
+		self.culure = player
 		self.AI_priority = 0
 		#self.desirability =_desirability
 
