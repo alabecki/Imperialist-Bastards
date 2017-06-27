@@ -13,7 +13,7 @@ technology_dict = {
 
 	"professional_armies": {"requirement": "pre_industry_1", "cost": 1},
 	"pre_industry_1": { "requirement": "any", "cost": 1},
-	"pre_industry_2": {"requirement": "pre_industry_1", "cost": 2},
+	"pre_industry_2": {"requirement": "pre_industry_1", "cost": 1},
 	"high_pressure_steam_engine": {"requirement": "pre_industry_2", "cost": 1},
 	"square_timbering": {"requirement": "high_pressure_steam_engine", "cost": 1},
 	"cotton_gin": {"requirement": "pre_industry_2", "cost": 1},

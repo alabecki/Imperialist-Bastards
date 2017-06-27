@@ -12,7 +12,7 @@ class Province(object):
 		self.powered = False
 		self.quality = _quality
 		self.type = _type  # core or colony
-		self.culure = player
+		self.culture = player
 		self.AI_priority = 0
 		#self.desirability =_desirability
 
@@ -20,7 +20,7 @@ class Uncivilized_minor(object):
 	def __init__(self, _name):
 		self.name = _name
 		self.provinces = {}  #always 2
-		self.number_irregulars = randint(2, 4)
+		self.number_irregulars = randint(2, 3)
 		provinces = {}
 		self.irregulars = {
 			"attack": 0.5,

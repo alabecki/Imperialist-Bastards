@@ -90,7 +90,7 @@ while True:
 		#			v = 0
 
 				print("################################################################################################################### \n ")
-				print("%s, it is your turn to exploit the globe for the greatness of your nation \n" % (player.name))
+				print("%s, it is your turn to exploit the globe for the greatness of your nation! \n" % (player.name))
 				while(True):
 					print(" ############################################################################################################ \n")
 					print("%s, what is your imperial decree? \n" % (player.name))
@@ -115,6 +115,7 @@ while True:
 							print("Colonization: %s  ___________  Reputation: %s \n" % (player.colonization, player.reputation))
 							print("Lower Class Pops: %s  _______  Middle Class Pops: %s \n" % (player.numLowerPOP, player.numMidPOP))
 							print("Development Points: %s  _____ Development Level: %s \n" % (player.new_development, player.number_developments))
+							print("Free POPs: %s  _______________ Culture Points: %s" % (player.freePOP, player.culture))
 							print("Factories:")
 							for f in player.factories:
 								print(f)
@@ -198,10 +199,11 @@ while True:
 						print("How would you like to manage your population? ################################################\n")
 						_choices = list(range(1, 4))
 						choices = ''.join(str(e) for e in _choices)
+						choice = " "
 						while (choice not in choices):
 							for k, v in manage_pops.items():
 								print("%s: %s" % (k,v))
-						choice = input()
+							choice = input()
 						if choice == "1":
 							player.increase_pop()
 						if choice == "2":
@@ -314,7 +316,7 @@ while True:
 								else:
 									print("Since you do not border %s, you must send your army by navy\n" % (other.name))
 									amount = naval_transport(player)
-									if other.human == "human":
+									if type(other) == Human:
 										print("That dasterdly %s is sending an armarda filled with soliders to your homeland! \n" % (player.name))
 										print("His navy has %s frigates and %s ironclads. Your navy has %s frigates and %s ironclads" \
 											% (player.military["frigates"], (player.military["iron_clad"]), other.military["frigates"], other.military["iron_clad"] ))
@@ -332,6 +334,12 @@ while True:
 											elif result == player.name:
 												print:("%s has sailed his navy to %s and is about to invade! \n" % (player.name, other.name))
 												amph_combat(player, other, amount)
+									if calculate_naval_strength(other) - calculate_naval_strength(player) >= 1.5:
+										result = naval_battle(player, other)
+									else: 
+										amph_combat(player, other, amount)
+
+
 						if action == "2":
 							print("On what nation would you like to declare a colonial war? ####################################################################  \n")
 							for k in players.keys():
@@ -513,16 +521,19 @@ while True:
 							while _type not in market.market.keys():
 								_type = input("What would you like to sell? \n")
 							market.sell_item(_type, player)
-			
+
 					if command == "9":
-						print("####################################################################################################################### \n ")
+						print("######################################################################################################### \n ")
+						player.use_culture()
+					if command == "10":
+						print("####################################################################################################### \n ")
 						check = input("Are you sure you want to end your turn? y/n \n")
 						if check == "y":
 							player.turn()
 							break
 						else:
 							continue
-					if command == "10":
+					if command == "11":
 						print("Would you like to make a new save? (If you have not created a save for this game yet, you should certainly choose yes) (y/n) \n")
 						yn = input()
 						if yn == "y":
@@ -531,7 +542,7 @@ while True:
 							save_name = input("Please write in the name of the save file (without file extension) \n")
 							save_game(file_name, players, relations, uncivilized_minors, market)
 
-					if command == "11":
+					if command == "12":
 						_continue = False
 						break
 

@@ -20,12 +20,12 @@ from globe import*
 
 NUM_MAJOR_POWERS = 6
 NUM_OLD_EMPIRES = 3
-NUM_UNCIVILIZRD_MINORS = 4
+NUM_UNCIVILIZRD_MINORS = 5
 NUM_OLD_MINORS = 4
 
 NUM_PROV_MAJORS = 6
 #NUM_PROV_OLD_EMPIRES = 4
-NUM_PROV_UNCIV = 2
+NUM_PROV_UNCIV = 1
 NUM_PROV_OLD_MINORS = 2
 
 
@@ -37,17 +37,22 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 5.8
-	player.freePOP = 5
+	player.POP = 7.00
+	player.freePOP = 5.2
 	player.milPOP = 0.8
-	player.numLowerPOP = 5.8
+	player.numLowerPOP = 6
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("professional_armies")
 	#player.technologies.add("high_pressure_steam_engine")
 
+	player.midPOP["researchers"]["number"] = 0.25
+	player.midPOP["officers"]["number"] = 0.25
+	player.midPOP["managers"]["number"] = 0.0
+	player.midPOP["bureaucrats"]["number"] = 0.25
+	player.midPOP["artists"]["number"] = 0.25
 
-	player.numMidPOP = 0.0
+	player.numMidPOP = 1.0
 
 	player.resources["gold"] = 12.0
 	
@@ -143,6 +148,12 @@ def start_game():
 			players[name].borders.add(b1)
 			players[name].borders.add(b2)
 			cheat = input("Would you like to make this player Uber? y/n  \n")
+			if cheat == "y":
+				Create_Uber_Player(players[name])
+			#initialize_major_power(players[name])
+			else:
+				initialize_major_power(players[name])
+
 
 
 		if control == "AI":
@@ -150,15 +161,8 @@ def start_game():
 			players[name] = new
 			players[name].borders.add(b1)
 			players[name].borders.add(b2)
-
-
-		#print(players[name].number)
-		#print(players[name].borders)
-		if cheat == "n":
-			Create_Uber_Player(players[name])
 			initialize_major_power(players[name])
-		else:
-			initialize_major_power(players[name])
+
 
 		i += 1
 
@@ -169,7 +173,7 @@ def start_game():
 		player.resources["food"] += 1
 
 		prov = 1
-		while(prov <= NUM_PROV_MAJORS):
+		while(prov < NUM_PROV_MAJORS):
 		#for prov in player.provinces:
 			#res = choice(['food', 'cotton', 'wood', 'coal', 'iron'])
 			res = " "
@@ -183,9 +187,9 @@ def start_game():
 				res = "cotton"
 			elif chance > 0.60 and chance<= 0.77:
 				res = "coal"
-			elif chance > 0.77 and chance<= 0.95:
+			elif chance > 0.77 and chance<= 0.96:
 				res = "wood"
-			elif chance > 0.95 and chance<= 0.98:
+			elif chance > 0.96 and chance<= 0.98:
 				res = "dyes"
 			elif chance > 0.98:
 				res = "gold"
@@ -242,23 +246,23 @@ def start_game():
 			empire.provinces[1] = Province(doname(), "food", 1.0, "core", empire.name)
 			empire.resources["food"] += 1
 			prov = 1
-			while(prov <= num_provinces):
+			while(prov < num_provinces):
 				#res = choice(['food', 'cotton', 'wood', 'coal', 'iron', 'spice', 'dyes', 'food'])
 				res = " "
 				chance = uniform(0, 1)
-				if chance <= 0.26:
+				if chance <= 0.28:
 					res = "food"
-				elif chance > 0.26 and chance<= 0.36:  
+				elif chance > 0.28 and chance<= 0.38:  
 					res = "iron"
-				elif chance > 0.36 and chance<= 0.50:
+				elif chance > 0.38 and chance<= 0.52:
 					res = "cotton"
-				elif chance > 0.50 and chance<= 0.60:
+				elif chance > 0.52 and chance<= 0.62:
 					res = "coal"
-				elif chance > 0.60 and chance<= 0.72:
+				elif chance > 0.62 and chance<= 0.76:
 					res = "wood"
-				elif chance > 0.72 and chance<= 0.79:
+				elif chance > 0.76 and chance<= 0.80:
 					res = "dyes"
-				elif chance > 0.79:
+				elif chance > 0.80:
 					res = "spice"
 
 				qual = triangular(0.5, 1.5, 1.0)
@@ -288,7 +292,7 @@ def start_game():
 		if old_minor.type == "old_minor":
 			old_minor.technologies.add("pre_industry_1")
 			prov = 1
-			while(prov <= NUM_PROV_OLD_MINORS):
+			while(prov <= NUM_PROV_UNCIV):
 				#print("old minor")
 				#res = choice(['food', 'cotton', 'wood', 'coal', 'iron', 'spice', 'spice','dyes', 'food', 'gold'])
 				res = " "
@@ -301,9 +305,9 @@ def start_game():
 					res = "cotton"
 				elif chance > 0.52 and chance<= 0.62:
 					res = "coal"
-				elif chance > 0.62 and chance<= 0.72:
+				elif chance > 0.62 and chance<= 0.74:
 					res = "wood"
-				elif chance > 0.72 and chance<= 0.77:
+				elif chance > 0.74 and chance<= 0.79:
 					res = "dyes"
 				elif chance > 0.77 and chance<= 0.95:
 					res = "spice"
@@ -344,7 +348,7 @@ def start_game():
 
 	for k, uncivilized in uncivilized_minors.items():
 		prov = 1
-		while(prov <= NUM_PROV_OLD_MINORS):
+		while(prov <= NUM_PROV_UNCIV):
 			#res = choice(['food', 'cotton', 'wood', 'coal', 'iron', 'spice', 'spice', 'dyes', 'food', 'gold'])
 			
 			res = " "
@@ -357,13 +361,13 @@ def start_game():
 				res = "cotton"
 			elif chance > 0.49 and chance<= 0.57:
 				res = "coal"
-			elif chance > 0.57 and chance<= 0.65:
+			elif chance > 0.57 and chance<= 0.67:
 				res = "wood"
-			elif chance > 0.65 and chance<= 0.70:
+			elif chance > 0.67 and chance<= 0.71:
 				res = "dyes"
-			elif chance > 0.70 and chance<= 0.94:
+			elif chance > 0.71 and chance<= 0.93:
 				res = "spice"
-			elif chance > 0.94:
+			elif chance > 0.93:
 				res = "gold"
 
 			qual = triangular(0.5, 2.0, 1.0)

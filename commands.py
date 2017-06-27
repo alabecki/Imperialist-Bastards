@@ -10,9 +10,10 @@ commands = {
 	"6": "Diplomatic Action",
 	"7": "Research Technology",
 	"8": "Trade",
-	"9": "End Turn",
-	"10": "Save Game",
-	"11": "End Game"
+	"9": "Culture",
+	"10": "End Turn",
+	"11": "Save Game",
+	"12": "End Game"
 }
 
 information = {
@@ -96,3 +97,12 @@ diplomacy = {
 	"9": "Offer to Sell Arms",
 	"10": "Ask to Buy Arms"
 }
+
+culture_commands = {
+		"1": "Increase Stability",
+		"2": "Assimilate Province",
+		"3": "Export Culture",
+		"4": "Spread Culture",
+		"5": "Steal Middle POP",
+		"6": "Use Spice for Stability"
+	}

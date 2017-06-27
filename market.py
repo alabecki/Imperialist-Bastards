@@ -5,25 +5,25 @@ import player_class
 class Market(object):
 	def __init__ (self):
 
-		self.gold = 100000
+		self.gold = 2000
 
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals"]
 
 		self.market = {
-			"food": 4,
-			"cotton": 3,
-			"iron": 4,
-			"wood": 3,
-			"coal": 2,
-			"spice": 2,
+			"food": 5,
+			"cotton": 5,
+			"iron": 5,
+			"wood": 5,
+			"coal": 3,
+			"spice": 3,
 			"dyes": 2,
 
 			"parts": 0,
-			"clothing": 0,
-			"cannons": 0,
-			"furniture": 0,
-			"paper": 0,
+			"clothing": 3,
+			"cannons": 2,
+			"furniture": 2,
+			"paper": 1,
 			"chemicals": 0
 		}
 

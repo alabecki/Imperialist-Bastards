@@ -130,21 +130,22 @@ class Player(object):
 		self.CB = set()
 
 		#culture
-		self.culture_points = 0.0
+		self.culture = 0.0
 		self.culture_level = 0.0
 
 			#Military
 
 		self.military = {
 			"irregulars": 0.0,
-			"infantry": 2.0,
-			"cavalry": 1.0,
+			"infantry": 0.0,
+			"cavalry": 0.0,
 			"artillery": 0.0,
-			"frigates": 1.0,
+			"frigates": 0.0,
 			"iron_clad": 0.0
 		}
 
 		self.number_units = 4.0
+		self.can_train = 1
 
 		self.irregulars = {
 			"attack": 0.5,
@@ -236,7 +237,7 @@ class Player(object):
 		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.4) + self.military["cavalry"] * 0.1
 		if(self.resources["food"] < mFood ):
 			self.freePOP -= (self.resources["food"] - mFood)
-			self.stability -= 0.25
+			self.stability -= 0.5
 			if self.stability < -3.0:
 				self.stability = -3.0
 			self.resources["food"] = 0.0
@@ -246,14 +247,15 @@ class Player(object):
 
 		if(self.resources["coal"] < 0.25 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
-			while(self.resources["coal"]  >= 0.3 ):
-				for k, prov in self.provinces.items():
-					if(prov.development_level == 1):
-						self.resources["coal"]  -= 0.25
-						self.provinces[k].powered = True
-					elif(prov.development_level == 2):
-						self.resources["coal"]  -= 0.5
-						self.provinces[k].powered = True
+
+		for k, prov in self.provinces.items():
+			if self.resources["coal"] >= 0.25 and prov.development_level == 1:
+				self.resources["coal"]  -= 0.25
+				self.provinces[k].powered = True
+			elif self.resources["coal"] >= 0.25 and prov.development_level == 2:
+				self.resources["coal"]  -= 0.5
+				self.provinces[k].powered = True
+
 		else:
 			self.resources["coal"] -= self.number_developments * 0.25
 			for k, prov in self.provinces.items():
@@ -266,12 +268,13 @@ class Player(object):
 		self.collect_resources()
 		self.collect_goods()
 		self.payMaintenance()
-		self.stability += self.midPOP["artists"]["number"] * 0.25
-		if self.stability > 3.0:
-			self.stability = 3.0
-		self.culture_points += (0.1 + self.midPOP["artists"]["number"])
+
+		self.culture += (0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5)
+		print("Culture points gained: %s " % (0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5))
+		self.can_train = 1 + self.midPOP["officers"]["number"] * 4
 		self.AP = int(self.proPOP) * self.production_modifier
-		research_gain = 0.3 + self.midPOP["researchers"]["number"] * stability_map[stab_rounds] * self.techModifier
+		self.reputation += self.midPOP["artists"]["number"] * 0.1
+		research_gain = 0.5 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds] * 2) + self.midPOP["managers"]["number"] * 0.4
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
 		diplo_gain = 0.15 + (self.midPOP["bureaucrats"]["number"] * self.reputation)

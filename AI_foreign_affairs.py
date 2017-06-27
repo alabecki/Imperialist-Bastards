@@ -31,7 +31,8 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 	if player.colonization < (1 + player.num_colonies) or player.diplo_action < 1 or transport_limit < 4:
 		return
 	self_strength = calculate_base_attack_strength(player)
-	if self_strength < 3:
+	self_naval_projection_strength = ai_naval_projection(player)
+	if self_strength < 3.5:
 		return
 	count = 0
 	for k, unciv in uncivilized_minors.items():
@@ -52,13 +53,14 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 	for p, pl in players.items():
 		if pl.type == "old_minor" and len(pl.provinces) >= 1:
 			minors[p] = pl
-	if len(minors) >= 1 and transport_limit >= 6 and self_strength > 4:
+	if len(minors) >= 1 and transport_limit >= 6 and self_naval_projection_strength >= 6:
 		for r in priorities:
 			for u, minor in minors.items():
 				for p, prov in minor.provinces.items():
 					if r == prov.resource:
 						target = minor
-		combat(player, target)
+		forces = ai_transport_units(player)					
+		amph_combat(player, target, forces)
 		player.diplo_action -= 1.0
 		player.reputation -= 0.1
 		return
@@ -70,7 +72,7 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 		options = []
 		for e in empires: 
 			defence = calculate_base_defense_strength(e)
-			if self_strength * 0.85 > defence:
+			if self_naval_projection_strength * 0.80 > defence:
 				options.append(e)
 		if len(options) < 1:
 			return
@@ -81,7 +83,8 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 					for p, prov in opt.provinces.items():
 						if r == prov.resource:
 							target = opt
-		combat(player, target)
+		forces = ai_transport_units(player)					
+		amph_combat(player, target, forces)
 		player.diplo_action -= 1.0
 		player.reputation -= 0.1
 		return
@@ -90,12 +93,12 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 
 def ai_transport_units(player):
 	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
-	forces = ["0", "0", "0"]
-	for i in range(transport_limit):
+	forces = [0, 0, 0]
+	for i in range(int(transport_limit)):
 		flag = False
 		tries = 0
 		while flag == False and tries < 12:
-			type = choice("infantry", "cavalry", "artillery")
+			type = choice(["infantry", "cavalry", "artillery"])
 			if type == "infantry":
 				if player.military["infantry"] - forces[0] >= 1:
 					forces[0] += 1
@@ -110,6 +113,21 @@ def ai_transport_units(player):
 					flag = True
 			tries += 1
 	return forces
+
+
+def ai_naval_projection(player):
+	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
+	strength = 0
+	while transport_limit > 0:
+		_type = choice(["infantry", "cavalry", "artillery"])
+		if _type == "infantry":
+			strength += player.infantry["attack"]
+		if _type == "cavalry":
+			strength += player.cavalry["attack"]
+		if _type == "artillery":
+			strength += player.artillery["attack"]
+		transport_limit -= 1
+	return strength
 
 
 def ai_destablize_empires(player, players):

@@ -19,22 +19,23 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	player.update_priorities(market)
 	player.assign_priorities_to_provs()
 
-	ai_destablize_empires(player, players)
-	ai_decide_colonial_war(player, players, uncivilized_minors)
-	player.use_culture(players):
-
-	player.choose_technology()
-
 	player.ai_increase_pop(market)
 	player.ai_increase_pop(market)
 	player.ai_increase_middle_class(market)
+
 	player.AI_reset_POP()
 	player.AI_assign_POP()
 	player.calculate_resource_production()
 	player.calculate_resource_need()
 	player.calculate_resource_forecast()
-	player.view_AI_inventory()
 	player.fulfill_needs(market)
+	player.view_AI_inventory()
+
+	ai_destablize_empires(player, players)
+	ai_decide_colonial_war(player, players, uncivilized_minors)
+	player.use_culture(players)
+
+	player.choose_technology()
 	
 	print("Decide Factory Production:")
 	player.ai_decide_factory_productions(market)
@@ -42,7 +43,11 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	player.AI_set_objective(turn, market)
 	player.attempt_objective(market)
 	player.early_game(turn, market)
+
+	player.decide_build_navy()
+
 	player.build_army()
+
 	if player.AP >= 1:
 		player.AI_set_objective(turn, market)
 		player.attempt_objective(market)

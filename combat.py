@@ -114,7 +114,7 @@ def calculate_manouver(p):
 	manouver += p.military["infantry"] * p.infantry["manouver"]
 	manouver += p.military["artillery"] * p.infantry["manouver"]
 	manouver += p.military["cavalry"] * p.infantry["manouver"]
-	manouver = manouver * (1 + p.midPOP["officers"]["number"]/p.milPOP)
+	manouver = manouver * (1 + p.midPOP["officers"]["number"])
 	return manouver
 
 def distribute_losses(player, losses, num_units):
@@ -124,9 +124,9 @@ def distribute_losses(player, losses, num_units):
 			player.military["irregulars"] -= 0.5
 			num_units -= 0.5
 			#player.num_units -=0.5
-			player.POP -= 0.075
-			player.milPOP -= 0.075
-			player.numLowerPOP -= 0.075
+			player.POP -= 0.1
+			player.milPOP -= 0.1
+			player.numLowerPOP -= 0.1
 			losses -= 0.5
 		loss = random.uniform(0, 1)
 		if loss <= 0.4:
@@ -134,9 +134,9 @@ def distribute_losses(player, losses, num_units):
 				player.military["infantry"] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
 			else:
 				continue
@@ -145,9 +145,9 @@ def distribute_losses(player, losses, num_units):
 				player.military["cavalry"] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
 			else:
 				continue
@@ -156,9 +156,9 @@ def distribute_losses(player, losses, num_units):
 				player.military["artillery"] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
 			else:
 				continue
@@ -166,38 +166,46 @@ def distribute_losses(player, losses, num_units):
 
 
 def distribute_losses_amph(player, losses, num_units, current_makeup):
-	while(losses > 0.5 and player.number_units >= 0):
+	while(losses > 0.5 and num_units >= 0.5):
+	
 		loss = random.uniform(0, 1)
 		if loss <= 0.4:
-			if(current_makeup[0] > 0.5):
+			if(current_makeup[0] >= 0.5):
 				player.military["infantry"] -=0.5
 				current_makeup[0] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
-		if loss > 0.4 and loss <= 0.8:
-			if(current_makeup[1] > 0.5):
+			else:
+				continue
+		elif loss > 0.4 and loss <= 0.8:
+			if(current_makeup[1] >= 0.5):
 				player.military["cavalry"] -= 0.5
+				num_units -= 0.5
 				current_makeup[1] -= 0.5
 				#player.num_units -=0.5
 				#def_losses -= 1
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
-		if loss > 0.8:
-			if(current_makeup[2] > 0.5):
+			else:
+				continue
+		elif loss > 0.8:
+			if(current_makeup[2] >= 0.5):
 				player.military["artillery"] -= 0.5
 				current_makeup[2] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
-				player.POP -= 0.075
-				player.milPOP -= 0.075
-				player.numLowerPOP -= 0.075
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
 				losses -= 0.5
+			else:
+				continue
 	return current_makeup
 
 def combat_outcome(winner, p1, p2):
@@ -207,7 +215,7 @@ def combat_outcome(winner, p1, p2):
 		if p1.stability > 3:
 			p1.stability = 3
 		p1.CB.discard(p2.name)
-		if(p2.type == "empire" or p2.type == "old_minor"):
+		if(p2.type == "old_empire" or p2.type == "old_minor"):
 			old_empire_defeat(p1, p2)
 		loot = p2.resources["gold"]/2.0
 		p1.resources["gold"] += loot
@@ -234,7 +242,8 @@ def combat_outcome(winner, p1, p2):
 						p1.CB.remove(p2.name)
 		else:
 			print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
-			p1.CB.remove(p2.name)
+			if p2.name in p1.CB:
+				p1.CB.remove(p2.name)
 
 
 def old_empire_defeat(p1, p2):
@@ -270,7 +279,7 @@ def old_empire_defeat(p1, p2):
 	if len(p2.provinces) == 0:
 		print("%s no longer exists as a nation!")
 
-	print(annex + " is now part of " + p1.name)
+	print(str(annex) + " is now part of " + p1.name)
 
 
 def combat_against_uncivilized(player, unciv):
@@ -356,6 +365,8 @@ def combat_against_uncivilized(player, unciv):
 
 
 def amph_combat(p1, p2, p1_forces):
+	print("War has broken out between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
+	cont = input()
 	att_initial_army = sum(p1_forces)
 	att_initial_makeup = p1_forces
 	att_current_makeup = p1_forces
@@ -394,16 +405,19 @@ def amph_combat(p1, p2, p1_forces):
 		p2.goods["cannons"] =- def_ammo
 		att_losses = def_str/3
 		def_losses = att_str/3
-
+		done = False
+		if att_losses < 0.5 and def_losses < 0.5:
+			done = True
 		print("%s losses: %s,  %s losses: %s \n" % (p1.name, att_losses, p2.name, def_losses))
 		att_current_makeup = distribute_losses_amph(p1, att_losses, att_number_units_army, att_current_makeup)
 		att_number_units_army = sum(att_current_makeup)
 		def_number_units_army = distribute_losses(p2, def_losses, def_number_units_army)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_army, p2.name, def_number_units_army))
 		done = False
-		if(att_number_units_army < att_initial_army * 0.4):
+
+		if(att_number_units_army <= att_initial_army * 0.4):
 			done = True
-		if(def_number_units_army < def_initial_army * 0.3):
+		if(def_number_units_army <= def_initial_army * 0.3):
 			done = True
 		if(done == True):
 			if att_number_units_army > def_number_units_army:
@@ -419,7 +433,7 @@ def amph_combat(p1, p2, p1_forces):
 				if(cont == "n"):
 					break
 			if type(p1) == AI:
-				player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
+				player_str = att_current_makeup[0] * p1.infantry["attack"] + att_current_makeup[1] * p1.cavalry["attack"] + att_current_makeup[2] * p1.artillery["attack"]
 				def_str = calculate_base_defense_strength(p2)
 				if player_str * 0.85 < def_str:
 					return
@@ -508,7 +522,8 @@ def calculate_ammo_needed_navy(player):
 
 
 def naval_battle(p1, p2):
-	print("Naval Battle!!!!__________________________________________________________________________________")
+	print("A naval battle is being fought between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
+	cont = input()
 	winner = ""
 	att_initial_navy = calculate_number_of_ships(p1)
 	def_initial_navy = calculate_number_of_ships(p2)
