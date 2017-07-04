@@ -23,10 +23,28 @@ def combat(p1, p2):
 		def_str = calculate_base_defense_strength(p2)
 		att_ammo = calculate_ammo_needed(p1)
 		def_ammo = calculate_ammo_needed(p2)
+		att_oil = calculate_oil_needed(p1)
+		def_oil = calculate_oil_needed(p2)
 		att_manouver = calculate_manouver(p1)
 		def_manouver = calculate_manouver(p2)
 		att_manouver_roll = random.uniform(0, 1)
 		def_manouver_roll = random.uniform(0, 1)
+
+		p1o_deficit = p1.resources["oil"] - att_oil
+		if p1_deficit < 0:
+			print("%s has an oil deficit of %s" % (p1.name, abs(p1_deficit)))
+			base = calculate_oil_manouver(p1)
+			temp = abs(p1_deficit/(att_oil * 1.5))
+			penalty = base * (1 - temp)
+			att_manouver -=  penalty
+
+		p2o_deficit = p2.resources["oil"] - def_oil
+		if p2_deficit < 0:
+			print("%s has an oil deficit of %s" % (p2.name, abs(p2_deficit)))
+			base = calculate_oil_manouver(p2)
+			temp = abs(p2_deficit/(def_oil * 1.5))
+			penalty = base * (1 - temp)
+			att_manouver -=  penalty
 
 		print("%s has %s units and base attack strength of %s \n" % (p1.name, att_number_units_army, att_str))
 		print("%s has %s units and base attack strength of %s \n" % (p2.name, def_number_units_army, def_str))
@@ -44,8 +62,46 @@ def combat(p1, p2):
 			if "indirect_fire" in p2.technologies:
 				def_str += (p2.military["artillery"] * p2.artillery["attack"]) * 0.5
 		print("%s total attack strength: %s, %s total attack strength: %s \n" % (p1.name, att_str, p2.name, def_str))
-		p1.goods["cannons"] -= att_ammo
-		p2.goods["cannons"] =- def_ammo
+
+		p1a_deficit = p1.goods["cannons"] - att_ammo
+		if p1a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p1.name, abs(p1a_deficit)))
+			penalty = abs(p1a_deficit/ (att_ammo * 2))
+			att_str = att_str * (1 - penalty)
+			p1.goods["cannons"] = 0
+		else:
+			p1.goods["cannons"] -= att_ammo
+
+		p2a_deficit = p2.goods["cannons"] - def_ammo
+		if p2a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p2.name, abs(p2a_deficit)))
+			penalty = abs(p2a_deficit/ (def_ammo * 2))
+			def_str = def_str * (1 - penalty)
+			p2.goods["cannons"] = 0
+		else:
+			p2.goods["cannons"] -= def_ammo
+
+		if p1o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p1.name, abs(p1o_deficit)))
+			base = calculate_oil_def(p1)
+			temp = abs(p1o_deficit/(att_oil *2))
+			penalty = base * (1 - temp)
+			att_str -= penalty
+			p1.resources["oil"] = 0
+		else:
+			p1.resources["oil"] -= att_oil
+
+		if p2o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p2.name, abs(p2o_deficit)))
+			base = calculate_oil_def(p2)
+			temp = abs(p2o_deficit/(def_oil *2))
+			penalty = base * (1 - temp)
+			def_str -= penalty
+			p2.resources["oil"] = 0
+		else:
+			p2.resources["oil"] -= def_oil
+
+	
 		att_losses = def_str/3
 		def_losses = att_str/3
 		print("%s losses: %s,  %s losses: %s \n" % (p1.name, att_losses, p2.name, def_losses))
@@ -83,7 +139,8 @@ def combat(p1, p2):
 
 def calculate_number_of_units(player):
 	count = 0
-	count += player.military["infantry"] + player.military["cavalry"] + player.military["artillery"] + player.military["irregulars"]
+	count += player.military["infantry"] + player.military["cavalry"] + player.military["artillery"] + \
+	 player.military["irregulars"] + player.military["tank"] + player.military["fighter"]
 	return count
 
 def calculate_base_attack_strength(p1):
@@ -91,6 +148,8 @@ def calculate_base_attack_strength(p1):
 	strength += p1.military["infantry"] * p1.infantry["attack"]
 	strength += p1.military["cavalry"] * p1.cavalry["attack"]
 	strength += p1.military["artillery"] * p1.artillery["attack"]
+	strength += p1.military["tank"] * p1.tank["attack"]
+	strength += p1.military["fighter"] * p1.fighter["attack"]
 	return strength
 
 def calculate_base_defense_strength(p2):
@@ -99,6 +158,8 @@ def calculate_base_defense_strength(p2):
 	strength += p2.military["infantry"] * p2.infantry["defend"]
 	strength += p2.military["cavalry"] * p2.cavalry["defend"]
 	strength += p2.military["artillery"] * p2.artillery["defend"]
+	strength += p2.military["tank"] * p2.tank["defend"]
+	strength += p2.military["fighter"] * p2.fighter["defend"]
 	strength = strength * p2.fortification
 	return strength
 
@@ -107,15 +168,45 @@ def calculate_ammo_needed(p):
 	ammo_needed += p.military["infantry"] * p.infantry["ammo_use"]
 	ammo_needed += p.military["cavalry"] * p.cavalry["ammo_use"]
 	ammo_needed += p.military["artillery"] * p.artillery["ammo_use"]
+	ammo_needed += p.military["tank"] * p.cavalry["ammo_use"]
+	ammo_needed += p.military["fighter"] * p.artillery["ammo_use"]
+
 	return ammo_needed
+
+def calculate_oil_needed(p):
+	oil_needed = 0.0
+	oil_needed += p.military["tank"] + p.tank["oil_use"]
+	oil_needed += p.military["fighter"] + p.fighter["oil_use"]
+	return oil_needed
 
 def calculate_manouver(p):
 	manouver = 0.0
 	manouver += p.military["infantry"] * p.infantry["manouver"]
-	manouver += p.military["artillery"] * p.infantry["manouver"]
 	manouver += p.military["cavalry"] * p.infantry["manouver"]
+	manouver += p.military["tank"] * p.infantry["manouver"]
+	manouver += p.military["fighter"] * p.infantry["manouver"]
 	manouver = manouver * (1 + p.midPOP["officers"]["number"])
 	return manouver
+
+def calculate_oil_manouver(p):
+	manouver = 0.0
+	manouver += p.military["tank"] * p.infantry["manouver"]
+	manouver += p.military["fighter"] * p.infantry["manouver"]
+	manouver = manouver * (1 + p.midPOP["officers"]["number"])
+	return manouver
+
+def calculate_oil_att(p):
+	strength = 0.0
+	strength += p.military["tank"] * p.tank["attack"]
+	strength += p.military["fighter"] * p.fighter["attack"]
+	return strength
+
+def calculate_oil_def(p):
+	strength = 0.0
+	strength += p.military["tank"] * p.tank["defend"]
+	strength += p.military["fighter"] * p.fighter["defend"]
+	return strength
+
 
 def distribute_losses(player, losses, num_units):
 	while(losses > 0.5 and num_units >= 0.5):
@@ -129,7 +220,7 @@ def distribute_losses(player, losses, num_units):
 			player.numLowerPOP -= 0.1
 			losses -= 0.5
 		loss = random.uniform(0, 1)
-		if loss <= 0.4:
+		if loss <= 0.25:
 			if(player.military["infantry"] >= 0.5):
 				player.military["infantry"] -= 0.5
 				num_units -= 0.5
@@ -140,7 +231,7 @@ def distribute_losses(player, losses, num_units):
 				losses -= 0.5
 			else:
 				continue
-		elif loss > 0.4 and loss <= 0.8:
+		elif loss > 0.25 and loss <= 0.5:
 			if(player.military["cavalry"] >= 0.5):
 				player.military["cavalry"] -= 0.5
 				num_units -= 0.5
@@ -151,9 +242,33 @@ def distribute_losses(player, losses, num_units):
 				losses -= 0.5
 			else:
 				continue
-		elif loss >= 0.8:
+		elif loss > 0.5 and loss <= 0.7:
+			if(player.military["tank"] >= 0.5):
+				player.military["tank"] -= 0.5
+				num_units -= 0.5
+				#player.num_units -=0.5
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
+				losses -= 0.5
+			else:
+				continue
+
+		elif loss > 0.7 and loss <= 0.85:
 			if(player.military["artillery"] >= 0.5):
 				player.military["artillery"] -= 0.5
+				num_units -= 0.5
+				#player.num_units -=0.5
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.2
+				losses -= 0.5
+			else:
+				continue
+
+		elif loss > 0.85:
+			if(player.military["fighter"] >= 0.5):
+				player.military["fighter"] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
 				player.POP -= 0.1
@@ -169,10 +284,10 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 	while(losses > 0.5 and num_units >= 0.5):
 	
 		loss = random.uniform(0, 1)
-		if loss <= 0.4:
-			if(current_makeup[0] >= 0.5):
+		if loss <= 0.25:
+			if(current_makeup["infantry"] >= 0.5):
 				player.military["infantry"] -=0.5
-				current_makeup[0] -= 0.5
+				current_makeup["infantry"] -= 0.5
 				num_units -= 0.5
 				#player.num_units -=0.5
 				player.POP -= 0.1
@@ -181,11 +296,11 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 				losses -= 0.5
 			else:
 				continue
-		elif loss > 0.4 and loss <= 0.8:
-			if(current_makeup[1] >= 0.5):
+		elif loss > 0.25 and loss <= 0.5:
+			if(current_makeup["cavalry"] >= 0.5):
 				player.military["cavalry"] -= 0.5
 				num_units -= 0.5
-				current_makeup[1] -= 0.5
+				current_makeup["cavalry"] -= 0.5
 				#player.num_units -=0.5
 				#def_losses -= 1
 				player.POP -= 0.1
@@ -194,11 +309,36 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 				losses -= 0.5
 			else:
 				continue
-		elif loss > 0.8:
-			if(current_makeup[2] >= 0.5):
-				player.military["artillery"] -= 0.5
-				current_makeup[2] -= 0.5
+
+		elif loss > 0.5 and loss <= 0.7:
+			if(current_makeup["tank"] >= 0.5):
+				player.military["tank"] -= 0.5
 				num_units -= 0.5
+				current_makeup["tank"] -= 0.5
+				#player.num_units -=0.5
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
+				losses -= 0.5
+			else:
+				continue
+		elif loss > 0.7 and loss <= 0.85:
+			if(current_makeup["artillery"] >= 0.5):
+				player.military["artillery"] -= 0.5
+				current_makeup["artillery"] -= 0.5
+				num_units -= 0.5
+				#player.num_units -=0.5
+				player.POP -= 0.1
+				player.milPOP -= 0.1
+				player.numLowerPOP -= 0.1
+				losses -= 0.5
+			else:
+				continue
+		elif loss > 0.85:
+			if(current_makeup["fighter"] >= 0.5):
+				player.military["fighter"] -= 0.5
+				num_units -= 0.5
+				current_makeup["fighter"] -= 0.5
 				#player.num_units -=0.5
 				player.POP -= 0.1
 				player.milPOP -= 0.1
@@ -263,14 +403,18 @@ def old_empire_defeat(p1, p2):
 							annex = p 
 	new = deepcopy(p2.provinces[annex])
 	p1.provinces[new.name] = new
-	p1.provinces[new.name].type = "colony"
+	p1.provinces[new.name].type = "old"
 	p1.provinces[new.name].worked = True
+	p1.ai_modify_priorities_from_province(p1.provinces[new.name].resource)
 	p2.provinces.pop(annex)
 	p1.POP += 1
 	p1.numLowerPOP += 1
 	p1.reputation -= 0.1
 	p1.colonization -= (1 + p1.num_colonies)
 	p1.num_colonies += 1
+	p1.stability -= 0.15
+	if p1.stability < -3.0:
+		p1.stability = -3.0
 	p2.POP -= 1
 	p2.numLowerPOP -= 1
 	p2.stability -= 0.5
@@ -282,38 +426,150 @@ def old_empire_defeat(p1, p2):
 	print(str(annex) + " is now part of " + p1.name)
 
 
+def calculate_amphib_num_units(player, current_makeup):
+	number = 0
+	for k, v in current_makeup.items():
+		number += v
+	return number
+
+def calculate_amphib_strength(player, forces):
+	strength = 0
+	for k, v in forces.items():
+		if k == "infantry":
+			strength += forces[k] * player.infantry["attack"]
+		if k == "cavalry":
+			strength += forces[k] * player.cavalry["attack"]
+		if k == "artillery":
+			strength += forces[k] * player.artillery["attack"]
+		if k == "tank":
+			strength += forces[k] * player.tank["attack"]
+		if k == "fighter":
+			strength += forces[k] * player.fighter["attack"]
+	return strength
+
+def calculate_amphib_ammo(player, current_makeup):
+	ammo = 0
+	for k, v in current_makeup.items():
+		if k == "infantry":
+			ammo += current_makeup[k] * player.infantry["ammo_use"]
+		if k == "cavalry":
+			ammo += current_makeup[k] * player.cavalry["ammo_use"]
+		if k == "artillery":
+			ammo += current_makeup[k] * player.artillery["ammo_use"]
+		if k == "tank":
+			ammo += current_makeup[k] * player.tank["ammo_use"]
+		if k == "fighter":
+			ammo += current_makeup[k] * player.fighter["ammo_use"]
+	return ammo
+
+def calculate_amphib_man(player, current_makeup):
+	manouver = 0
+	for k, v in current_makeup.items():
+		if k == "infantry":
+			manouver += current_makeup[k] * player.infantry["manouver"]
+		if k == "cavalry":
+			manouver += current_makeup[k] * player.cavalry["manouver"]
+		if k == "artillery":
+			manouver += current_makeup[k] * player.artillery["manouver"]
+		if k == "tank":
+			manouver += current_makeup[k] * player.tank["manouver"]
+		if k == "fighter":
+			manouver += current_makeup[k] * player.fighter["manouver"]
+	manouver = manouver * (1 + player.midPOP["officers"]["number"]/2)
+	return manouver
+
+def calculate_amphib_oil(player, current_makeup):
+	oil = 0
+	for k, v in current_makeup.items():
+		if k == "tank":
+			oil += current_makeup[k] * player.tank["oil_use"]
+		if k == "fighter":
+			oil += current_makeup[k] * player.fighter["oil_use"]
+	return oil
+
+def oil_amph_unit_str(player, current_makeup):
+	amount = 0
+	for k, v in current_makeup.items():
+		if k == "tank":
+			amount = current_makeup[k] * player.tank["attack"]
+		if k == "fighter":
+			amount = current_makeup[k] * player.fighter["attack"]
+	return amount  
+
+def oil_amph_unit_man(player, current_makeup):
+	amount = 0
+	for k, v in current_makeup.items():
+		if k == "tank":
+			amount = current_makeup[k] * player.tank["manouver"]
+		if k == "fighter":
+			amount = current_makeup[k] * player.fighter["manouver"]
+	return amount  
+
+
+
 def combat_against_uncivilized(player, unciv):
 	print("The nation of %s is attacking %s !__________________________________________________" % (player.name, unciv.name))
 	cont = input()
+	forces = {}
 	if type(player) == Human:
-		amount = naval_transport(player)
+		forces = naval_transport(player)
 	if type(player) == AI:
-		amount = ai_transport_units(player)
+		forces = ai_transport_units(player)
 
-	player_initial_army = sum(amount)
-	player_initial_makeup = amount
-	player_current_makeup = amount
+	player_initial_army = calculate_amphib_num_units(player, forces)
+	player_initial_makeup = forces
+	player_current_makeup = forces
 	unciv_initial_army = unciv.number_irregulars
 
 	while(True):
-		player_number_units_army = sum(player_current_makeup)
-		player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
-		player_ammo = player_current_makeup[0] * player.infantry["ammo_use"] + player_current_makeup[1] * player.cavalry["ammo_use"] + player_current_makeup[2] * player.artillery["ammo_use"]
-		player_manouver = player_current_makeup[0] * player.infantry["manouver"] + player_current_makeup[1] * player.cavalry["manouver"] + player_current_makeup[2] * player.artillery["manouver"]
-		player_manouver = player_manouver * (1 + player.midPOP["officers"]["number"]/player.milPOP)
+		player_number_units_army = calculate_amphib_num_units(player, player_current_makeup)
+		player_str = calculate_amphib_strength(player, player_current_makeup)
+		player_ammo = calculate_amphib_ammo(player, player_current_makeup)
+		player_manouver = calculate_amphib_man(player, player_current_makeup)
+		player_oil = calculate_amphib_oil(player, player_current_makeup)
+		print("Oil amount %s" % (player_oil))
+		print("player oil %s" % (player.resources["oil"]))
+
 		unciv_strength = unciv.number_irregulars * 0.65
 		player_manouver_roll = random.uniform(0, 1)
 		unciv_manouver_roll = random.uniform(0, 1)
+		o_deficit = player.resources["oil"] - player_oil
+		print("deficit %s" % (o_deficit))
+		if o_deficit < 0:
+			print("%s has an oil deficit of %s" % (player.name, abs(o_deficit)))
+			base = oil_amph_unit_man(player, player_current_makeup)
+			temp = abs(o_deficit/(player_oil * 1.5))
+			penalty = base * (1 - temp)
+			player_manouver -=  penalty
 
-		print("%s has %s units with a total attack strength of %s \n" % (player.name, player_initial_army, player_str))
+		print("%s has %s units with a total attack strength of %s \n" % (player.name, player_number_units_army, player_str))
 		print("%s has %s units with a total attack strength of %s \n" % (unciv.name, unciv.number_irregulars, unciv_strength ))
 		if(player_manouver + player_manouver_roll > 1.5 + unciv_manouver_roll):
 			player_str = player_str * 1.20
 			if "indirect_fire" in player.technologies:
-				player_str += (player_current_makeup[2] * player.artillery["attack"]) * 0.5
+				player_str += (player_current_makeup["artillery"] * player.artillery["attack"]) * 0.5
 		else:
 			unciv_strength  = unciv_strength * 1.20
-		player.goods["cannons"] -= player_ammo
+		
+		a_deficit = player.goods["cannons"] - player_ammo
+		if a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (player.name, abs(a_deficit)))
+			penalty = abs(a_deficit/ (player_ammo * 2))
+			player_str = player_str * (1 - penalty)
+			player.goods["cannons"] = 0
+		else:
+			player.goods["cannons"] -= player_ammo
+
+		if o_deficit < 0:
+			print("%s has an oil deficit of %s" % (player.name, abs(o_deficit)))
+			base = oil_amph_unit_str(player, player_current_makeup)
+			temp = abs(o_deficit/(player_oil *2))
+			penalty = base * (1 - temp)
+			player_str -= penalty
+			player.resources["oil"] = 0
+		else:
+			player.resources["oil"] -= player_oil
+
 		print("Player modified att str: %s \n" % (player_str))
 		print("unciv modified att str %s \n" % (unciv_strength))
 		player_losses = unciv_strength/3.0
@@ -322,9 +578,9 @@ def combat_against_uncivilized(player, unciv):
 		print("unciv losses %s \n" % (unciv_losses))
 
 		player_current_makeup = distribute_losses_amph(player, player_losses, player_number_units_army, player_current_makeup)
-		player_number_units_army = sum(player_current_makeup)
+		player_number_units_army = calculate_amphib_num_units(player, player_current_makeup)
 		unciv.number_irregulars -= unciv_losses
-		player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
+		player_str = calculate_amphib_strength(player, player_current_makeup)
 		print("Player units remaining: %s. Player Stength: %s \n" % (player_number_units_army, player_str) )
 		print("Unciv remaining: %s. Unciv Strenthg: %s \n" % (unciv.number_irregulars, unciv.number_irregulars * 0.65) )
 		done = False
@@ -337,18 +593,22 @@ def combat_against_uncivilized(player, unciv):
 				print("%s is now in the hands of %s \n" % (unciv.name, player.name))
 				for k, prov in unciv.provinces.items():
 					player.provinces[k] = prov
-					player.provinces[k].type = "colony"
+					player.provinces[k].type = "uncivilized"
 					player.provinces[k].worked = False
-				player.colonization -= 1
+					player.ai_modify_priorities_from_province(player.provinces[k].resource)
+				player.colonization -= (1 + player.num_colonies)
 				player.num_colonies +=1
+				player.stability -= 0.15
+				if player.stability < - 3.0:
+					player.stability = - 3.0
 				print("%s is now in possession of %s, which produces %s \n" % (player.name, prov.name, prov.resource))
 				unciv.provinces.clear()
 				return
 			else:
 				print("%s's attept to take %s has ended in failure, what an embarresment! \n" % (player.name, unciv.name))
 				player.stability -= 0.5
-				if p1.stability < -3.0:
-					p1.stability = -3.0
+				if player.stability < -3.0:
+					player.stability = -3.0
 				unciv.number_irregulars += 1
 				return
 		else:
@@ -358,7 +618,7 @@ def combat_against_uncivilized(player, unciv):
 				if(cont == "n"):
 					return
 			if type(player) == AI:
-				player_str = player_current_makeup[0] * player.infantry["attack"] + player_current_makeup[1] * player.cavalry["attack"] + player_current_makeup[2] * player.artillery["attack"]
+				player_str =  calculate_amphib_strength(player, player_current_makeup)
 				unciv_strength = unciv.number_irregulars * 0.65
 				if player_str * 0.85 < unciv_strength:
 					return
@@ -367,22 +627,39 @@ def combat_against_uncivilized(player, unciv):
 def amph_combat(p1, p2, p1_forces):
 	print("War has broken out between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
 	cont = input()
-	att_initial_army = sum(p1_forces)
+	att_initial_army = calculate_amphib_num_units(p1, p1_forces)
 	att_initial_makeup = p1_forces
 	att_current_makeup = p1_forces
 	def_initial_army = calculate_number_of_units(p2)
 	while(True):
 		def_number_units_army = calculate_number_of_units(p2)
-		att_number_units_army = sum(att_current_makeup)
-		att_str = att_current_makeup[0] * p1.infantry["attack"] + att_current_makeup[1] * p1.cavalry["attack"] + att_current_makeup[2] * p1.artillery["attack"]
+		att_number_units_army = calculate_amphib_num_units(p1, p1_forces)
+		att_str = calculate_amphib_strength(p1, p1_forces)
 		def_str = calculate_base_defense_strength(p2)
-		att_ammo = att_current_makeup[0] * p1.infantry["ammo_use"] + att_current_makeup[1] * p1.cavalry["ammo_use"] + att_current_makeup[2] * p1.artillery["ammo_use"]
+		att_ammo = calculate_amphib_ammo(p1, p1_forces)
+		att_oil = calculate_amphib_oil(p1, p1_forces)
 		def_ammo = calculate_ammo_needed(p2)
-		att_manouver = att_current_makeup[0] * p1.infantry["manouver"] + att_current_makeup[1] * p1.cavalry["manouver"] + att_current_makeup[2] * p1.artillery["manouver"]
-		att_manouver = att_manouver * (1 + p1.midPOP["officers"]["number"]/p1.milPOP)
+		def_oil = calculate_oil_needed(p2)
+		att_manouver = calculate_amphib_man(p1, p1_forces)
 		def_manouver = calculate_manouver(p2)
 		att_manouver_roll = random.uniform(0, 1)
 		def_manouver_roll = random.uniform(0, 1)
+
+		p1o_deficit = p1.resources["oil"] - att_oil
+		if p1o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p1.name, abs(p1o_deficit)))
+			base = oil_amph_unit_man(p1, p1_forces)
+			temp = abs(p1o_deficit/(att_oil * 1.5))
+			penalty = base * (1 - temp)
+			att_manouver -=  penalty
+
+		p2o_deficit = p2.resources["oil"] - def_oil
+		if p2o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p2.name, abs(p2o_deficit)))
+			base = calculate_oil_manouver(p2)
+			temp = abs(p2o_deficit/(def_oil * 1.5))
+			penalty = base * (1 - temp)
+			att_manouver -=  penalty
 
 		print("%s has %s units and base attack strength of %s \n" % (p1.name, att_number_units_army, att_str))
 		print("%s has %s units and base attack strength of %s \n" % (p2.name, def_number_units_army, def_str))
@@ -401,8 +678,45 @@ def amph_combat(p1, p2, p1_forces):
 				def_str += (p2.military["artillery"] * p2.artillery["attack"]) * 0.5
 
 		print("%s total attack strength: %s, %s total attack strength: %s \n" % (p1.name, att_str, p2.name, def_str))
-		p1.goods["cannons"] -= att_ammo
-		p2.goods["cannons"] =- def_ammo
+		p1a_deficit = p1.goods["cannons"] - att_ammo
+		if p1a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p1.name, abs(p1a_deficit)))
+			penalty = abs(p1a_deficit/ (att_ammo * 2))
+			att_str = att_str * (1 - penalty)
+			p1.goods["cannons"] = 0
+		else:
+			p1.goods["cannons"] -= att_ammo
+		
+		p2a_deficit = p2.goods["cannons"] - def_ammo
+		if p2a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p2.name, abs(p2a_deficit)))
+			penalty = abs(p2a_deficit/ (def_ammo * 2))
+			def_str = def_str * (1 - penalty)
+			p2.goods["cannons"] = 0
+		else:
+			p2.goods["cannons"] -= def_ammo
+
+		if p1o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p1.name, abs(p1o_deficit)))
+			base = oil_amph_unit_str(p1, p1_forces)
+			temp = abs(p1o_deficit/(att_oil *2))
+			penalty = base * (1 - temp)
+			att_str -= penalty
+			p1.resources["oil"] = 0
+		else:
+			p1.resources["oil"] -= att_oil
+
+		p2o_deficit = p2.resources["oil"] - def_oil
+		if p2o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p2.name, abs(p2o_deficit)))
+			base = calculate_oil_def(p2)
+			temp = abs(p2o_deficit/(def_oil *2))
+			penalty = base * (1 - temp)
+			def_str -= penalty
+			p2.resources["oil"] = 0
+		else:
+			p2.resources["oil"] -= def_oil
+
 		att_losses = def_str/3
 		def_losses = att_str/3
 		done = False
@@ -410,7 +724,7 @@ def amph_combat(p1, p2, p1_forces):
 			done = True
 		print("%s losses: %s,  %s losses: %s \n" % (p1.name, att_losses, p2.name, def_losses))
 		att_current_makeup = distribute_losses_amph(p1, att_losses, att_number_units_army, att_current_makeup)
-		att_number_units_army = sum(att_current_makeup)
+		att_number_units_army = calculate_amphib_num_units(p1, att_current_makeup)
 		def_number_units_army = distribute_losses(p2, def_losses, def_number_units_army)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_army, p2.name, def_number_units_army))
 		done = False
@@ -433,84 +747,96 @@ def amph_combat(p1, p2, p1_forces):
 				if(cont == "n"):
 					break
 			if type(p1) == AI:
-				player_str = att_current_makeup[0] * p1.infantry["attack"] + att_current_makeup[1] * p1.cavalry["attack"] + att_current_makeup[2] * p1.artillery["attack"]
+				att_str = calculate_amphib_strength(p1, p1_forces)
 				def_str = calculate_base_defense_strength(p2)
-				if player_str * 0.85 < def_str:
+				if att_str * 0.85 < def_str:
 					return
 
 
 def naval_transport(p1):
-	transport_limit = int((p1.military["frigates"] * 2) + (p1.military["iron_clad"] *2))
+	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+	forces = {
+		"infantry": 0,
+		"cavalry": 0,
+		"artillery": 0,
+		"tank": 0,
+		"fighter": 0
+	}
+	number = 0
 	correct = False
-	print("check")
 	print("Your transport capacity is %s" % (transport_limit))
-	while correct == False:
-		amount = input("How many do you want to send of each of the following? \
-		infantry, cavalry, and artillery (three numbers seprated by a space each) \n").split()
-		amount = [int(x) for x in amount]
-		if sum(amount) > transport_limit:
-			print("The amount you specified exceeds your capacity \n")
-		elif amount[0] > p1.military["infantry"] or amount[1] > p1.military["cavalry"] or amount[2] > p1.military["artillery"]:
-			print("You do not have have that many units \n")
-		else:
-			correct = True
-	return amount
+	for k, v in focres.items():
+		while correct == False:
+			amount = input("How many %s would you like to send? (you have %s)" % (forces[k], forces[v]))
+			if number + amound > transport_limit:
+				print("The amount you specified exceeds your capacity \n")
+				continue
+			elif amount > p1.military[v]:
+				print("You only have %s %s" (forces[v], forces[k]))
+				continue
+			else:
+				forces[k] = amount
+				correct = True
+	return forces
 
 
 def ai_transport_units(player):
-	transport_limit = int((player.military["frigates"] * 2) + (player.military["iron_clad"] *2))
-	forces = [0, 0, 0]
-	for i in range(transport_limit):
-		flag = False
+	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+	forces = {
+		"infantry": 0,
+		"cavalry": 0,
+		"artillery": 0,
+		"tank": 0,
+		"fighter": 0
+	}
+	number = 0
+	for v in range(int(transport_limit)):
 		tries = 0
-		while flag == False and tries < 12:
-			type = random.choice(["infantry", "cavalry", "artillery"])
-			if type == "infantry":
-				if player.military["infantry"] - forces[0] >= 1:
-					forces[0] += 1
-					flag = True
-			if type == "cavalry":
-				if player.military["cavalry"] - forces[1] >= 1:
-					forces[1] += 1
-					flag = True
-			if type == "artillery":
-				if player.military["artillery"] - forces[2] >= 1:
-					forces[2] += 1
-					flag = True
+		while tries < 32:
+			_type = random.choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
+			if player.military[_type] - forces[_type] >= 1:
+				forces[_type] += 1
 			tries += 1
 	return forces
 
 
 def calculate_number_of_ships(player):
 	count = 0
-	count += player.military["frigates"] + player.military["iron_clad"]
+	count += player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]
 	return count
 
 def calculate_naval_strength(player):
 	count = 0
 	count += player.military["frigates"] * player.frigates["attack"] + random.uniform(0, 1)
 	count +=  player.military["iron_clad"] * player.iron_clad["attack"]
-	count = count * (1 + player.midPOP["officers"]["number"]/((player.milPOP) *2))
+	count +=  player.military["battle_ship"] * player.battle_ship["attack"]
 	return count
 
 
 
 def distribute_naval_losses(player, losses, num_units):
 	while(losses > 0.5 and num_units >= 0.1):
-		while(player.military["frigates"] > 0.1 and losses > 0.5):
+		while(player.military["frigates"] > 0.5 and losses > 0.5):
 		#	print("Losses %s, num_units %s \n" % (losses, num_units))
 			player.military["frigates"] -=0.5
-			player.POP -= 0.075
-			player.milPOP -= 0.075
-			player.numLowerPOP -= 0.075
+			player.POP -= 0.1
+			player.milPOP -= 0.1
+			player.numLowerPOP -= 0.1
 			num_units -= 0.5
 			losses -= 0.5
-		while(player.military["iron_clad"] >= 0.1 and losses > 0.5):
-			player.military["iron_clad"] -= 0.5
-			player.POP -= 0.075
-			player.milPOP -= 0.075
-			player.numLowerPOP -= 0.075
-			num_units -= 0.5
+		while(player.military["iron_clad"] >= 0.5 and losses > 0.5):
+			player.military["iron_clad"] -= 0.25
+			player.POP -= 0.05
+			player.milPOP -= 0.05
+			player.numLowerPOP -= 0.05
+			num_units -= 0.25
+			losses -= 0.5
+		while(player.military["battle_ship"] >= 0.5 and losses > 0.5):
+			player.military["battle_ship"] -= 0.25
+			player.POP -= 0.020
+			player.milPOP -= 0.025
+			player.numLowerPOP -= 0.025
+			num_units -= 0.125
 			losses -= 0.5
 	return num_units
 
@@ -518,6 +844,11 @@ def calculate_ammo_needed_navy(player):
 	amount = 0
 	amount += player.military["frigates"] * player.frigates["ammo_use"]
 	amount += player.military["iron_clad"] * player.iron_clad["ammo_use"]
+	amount += player.military["battle_ship"] * player.battle_ship["ammo_use"]
+	return amount
+
+def calculate_oil_needed_navy(player):
+	amount = player.military["battle_ship"] * player.battle_ship["oil_use"]
 	return amount
 
 
@@ -531,13 +862,53 @@ def naval_battle(p1, p2):
 	while(True):
 		att_number_units_navy = calculate_number_of_ships(p1)
 		def_number_units_navy = calculate_number_of_ships(p2)
-		def_ammo = calculate_ammo_needed_navy(p1)
-		att_ammo = calculate_ammo_needed_navy(p2)
+		att_ammo = calculate_ammo_needed_navy(p1)
+		def_ammo = calculate_ammo_needed_navy(p2)
+		att_oil = calculate_oil_needed_navy(p1)
+		def_oil = calculate_oil_needed_navy(p2)
 		att_str = calculate_naval_strength(p1)
 		def_str = calculate_naval_strength(p2)
 		print("%s has naval strength of %s, %s has naval strength of %s \n" % (p1.name, att_str, p2.name, def_str))
-		p1.goods["cannons"] -= att_ammo
-		p2.goods["cannons"] -= def_ammo
+		p1a_deficit = p1.goods["cannons"] - att_ammo
+		if p1a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p1.name, abs(p1a_deficit)))
+			penalty = abs(p1a_deficit/ (att_ammo * 2))
+			att_str = att_str * (1 - penalty)
+			p1.goods["cannons"] = 0
+		else:
+			p1.goods["cannons"] -= att_ammo
+
+		p2a_deficit = p2.goods["cannons"] - def_ammo
+		if p2a_deficit < 0:
+			print("%s has an ammo deficit of %s" % (p2.name, abs(p2a_deficit)))
+			penalty = abs(p2a_deficit/ (def_ammo * 2))
+			att_str = def_str * (1 - penalty)
+			p2.goods["cannons"] = 0
+		else:
+			p2.goods["cannons"] -= def_ammo
+
+		p1o_deficit = p1.resources["oil"] - att_oil
+		if p1o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p1.name, abs(p1o_deficit)))
+			base = p1.military["battle_ship"] * p1.battle_ship["oil_use"]
+			temp = abs(p1o_deficit/(att_oil *2))
+			penalty = base * (1 - temp)
+			att_str -= penalty
+			p1.resources["oil"] = 0
+		else:
+			p1.resources["oil"] -= att_oil
+
+		p2o_deficit = p2.resources["oil"] - def_oil
+		if p2o_deficit < 0:
+			print("%s has an oil deficit of %s" % (p2.name, abs(p2o_deficit)))
+			base = p2.military["battle_ship"] * p2.battle_ship["oil_use"]
+			temp = abs(p2o_deficit/(def_oil *2))
+			penalty = base * (1 - temp)
+			def_str -= penalty
+			p2.resources["oil"] = 0
+		else:
+			p2.resources["oil"] -= def_oil
+
 		att_losses = def_str/4
 		def_losses = att_str/4
 		print("%s takes %s losses, %s takes %s losses \n" % (p1.name, att_losses, p2.name, def_losses))

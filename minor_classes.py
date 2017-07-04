@@ -11,7 +11,7 @@ class Province(object):
 		self.worked = False
 		self.powered = False
 		self.quality = _quality
-		self.type = _type  # core or colony
+		self.type = _type  # civilized, old, uncivilized
 		self.culture = player
 		self.AI_priority = 0
 		#self.desirability =_desirability

@@ -20,12 +20,12 @@ from globe import*
 
 NUM_MAJOR_POWERS = 6
 NUM_OLD_EMPIRES = 3
-NUM_UNCIVILIZRD_MINORS = 5
+NUM_UNCIVILIZRD_MINORS = 4
 NUM_OLD_MINORS = 4
 
 NUM_PROV_MAJORS = 6
 #NUM_PROV_OLD_EMPIRES = 4
-NUM_PROV_UNCIV = 1
+NUM_PROV_UNCIV = 2
 NUM_PROV_OLD_MINORS = 2
 
 
@@ -38,9 +38,11 @@ def initialize_major_power(player):
 	player.government = "absolute monarchy"
 	player.AP = 2
 	player.POP = 7.00
-	player.freePOP = 5.2
-	player.milPOP = 0.8
+	player.freePOP = 5
+	player.milPOP = 1.0
 	player.numLowerPOP = 6
+
+	player.factories["ship_yard"] = 1
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("professional_armies")
@@ -57,17 +59,36 @@ def initialize_major_power(player):
 	player.resources["gold"] = 12.0
 	
 	player.goods["cannons"] = 1.0
-	player.goods["furniture"] = 0.0
 
 	player.military["infantry"] = 2.0
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 1.0
+	player.military["artillery"] = 1.0
 
-	player.number_units = 4.0
+	player.number_units = 5.0
 	player.colonization = 0.5
 	player.new_development = 1.0
 	player.diplo_action = 0.5
 
+def advanced_minor(player):
+	player.stability = 1.0
+	player.government = "absolute monarchy"
+	player.AP = 1
+	player.POP = 2.4
+	player.freePOP = 5
+	player.milPOP = 0.4
+	player.numLowerPOP = 2.4
+
+	player.technologies.add("pre_industry_2")
+	player.technologies.add("professional_armies")
+	#player.technologies.add("high_pressure_steam_engine")
+
+	player.numMidPOP = 1.0
+
+	player.resources["gold"] = 7.0
+	
+	player.military["infantry"] = 2.0
+	player.number_units = 2
 
 
 def initialize_oldemp(player):
@@ -119,6 +140,26 @@ def initialize_old_minor(player):
 
 	player.colonization = -5.0
 
+
+def initilize_uncivilized(player):
+	player.stability = -1.0
+	player.milPOP = 0.4
+	player.government = "despotism"
+	player.technologies.add("basic_civ")
+
+	player.POP = 2.4
+	player.numLowerPOP = 2.4
+	player.freePOP = 2
+	player.technologies.add("pre_industry_1")
+	player.resources["gold"] = 4.0
+	player.military["irregulars"] = 2.0
+	player.techModifier = 0.5
+	player.reputation = 0.6
+	player.colonization = -8.0
+
+
+
+
 def start_game():
 
 	print("____________________________________________________________________________________________ \n")
@@ -155,7 +196,6 @@ def start_game():
 				initialize_major_power(players[name])
 
 
-
 		if control == "AI":
 			new = AI(name, "major", i)
 			players[name] = new
@@ -163,13 +203,12 @@ def start_game():
 			players[name].borders.add(b2)
 			initialize_major_power(players[name])
 
-
 		i += 1
 
 	#Initialize the resources each player has in each province
 	for k, player in players.items():
 		name = doname()
-		player.provinces[name] = Province(name, "food", 1.0, "core", player.name)
+		player.provinces[name] = Province(name, "food", 1.0, "civilized", player.name)
 		player.resources["food"] += 1
 
 		prov = 1
@@ -189,13 +228,15 @@ def start_game():
 				res = "coal"
 			elif chance > 0.77 and chance<= 0.96:
 				res = "wood"
-			elif chance > 0.96 and chance<= 0.98:
+			elif chance > 0.96 and chance<= 0.97:
 				res = "dyes"
+			elif chance > 0.97 and chance <= 0.98:
+				res = "oil"
 			elif chance > 0.98:
 				res = "gold"
 			qual = triangular(0.5, 2.0, 1.0)
 			name = doname()
-			new = Province(name, res, qual, "core", player.name)
+			new = Province(name, res, qual, "civilized", player.name)
 			player.provinces[name] = new
 			print("Player %s is assigned %s at %s with %s quality\n" % (player.name, res, player.provinces[name].name, qual))
 			player.resources[res] += 1
@@ -243,7 +284,7 @@ def start_game():
 			empire.POP = num_provinces
 			empire.numLowerPOP = empire.POP
 			empire.freePOP = empire.numLowerPOP - empire.milPOP
-			empire.provinces[1] = Province(doname(), "food", 1.0, "core", empire.name)
+			empire.provinces[1] = Province(doname(), "food", 1.0, "old", empire.name)
 			empire.resources["food"] += 1
 			prov = 1
 			while(prov < num_provinces):
@@ -254,22 +295,26 @@ def start_game():
 					res = "food"
 				elif chance > 0.28 and chance<= 0.38:  
 					res = "iron"
-				elif chance > 0.38 and chance<= 0.52:
+				elif chance > 0.38 and chance<= 0.50:
 					res = "cotton"
-				elif chance > 0.52 and chance<= 0.62:
+				elif chance > 0.50 and chance<= 0.60:
 					res = "coal"
-				elif chance > 0.62 and chance<= 0.76:
+				elif chance > 0.60 and chance<= 0.73:
 					res = "wood"
-				elif chance > 0.76 and chance<= 0.80:
+				elif chance > 0.73 and chance<= 0.77:
 					res = "dyes"
-				elif chance > 0.80:
+				elif chance > 0.77 and chance <= 0.90:
 					res = "spice"
+				elif chance > 0.90 and chance <= 0.95:
+					res = "rubber"	
+				elif chance > 0.95:
+					res = "oil"
 
 				qual = triangular(0.5, 1.5, 1.0)
 				#player.provinces[prov]["resource"] = res
 				#player.provinces(prov)resource =
 				name = doname()
-				new = Province(name, res, qual, "core", empire.name)
+				new = Province(name, res, qual, "old", empire.name)
 				empire.provinces[name] = new
 				print("Player %s is assigned %s at %s with %s quality\n" % (empire.name, res, empire.provinces[name].name, qual))
 				empire.resources[res] += 1
@@ -297,28 +342,30 @@ def start_game():
 				#res = choice(['food', 'cotton', 'wood', 'coal', 'iron', 'spice', 'spice','dyes', 'food', 'gold'])
 				res = " "
 				chance = uniform(0, 1)
-				if chance <= 0.32:
+				if chance <= 0.30:
 					res = "food"
-				elif chance > 0.32 and chance <= 0.42:  
+				elif chance > 0.30 and chance <= 0.38:  
 					res = "iron"
-				elif chance > 0.42 and chance<= 0.52:
+				elif chance > 0.38 and chance<= 0.46:
 					res = "cotton"
-				elif chance > 0.52 and chance<= 0.62:
+				elif chance > 0.46 and chance<= 0.56:
 					res = "coal"
-				elif chance > 0.62 and chance<= 0.74:
+				elif chance > 0.56 and chance<= 0.64:
 					res = "wood"
-				elif chance > 0.74 and chance<= 0.79:
+				elif chance > 0.64 and chance<= 0.70:
 					res = "dyes"
-				elif chance > 0.77 and chance<= 0.95:
+				elif chance > 0.70 and chance<= 0.84:
 					res = "spice"
-				elif chance > 0.95:
+				elif chance > 0.84 and chance <= 0.92:
+					res = "rubber"
+				elif chance > 0.92 and chance <= 0.98:
+					res = "oil"
+				elif chance > 0.98:
 					res = "gold"
-
-
 
 				qual = triangular(0.5, 1.5, 1.0)
 				name = doname()
-				new = Province(name, res, qual, "core", old_minor.name)
+				new = Province(name, res, qual, "old", old_minor.name)
 				old_minor.provinces[name] = new
 				print("Player %s is assigned %s at %s with %s quality\n" % (old_minor.name, res, old_minor.provinces[name].name, qual))
 				old_minor.resources[res] += 1
@@ -353,26 +400,30 @@ def start_game():
 			
 			res = " "
 			chance = uniform(0, 1)
-			if chance <= 0.29:
+			if chance <= 0.28:
 				res = "food"
-			elif chance > 0.29 and chance<= 0.38:  
+			elif chance > 0.28 and chance<= 0.36:  
 				res = "iron"
-			elif chance > 0.38 and chance<= 0.49:
+			elif chance > 0.36 and chance<= 0.44:
 				res = "cotton"
-			elif chance > 0.49 and chance<= 0.57:
+			elif chance > 0.44 and chance<= 0.52:
 				res = "coal"
-			elif chance > 0.57 and chance<= 0.67:
+			elif chance > 0.52 and chance<= 0.60:
 				res = "wood"
-			elif chance > 0.67 and chance<= 0.71:
+			elif chance > 0.60 and chance<= 0.68:
 				res = "dyes"
-			elif chance > 0.71 and chance<= 0.93:
+			elif chance > 0.68 and chance<= 0.83:
 				res = "spice"
-			elif chance > 0.93:
+			elif chance > 0.83 and chance <= 91:
+				res = "rubber"
+			elif chance > 0.91 and chance <= 98:
+				res = "oil"
+			elif chance > 98:
 				res = "gold"
 
 			qual = triangular(0.5, 2.0, 1.0)
 			name = doname()
-			new = Province(name, res, qual, "core", uncivilized.name)
+			new = Province(name, res, qual, "uncivilized", uncivilized.name)
 			uncivilized.provinces[name] = new
 			print("Player %s is assigned %s at %s with %s quality\n" % (uncivilized.name, res, uncivilized.provinces[name].name, qual))
 			prov += 1

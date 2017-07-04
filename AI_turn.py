@@ -31,6 +31,8 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	player.fulfill_needs(market)
 	player.view_AI_inventory()
 
+	player.use_chemicals()
+
 	ai_destablize_empires(player, players)
 	ai_decide_colonial_war(player, players, uncivilized_minors)
 	player.use_culture(players)
@@ -40,19 +42,21 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	print("Decide Factory Production:")
 	player.ai_decide_factory_productions(market)
 
-	player.AI_set_objective(turn, market)
-	player.attempt_objective(market)
 	player.early_game(turn, market)
+	#player.AI_set_objective(turn, market)
+	player.develop_industry(market)
+	#player.attempt_objective(market)
+	player.decide_build_navy(market)
+	player.build_army(market)
+	player.ai_increase_middle_class(market)
+	player.develop_industry(market)
+	player.decide_build_navy(market)
 
-	player.decide_build_navy()
 
-	player.build_army()
+	#if player.AP >= 1:
+	#	player.AI_set_objective(turn, market)
+	#	player.attempt_objective(market)
 
-	if player.AP >= 1:
-		player.AI_set_objective(turn, market)
-		player.attempt_objective(market)
-
-	player.use_chemicals()
 
 	player.AI_sell_surplus(market)
 
@@ -64,13 +68,11 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 
 	fact2_set = player.factories
 	new_fact = [item for item in fact2_set if item not in fact_set]
-	print("New factory:")
 	for f in new_fact:
 		print (f)
 		for p in players.items():
 			if type(player) == AI:
-				if f != "cannons":
-					print("Reducing factory priority after someone built one")
+				if f != "cannons" and f != "ship_yard":
 					player.build_factory_priority[f] -= 0.2
 
 	player.turn()

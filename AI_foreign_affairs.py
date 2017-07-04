@@ -11,7 +11,10 @@ def calculate_base_attack_strength(p1):
 	strength += p1.military["infantry"] * p1.infantry["attack"]
 	strength += p1.military["cavalry"] * p1.cavalry["attack"]
 	strength += p1.military["artillery"] * p1.artillery["attack"]
+	strength += p1.military["tank"] * p1.tank["attack"]
+	strength += p1.military["fighter"] * p1.fighter["attack"]
 	return strength
+
 
 def calculate_base_defense_strength(p2):
 	strength = 0.0
@@ -19,14 +22,15 @@ def calculate_base_defense_strength(p2):
 	strength += p2.military["infantry"] * p2.infantry["defend"]
 	strength += p2.military["cavalry"] * p2.cavalry["defend"]
 	strength += p2.military["artillery"] * p2.artillery["defend"]
+	strength += p2.military["tank"] * p2.tank["defend"]
+	strength += p2.military["fighter"] * p2.fighter["defend"]
 	strength = strength * p2.fortification
 	return strength
-
 
 def ai_decide_colonial_war(player, players, uncivilized_minors):
 	if player.type == "old_empire" or player.type =="old_minor":
 		return
-	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
+	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 	priorities = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True) 
 	if player.colonization < (1 + player.num_colonies) or player.diplo_action < 1 or transport_limit < 4:
 		return
@@ -36,7 +40,7 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 		return
 	count = 0
 	for k, unciv in uncivilized_minors.items():
-		if len(unciv.provinces) > 0:
+		if len(unciv.provinces) >= 1:
 			count += 1
 	if count != 0:
 		target = " "
@@ -67,7 +71,7 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 	if transport_limit >= 8:
 		empires = []
 		for k, v in players.items():
-			if v.type == "old_empire":
+			if v.type == "old_empire" and len(v.provinces) >= 1:
 				empires.append(v)
 		options = []
 		for e in empires: 
@@ -89,44 +93,43 @@ def ai_decide_colonial_war(player, players, uncivilized_minors):
 		player.reputation -= 0.1
 		return
 		
-
-
 def ai_transport_units(player):
-	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
-	forces = [0, 0, 0]
-	for i in range(int(transport_limit)):
-		flag = False
+	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+	forces = {
+		"infantry": 0,
+		"cavalry": 0,
+		"artillery": 0,
+		"tank": 0,
+		"fighter": 0
+	}
+	number = 0
+	for v in range(int(transport_limit)):
 		tries = 0
-		while flag == False and tries < 12:
-			type = choice(["infantry", "cavalry", "artillery"])
-			if type == "infantry":
-				if player.military["infantry"] - forces[0] >= 1:
-					forces[0] += 1
-					flag = True
-			if type == "cavalry":
-				if player.military["cavalry"] - forces[1] >= 1:
-					forces[1] += 1
-					flag = True
-			if type == "artillery":
-				if player.military["artillery"] - forces[2] >= 1:
-					forces[2] += 1
-					flag = True
+		while tries < 32:
+			_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
+			if player.military[_type] - forces[_type] >= 1:
+				forces[_type] += 1
 			tries += 1
 	return forces
 
 
 def ai_naval_projection(player):
-	transport_limit = (player.military["frigates"] * 2) + (player.military["iron_clad"] *2)
+	forces = ai_transport_units(player)
 	strength = 0
-	while transport_limit > 0:
-		_type = choice(["infantry", "cavalry", "artillery"])
-		if _type == "infantry":
-			strength += player.infantry["attack"]
-		if _type == "cavalry":
-			strength += player.cavalry["attack"]
-		if _type == "artillery":
-			strength += player.artillery["attack"]
-		transport_limit -= 1
+	for k, v in forces.items():
+		att = 0
+		if k == "infantry":
+			strength += forces[k] * player.infantry["attack"]
+		if k == "cavalry":
+			strength += forces[k] * player.cavalry["attack"]
+		if k == "artillery":
+			strength += forces[k] * player.artillery["attack"]
+		if k == "tank":
+			strength += forces[k] * player.tank["attack"]
+		if k == "fighter":
+			strength += forces[k] * player.fighter["attack"]
+
+
 	return strength
 
 

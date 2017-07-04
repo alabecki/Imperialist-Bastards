@@ -7,8 +7,9 @@ class Market(object):
 
 		self.gold = 2000
 
-		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes"]
-		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals"]
+		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
+		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio" \
+		"telephone", "fighter", "tank", "auto", "frigates", "iron_clad", "battle_ship"]
 
 		self.market = {
 			"food": 5,
@@ -18,23 +19,41 @@ class Market(object):
 			"coal": 3,
 			"spice": 3,
 			"dyes": 2,
+			"rubber": 0,
+			"oil": 0,
 
 			"parts": 0,
 			"clothing": 3,
 			"cannons": 2,
 			"furniture": 2,
-			"paper": 1,
-			"chemicals": 0
+			"paper": 2,
+			"chemicals": 0,
+			"frigates": 0,
+			"iron_clad": 0,
+			"battle_ship": 0,
+			"gear": 0,
+			"radio": 0,
+			"telephone": 0,
+			"fighter": 0,
+			"tank": 0,
+			"auto": 0
 		}
 
 		self.global_factories = {
 
+			"ship_yard": 0,
 			"parts": 0,
-			"cannons": 0,
 			"clothing": 0,
 			"furniture": 0,
 			"paper": 0,
-			"chemicals": 0
+			"cannons": 0,
+			"chemicals": 0,
+			"gear": 0,
+			"radio": 0,
+			"telephone": 0,
+			"fighter": 0,
+			"auto": 0,
+			"tank": 0
 		}
 
 		self.resources_sell_price = {
@@ -59,29 +78,30 @@ class Market(object):
 			18: 2,
 			19: 2,
 			20: 2,
-			21: 2
+			21: 2,
+			22:2
 			#if more than 15 goes to 1
 		}
 
 		self.goods_sell_price = {
-			1: 7,
+			1: 8,
 			2: 7,
-			3: 6,
+			3: 7,
 			4: 6,
 			5: 6,
 			6: 6,
 			7: 6,
-			8: 5,
+			8: 6,
 			9: 5,
 			10: 5,
 			11: 5,
 			12: 5,
-			13: 4,
+			13: 5,
 			14: 4,
 			15: 4,
 			16: 4,
 			17: 4,
-			18: 3,
+			18: 4,
 			19: 3,
 			20: 3,
 			21: 3,
@@ -100,10 +120,10 @@ class Market(object):
 				price = 1
 				return price
 			else:
-				price = self.resources_sell_price[amount]
+				price = self.resources_sell_price[amount] - 1
 			return price
 		if(_type in self.goods):
-			amount = self.market[_type] + 1
+			amount = self.market[_type]
 			if(amount < 2):
 				price = 10000
 				return price
@@ -111,7 +131,7 @@ class Market(object):
 				price = 2
 				return price
 			else:
-				price = self.goods_sell_price[amount]
+				price = self.goods_sell_price[amount] - 1
 			return price
 
 
@@ -175,21 +195,34 @@ class Market(object):
 				return price
 		if(_type in self.goods):
 			amount = self.market[_type]
+			mod = 1
+			if _type == "radio" or _type == "telephone":
+				mod = 1.25
+			if _type == "fighter":
+				mod = 3
+			if _type == "tank":
+				mod =  5.5
+			if _type == "frigates" or _type == "iron_clad":
+				mod = 3.2
+			if _type == "auto":
+				mod = 2.5
+			if _type == "battle_ship":
+				mod = 9
 			if(amount < 1):
-				price = 8
-				return price
+				price = 8 * mod
+				#return price
 			if(amount >= 22 and amount < 26):
-				price = 2
-				return price
+				price = 2 * mod
+				#return price
 			if(amount >= 26 and amount <= 30):
-				price = 1
-				return price
+				price = 1 * mod
+				#return price
 			if(amount > 30):
-				price = 0
-				return price
+				price = 0.5 * mod
+				#return price
 			else:
-				price = self.goods_sell_price[amount]
-			return price
+				price = self.goods_sell_price[amount] * mod
+			return price 
 
 	def total_sell_price(self, _type, amount):
 		print("Sell type: %s" % (_type))

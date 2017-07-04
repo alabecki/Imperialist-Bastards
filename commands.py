@@ -32,7 +32,7 @@ manage_pops = {
 	"1": "Increase Population",
 	"2": "Increase Middle Class",
 	"3": "Assign POPs",
-	"4": "Set Middle Class Priorities"
+	"4": "Use Spice for Happiness"
 }
 
 foreign_intelligence = {
@@ -45,8 +45,14 @@ foreign_intelligence = {
 produce_goods = {
 	"1": "Manifacture with Artisans",
 	"2": "Manifacture with Factories",
-	"3": "Change Chemicals into dyes (requires dyes technology)",
-	"4": "Change Chemicals to improve farmland"
+	"3": "Use Chemicals",
+}
+
+use_chemicals = {
+	"1": "Change Chemicals into dyes (requires dyes technology)",
+	"2": "Use Chemicals to improve farmland (requires fertlizer technology)",
+	"3": "Change Chemicals into rubber (requires synthetic rubber technology)",
+	"4": "Change Chemicals into oil (requires snythetic oil technology)",
 }
 
 build = {
@@ -58,15 +64,19 @@ build = {
 }
 
 build_factory = {
-	"1": "parts",
-	"2": "clothing",
-	"3": "paper",
-	"4": "furniture",
-	"5": "cannons",
-	"6": "chemicals"
-	#"7": "Electric Gear",
-	#"8": "Telephone"
-	#"9": "Automobile"
+	"1": "ship_yard",
+	"2": "parts",
+	"3": "clothing",
+	"4": "paper",
+	"5": "furniture",
+	"6": "cannons",
+	"7": "chemicals",
+	"8": "gear",
+	"9": "radio",
+	"10": "telephone",
+	"11": "auto",
+	"12": "fighter",
+	"13": "tank"
 }
 
 military_action = {
@@ -81,8 +91,9 @@ build_unit = {
 	"3": "Cavalry",
 	"4": "Frigate",
 	"5": "Iron Clad",
-	#"6": "Fighter",
-	#"7": "Tank"
+	"6": "Fighter",
+	"7": "Tank",
+	"8": "Battle Ship"
 }
 
 diplomacy = {

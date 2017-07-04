@@ -41,6 +41,7 @@ government_map = {
 	"oligarchy":  1.25
 }
 
+
 class Player(object):
 
 	player_count = 0
@@ -88,16 +89,27 @@ class Player(object):
 			"coal": 0.0,
 			"cotton": 0.0,
 			"spice": 1.0,
-			"dyes": 0.0
+			"dyes": 0.0,
+			"rubber": 0.0,
+			"oil": 0.0
 		}
 
 		self.goods = {
 			"parts": 0.0,
 			"clothing": 0.0,
 			"paper": 0.0,
-			"cannons": 0.0,
+			"cannons": 1.0,
 			"furniture": 0.0,
-			"chemicals": 0.0
+			"chemicals": 0.0,
+			"gear": 0.0,
+			"radio": 0.0,
+			"telephone": 0.0,
+			"auto": 0.0,
+			"frigates": 0.0,
+			"iron_clad": 0.0,
+			"battle_ship": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0
 		}
 
 		self.goods_produced = {
@@ -106,13 +118,39 @@ class Player(object):
 			"paper": 0.0,
 			"cannons": 0.0,
 			"furniture": 0.0,
-			"chemicals": 0.0
+			"chemicals": 0.0,
+			"gear": 0.0,
+			"radio": 0.0,
+			"telephone": 0.0,
+			"auto": 0.0,
+			"frigates": 0.0,
+			"iron_clad": 0.0,
+			"battle_ship": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0
 		}
 
 		#Industry
 		self.new_development = 0.0
 		self.number_developments = 0.0
-		self.factories = set()
+
+		self.factories = {
+			"ship_yard": 0,
+			"parts": 0,
+			"clothing": 0,
+			"furniture": 0,
+			"paper": 0,
+			"cannons": 0,
+			"chemicals": 0,
+			"gear": 0,
+			"radio": 0,
+			"telephone": 0,
+			"fighter": 0,
+			"auto": 0,
+			"tank": 0
+		}
+
+		#self.factories = set()
 		self.factory_throughput = 4.0
 		self.material_mod = 1.0
 
@@ -134,14 +172,16 @@ class Player(object):
 		self.culture_level = 0.0
 
 			#Military
-
 		self.military = {
 			"irregulars": 0.0,
 			"infantry": 0.0,
 			"cavalry": 0.0,
 			"artillery": 0.0,
 			"frigates": 0.0,
-			"iron_clad": 0.0
+			"iron_clad": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0,
+			"battle_ship": 0.0,
 		}
 
 		self.number_units = 4.0
@@ -150,50 +190,81 @@ class Player(object):
 		self.irregulars = {
 			"attack": 0.5,
 			"defend": 0.625,
-			"manouver": 0.75,
-			"ammo_use": 0.025
+			"manouver": 0.0,
+			"ammo_use": 0.025,
+			"oil_use": 0.0
 			}
 
 		self.infantry = {
 			"attack": 1.0,
-			"defend": 1.25,
-			"manouver": 1.0,
-			"ammo_use": 0.1
+			"defend": 1.1,
+			"manouver": 0.5,
+			"ammo_use": 0.1,
+			"oil_use": 0.0
 			}
 
 		self.artillery = {
 			"attack": 1.75,
 			"defend": 1.75,
-			"manouver": 0.5,
-			"ammo_use": 0.2
+			"manouver": 0.0,
+			"ammo_use": 0.2,
+			"oil_use": 0.0
 			}
 
 		self.cavalry = {
 			"attack": 1.5,
 			"defend": 1.0,
 			"manouver": 2.0,
-			"ammo_use": 0.1
+			"ammo_use": 0.1,
+			"oil_use": 0.0
 		}
 
+		self.fighter = {
+			"attack": 0.6,
+			"defend": 1.0,
+			"manouver": 6.0,
+			"ammo_use": 0.1,
+			"oil_use": 0.1
+		}
+
+		self.tank = {
+			"attack": 3,
+			"defend": 2,
+			"manouver": 4.0,
+			"ammo_use": 0.15,
+			"oil_use": 0.1
+		}
+		
 		self.frigates = {
 			"attack": 2.0,
-			"ammo_use": 0.2
+			"HP": 1.0,
+			"ammo_use": 0.2,
+			"oil_use": 0.0
 		}
 
 		self.iron_clad = {
-			"attack": 4.0,
-			"ammo_use": 0.2
+			"attack": 2.8,
+			"HP": 2,
+			"ammo_use": 0.2,
+			"oil_use": 0.0,
 			}
+
+		self.battle_ship = {
+			"attack": 8,
+			"HP": 4,
+			"ammo_use": 0.6,
+			"oil_use": 0.2
+		}
+
+
 
 		self.colonization = 0.0
 		self.num_colonies = 0
 
 		self.fortification = 1.0
 		self.max_fortification = 1.1
-		self.steam_ship_yard = False
-		self.steam_ship_port = False
 
-		Player.player_count += 1
+		self.sprawl = False
 
 
 
@@ -207,17 +278,21 @@ class Player(object):
 				dev = p.development_level
 				c_mod = 1.0
 				if p.culture != self.name:
-					c_mod = 0.8
-
-
+					c_mod = 0.75
+				if p.resource == "rubber" and "electricity" not in self.technologies:
+					continue
+				if p.resource == "oil" and p.development_level == 0:
+					continue
 				if p.powered == True:
-					gain = development_map[dev] * stability_map[stab_rounds] * p.quality
+					gain = development_map[dev] * stability_map[stab_rounds] * p.quality * c_mod
 					print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
 					self.resources[p.resource] += gain
 				else:
-					gain = stability_map[stab_rounds] * p.quality
+					if p.resource == "oil":
+						continue
+					gain = stability_map[stab_rounds] * p.quality * c_mod
 					print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
@@ -245,21 +320,30 @@ class Player(object):
 		else:
 			self.resources["food"] -= mFood
 
-		if(self.resources["coal"] < 0.25 * self.number_developments):
+		if(self.resources["coal"] < 0.2 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
 
 		for k, prov in self.provinces.items():
-			if self.resources["coal"] >= 0.25 and prov.development_level == 1:
-				self.resources["coal"]  -= 0.25
+			if self.resources["coal"] >= 0.2 and prov.development_level == 1:
+				self.resources["coal"]  -= 0.2
 				self.provinces[k].powered = True
-			elif self.resources["coal"] >= 0.25 and prov.development_level == 2:
-				self.resources["coal"]  -= 0.5
+			elif self.resources["coal"] >= 0.2 and prov.development_level == 2:
+				self.resources["coal"]  -= 0.4
 				self.provinces[k].powered = True
-
 		else:
-			self.resources["coal"] -= self.number_developments * 0.25
+			self.resources["coal"] -= self.number_developments * 0.2
 			for k, prov in self.provinces.items():
 				self.provinces[k].powered = True
+		oil_need = 0
+		if self.numMidPOP - 8 > 0:
+			oil_need = self.numMidPOP - 8
+		if self.resources["oil"] < oil_need:
+			penality = self.resources["oil"] - oil_need
+			self.stability += penality
+			self.resources["oil"] = 0
+		else:
+			self.resources["oil"] -= oil_need
+
 
 		#return stab_change
 
