@@ -4,17 +4,29 @@ from random import*
 
 
 class Province(object):
-	def __init__ (self, name, _resource, _quality, _type, player):
+	def __init__ (self, name, _resource, _quality, _type, _culture):
 		self.name = name
+		self.ocean = True
 		self.resource = _resource
 		self.development_level = 0
 		self.worked = False
 		self.powered = False
 		self.quality = _quality
-		self.type = _type  # core or colony
-		self.culture = player
+		self.type = _type  # civilized, old, uncivilized
+		self.culture = _culture
+		self.religion = ""
 		self.AI_priority = 0
+		self.borders = set()
+		self.x = 0
+		self.y = 0
+		#self.fortress_level = 0
+		#self.factories = set()
 		#self.desirability =_desirability
+		#self.abb = ""
+		#self.ruler =  ""
+		#self.occupier = ""
+		#self.friendly_units_present = []
+		#self.occupying_units_present = []
 
 class Uncivilized_minor(object):
 	def __init__(self, _name):
@@ -28,12 +40,6 @@ class Uncivilized_minor(object):
 			"manouver": 0.75,
 			"ammo_use": 0.025
 			}
-
-class Railroad(object):
-	def __init__(self, powered, level):
-		self.powered = False
-		self.level = 0
-
 
 class Relation(object):
 	def __init__ (self, _relata):

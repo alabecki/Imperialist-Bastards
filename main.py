@@ -21,6 +21,7 @@ from save import*
 from AI import*
 from human_turn import*
 from AI_turn import*
+from Scenario import*
 
 # Main Game Loop
 
@@ -42,11 +43,13 @@ while True:
 	print("______________________________________________________________________________________________ \n")
 
 	selection = " "
-	while selection not in ["S", "L", "O", "E"]:
+	while selection not in ["N", "S", "L", "O", "E"]:
 		selection = input()
 
-	if selection == "S":
+	if selection == "N":
 		initial = start_game()
+	if selection == "S":
+		initial == historical()
 	elif selection == "L":
 		name = input("What is the name of the save that you want to load? \n")
 		initial = load_game(name)
@@ -58,6 +61,7 @@ while True:
 		sys.exit(0)
 
 	players = initial["players"]
+	provinces = initial["provinces"]
 	relations = initial["relations"]
 	uncivilized_minors = initial["uncivilized_minors"]
 	market = initial["market"]
@@ -211,7 +215,7 @@ while True:
 						if choice == "3": 
 							player.assign_POP()
 						if choice =="4":
-							player.setMiddleClassPriorities()
+							player.use_spice_stability()
 
 
 					if command == "3":
@@ -228,38 +232,70 @@ while True:
 						if means == "2":
 							player.factory_production()
 						if means == "3":
-							if "synthetic_dyes" not in player.technologies:
-								print("You need the synthetic_dyes technology to do this \n")
-							elif players.goods["chemicals"] < 1:
-								print("You do not have enough chemicals \n")
-							else:
-								amount = input("How many chemicals would you like to convert to dyes? (you have %s chemicals \n" % (player.goods["chemicals"]))
-								if int(amount) > player.goods["chemicals"]:
-									print("You do not have enough chemicals for that \n")
+							chem = " "
+							while chem not in use_chemicals.keys():
+								for k1, v1 in use_chemicals:
+									print(k1, k1)
+								chem = input()
+							if chem == "1":
+								if "synthetic_dyes" not in player.technologies:
+									print("You need the synthetic_dyes technology to do this \n")
+								elif players.goods["chemicals"] < 2:
+									print("You do not have enough chemicals \n")
 								else:
-									player.goods["chemicals"] -= amount
-									player.resources["dyes"] += amount
-						if means == "4":
-							if "fertlizer" not in player.technologies:
-								print("You need the fertlizer technology to do this \n")
-							elif players.goods["chemicals"] < 1:
-								print("You do not have enough chemicals \n")
-							else:
-								num_farms = 0
-								for k, v in player.provinces.items():
-									if v.resource == "food":
-										num_farms += 1
-								print("You have %s farming provinces and %s chemicals \n" % (num_farms, player.goods["chemicals"]))
-								amount = input("How many farms would you like to improve? \n")
-								if(amount > num_farms or amount > player.goods["chemicals"]):
-									print("What is wrong with you anyway? \n")
+									amount = input("How many chemicals would you like to convert to dyes? (you have %s chemicals \n" % (player.goods["chemicals"]))
+									if int(amount) > player.goods["chemicals"]:
+										print("You do not have enough chemicals for that \n")
+									else:
+										player.goods["chemicals"] -= amount * 2
+										player.resources["dyes"] += amount
+										print("You now have %s dyes and %s chemicals" % (player.resources["dyes"], \
+											player.goods["chemicals"]))
+
+							if chem == "2":
+								if "fertlizer" not in player.technologies:
+									print("You need the fertlizer technology to do this \n")
+								elif players.goods["chemicals"] < 1:
+									print("You do not have enough chemicals \n")
 								else:
-									while amount > 0:
-										for k, v in player.provinces.items():
-											if v.resource == "food":
-												v.quality += 0.15
-												player.goods["chemicals"] -= 1
-												print("%s now has a quality rating of: %s \n" % (v.name, v.quality))
+									num_farms = 0
+									for k, v in player.provinces.items():
+										if v.resource == "food":
+											num_farms += 1
+									print("You have %s farming provinces and %s chemicals \n" % (num_farms, player.goods["chemicals"]))
+									amount = input("How many farms would you like to improve? \n")
+									if(amount > num_farms or amount > player.goods["chemicals"]):
+										print("What is wrong with you anyway? \n")
+									else:
+										while amount > 0:
+											for k, v in player.provinces.items():
+												if v.resource == "food":
+													v.quality += 0.12
+													player.goods["chemicals"] -= 1
+													print("%s now has a quality rating of: %s \n" % (v.name, v.quality))
+								if chem == "3":
+									if "synthetic_rubber" not in technologies:
+										print ("You need the synthetic rubber technology to do this")
+									elif players.goods["chemicals"] < 4:
+										print("You do not have enough chemicals \n")
+									else:
+										player.goods["chemicals"] -= 5
+										player.resources["rubber"] += 1
+										rint("You now have %s rubber and %s chemicals" % (player.resources["rubber"], \
+											player.goods["chemicals"]))
+								if chem == "4":
+									if "synthetic_oil" not in technologies:
+										print ("You need the synthetic oil technology to do this")
+									elif players.goods["chemicals"] < 4:
+										print("You do not have enough chemicals \n")
+									else:
+										player.goods["chemicals"] -= 5
+										player.resources["oil"] += 1
+										rint("You now have %s oil and %s chemicals" % (player.resources["oil"], \
+											player.goods["chemicals"]))
+
+
+
 					if command == "4":
 						print("What sort of item would you like to build? #################################################################################### \n")
 						for k, v in build.items():

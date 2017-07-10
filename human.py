@@ -74,61 +74,97 @@ class Human(Player):
 		if(self.freePOP < 0.5):
 			print("You do not have any free POPs")
 			return
-		elif(self.goods["furniture"] < 1.0):
-			print("You do not have any furniture \n")
+		requirement = ["paper"]
+		if self.resources["spice"] < 1:
+			print("You do not have any spice")
 			return
-		elif(self.resources["spice"] < 1.0):
-			print("You do not have any spice \n")
+		if self.goods["paper"] < 1:
+			print("You do not have any paper")
 			return
-		elif(self.goods["paper"] < 2.0):
-			print("You do not have enough paper \n")
-			return
-		elif(self.goods["clothing"] < 1.0):
-			print("You do not have enough clothing \n")
-			return
-
+		if self.numMidPOP >= 2: 
+			if self.goods["clothing"] < 1:
+				print("You do not have any clothing")
+				return
+			else: 
+				requirement.append("clothing")
+		if self.numMidPOP >= 3:
+			if self.goods["furniture"] < 1:
+				print("You do not have any furniture")
+				return
+			else:
+				requirement.append("furniture")
+		if self.numMidPOP >= 4:
+			if self.goods["paper"] < 2:
+				print("You do not have enough paper")
+				return
+			else:
+				requirement.append("paper")
+		if self.numMidPOP >= 5:
+			if self.goods["chemicals"] < 1:
+				print("You do not have any chemicals")
+				return
+			else:
+				requirement.append("chemicals")
+		if self.numMidPOP >= 6:
+			if self.goods["radio"] < 1:
+				print("You do not have enough radios")
+				return
+			else:
+				requirement.append("radio")
+		if self.numMidPOP >= 7:
+			if self.goods["telephone"] < 1:
+				print("You do not have any telephones")
+				return
+			else:
+				requirement.append("telephone")
+		if self.numMidPOP >= 8:
+			if self.goods["auto"] < 1:
+				print("You do not have any telehones")
+				return
+			else:
+				requirement.append("auto")
 		_type = input("What kind of middle class POP would you like to create?: researchers officers  \
-			bureaucrats artists managers \n")
-		if(self.midPOP[_type] > 1.6):
+				bureaucrats artists managers \n")
+		if(self.midPOP[_type] >= 2.0):
 			print("You have already created as many %s a permitted \n")
 			return
-		self.resources["spice"] -= 1.0
-		self.goods["furniture"] -= 1.0
-		self.goods["paper"] -= 2.0
-		self.goods["clothing"] -= 1.0
+		self.goods["spice"] -= 1
+		for r in requirement:
+			self.goods[r] -1
 		self.numLowerPOP -= 0.25
 		self.numMidPOP += 0.25
 		self.midPOP[_type] += 0.25
 		self.freePOP -= 0.25
-		self.new_development += 1.0
-
+		self.new_development += 0.5
+	
 
 	def research_tech(self):
 			print("Which Technology would you like to develop? (Print entire name) \n")
 			print("You currently have %s Research Points \n" % (self.research))
 			options = []
 			for k, t in technology_dict.items():
-				if(k not in self.technologies and t["requirement"] in self.technologies):
+				if k not in self.technologies and t["requirement"] <= self.technologies \
+				and self.research >= t["cost"] and self.numMidPOP >= t["min_mid"]:
 					print(k, t)
 					options.append(k)
+			if len(options) == 0:
+				print("You cannot research any technologies at this time")
+				return
 			choice = " "
 			while choice not in options:
 				choice = input()
-			if(technology_dict[choice]["cost"] > self.research):
-				print("You do not have enough research points to gain that technology. \n")
-				return
-			else:
-				self.research -= technology_dict[choice]["cost"]
-				self.technologies.add(choice)
-				print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n ")
-				print("Your ingenius researches have discovered %s \n " % (choice))
+			
+			self.research -= technology_dict[choice]["cost"]
+			self.technologies.add(choice)
+			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n ")
+			print("Your ingenius researches have discovered %s \n " % (choice))
 			if(choice == "muzzle_loaded_arms"):
-				self.irregulars["attack"] += 0.1
-				self.irregulars["defend"] += 0.06
+				self.irregulars["attack"] += 0.15
+				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.25
 				self.infantry["defend"] += 0.10
 				self.cavalry["attack"] += 0.20
-				self.cavalry["defend"] += 0.10
+				self.cavalry["defend"] += 0.08
 				self.artillery["attack"] += 0.25
 				self.artillery["defend"] += 0.10
 				self.frigates["attack"] += 0.25
@@ -137,38 +173,35 @@ class Human(Player):
 				self.max_fortification += 0.1
 			if(choice == "breach_loaded_arms"):
 				self.irregulars["attack"] += 0.15
-				self.irregulars["defend"] += 0.08
-				self.infantry["attack"] += 0.30
-				self.infantry["defend"] += 0.15
+				self.irregulars["defend"] += 0.1
+				self.infantry["attack"] += 0.35
+				self.infantry["defend"] += 0.2
 				self.cavalry["attack"] += 0.25
-				self.cavalry["defend"] += 0.12
-				self.artillery["attack"] += 0.30
-				self.artillery["defend"] += 0.15
-				self.frigates["attack"] += 0.30
-				self.frigates["attack"] += 0.30
+				self.cavalry["defend"] += 0.10
+				self.artillery["attack"] += 0.35
+				self.artillery["defend"] += 0.2
+				self.frigates["attack"] += 0.35
+				self.frigates["attack"] += 0.35
 			if(choice == "machine_guns" ):
 				self.irregulars["defend"] += 0.2
 				self.infantry["defend"] += 1.0
+				self.infantry["attack"] += 0.1
 				self.cavalry["defend"] + 0.15
 			if(choice == "indirect_fire"):
 				self.artillery["attack"] += 0.1
-				self.artillery["defend"] += 0.5
+				self.artillery["defend"] += 0.4
+				self.artillery["ammo_use"] += 0.05
 				self.iron_clad["attack"] += 0.25
 				self.iron_clad["defend"] += 0.25
-			if(choice == "electricity"):
-				self.production_modifier += 0.1
-			if(choice == "medicine"):
-				self.POP_growth_mod += 0.10
-				self.chemicals.add("medicine")
-			if(choice == "synthetic_dyes"):
-				self.chemicals.add("dyes")
-			if(choice == "fertlizer"):
-				self.chemicals.add("fertlizer")
-			if(choice == "telegraph"):
-				self.production_modifier += 0.1
-				self.stability_mod += 0.1
-			if(choice == "radio"):
-				self.stability_mod += 0.15
+			if(choice == "steel_plate_armor"):
+				self.iron_clad["attack"] += 0.45
+			if(choice == "bombers"):
+				self.fighter["attack"] += 1
+				self.fighter["oil"] += 0.05
+				self.fighter["ammo"] += 0.1
+			if(choice == "radar"):
+				self.fighter["defend"] += 0.5
+				self.battle_ship["attack"] += 1
 
 	def spice_to_stability(self):
 		if self.resources["spice"] > 2:
@@ -276,10 +309,16 @@ class Human(Player):
 			self.build_cavalry ()
 		elif(choice == "artillery"):
 			self.build_artillery()
+		elif(choice == "tank"):
+			self.build_tank()
+		elif(choice == "fighter"):
+			self.build_fighter()
 		elif(choice == "frigates"):
 			self.build_frigates()
 		elif(choice == "iron_clad"):
 			self.build_ironclad()
+		elif(choice == "battle_ship"):
+			self.build_battleship()
 		else:
 			return
 
@@ -327,59 +366,86 @@ class Human(Player):
 		self.can_train -= 1.0
 		print("You now have %s artillery \n" % (self.military["artillery"]))
 
+	def build_tank(self):
+		if self.goods["tank"] < 1:
+			print("You do not have any tanks to turn into units")
+			return
+		if self.can_train < 1:
+			print("You cannon train any more land units this turn")
+			return
+		self.goods["tank"] -= 1
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.military["tank"] += 1.0
+		self.num_units += 1.0
+		self.can_train -= 1.0
+		print("You now have %s tanks \n" % (self.military["tank"]))
+
+
+	def build_fighter(self):
+		if self.goods["fighter"] < 1:
+			print("You do not have any fighters to turn into units")
+			return
+		if self.can_train < 1:
+			print("You cannon train any more land units this turn")
+			return
+		self.goods["fighter"] -= 1
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.military["fighter"] += 1.0
+		self.num_units += 1.0
+		self.can_train -= 1.0
+		print("You now have %s fighters \n" % (self.military["fighter"]))
+
+
 	def build_frigates(self):
-		if(self.AP < 1):
-			print("You do not have any Action Points left \n")
+		if self.goods["frigates"] < 1:
+			print("You do not have any frigates made to turn into units")
 			return
-		if(self.goods["cannons"] < 1.0):
-			print("You do not have enough cannons \n")
-			return
-		elif(self.resources["cotton"] < 1.0):
-			print("You do not have enough cotton \n")
-			return
-		elif(self.resources["wood"] < 1.0):
-			print("You do not have enough wood \n")
+		if self.freePOP < 0.2:
+			print("You do not have any freePOPs")
 			return
 		else:
-			self.AP -= 1
-			self.goods["cannons"] -= 1.0
-			self.resources["cotton"] -= 1.0
-			self.resources["wood"] -= 1.0
+			self.goods["frigates"] -= 1.0
 			self.military["frigates"] += 1.0
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
-
 			print("You now have %s frigates \n" % (self.military["frigates"]))
 			return
 
 	def build_ironclad(self):
-		if self.steam_ship_yard == False:
-			print("You cannot build Ironclads without a steam_ship_yard \n")
-		if(self.AP < 1):
-			print("You do not have any Action Points left \n")
+		if self.goods["iron_clad"] < 1:
+			print("You do not have any iron clads made to turn into units")
 			return
-		elif(self.goods["cannons"] < 1.0):
-			print("You do not have enough cannons \n")
-			return
-		elif(self.resources["iron"] < 1.0):
-			print("You do not have enough iron \n")
-			return
-		elif(self.goods["parts"] < 1.0):
-			print("You do not have enough parts \n")
+		if self.freePOP < 0.2:
+			print("You do not have any freePOPs")
 			return
 		else:
-			self.AP -= 1
-			self.goods["cannons"] -= 1.0
-			self.resources["iron"] -= 1.0
-			self.goods["parts"] -= 1.0
-			self.military["iron_clad"] += 1
+			self.goods["iron_clad"] -= 1.0
+			self.military["iron_clad"] += 1.0
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
-			print("You now have %s \n" % (self.military["iron_clad"]))
+			print("You now have %s iron clads \n" % (self.military["iron_clad"]))
+			return
+
+	def build_battleship(self):
+		if self.goods["battle_ship"] < 1:
+			print("You do not have any battle ships made to turn into units")
+			return
+		if self.freePOP < 0.2:
+			print("You do not have any freePOPs")
+			return
+		else:
+			self.goods["battle_ship"] -= 1.0
+			self.military["battle_ship"] += 1.0
+			self.freePOP -= 0.2
+			self.milPOP += 0.2
+
+			print("You now have %s battle ships \n" % (self.military["battle_ship"]))
 			return
 
 
-	def build_factory(self, _type, market):
+	def build_factory(self, market):
 		if(self.new_development < 1):
 			print("You do not have any Development Points to spend \n")
 			return
@@ -395,40 +461,69 @@ class Human(Player):
 		elif(self.goods["parts"] < 1.0):
 			print("You do not have enough parts to build a factory \n")
 			return
-		else:
-			self.AP -= 1
-			self.resources["iron"] -= 1.0
-			self.goods["parts"] -= 1.0
-			self.factories.add(_type)
-			market.global_factories[_type] += 1
-			self.stability -= 0.5
-			self.new_development -= 1
-			print("You have constructed a %s factory \n" % (_type))
+		options = []
+		if "high_pressure_steam_engine" in self.technologies and self.new_development >= 1.0:
+			if self.factories["ship_yard"] == 0:
+				options.append["ship_yard"]
+			if self.factories["ship_yard"] == 1 and "iron_clad" in self.technologies:
+				options.append["ship_yard"]
+			if self.factories["ship_yard"] == 2 and "oil_powered_ships" in self.technologies:
+				options.append["ship_yard"]
+			if self.factories["parts"] == 0 and self.resource_base["iron"] >= 1:
+				options.append("parts")
+			if self.factories["parts"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.8 and self.resource_base["coal"] >= 1.0: 
+				options.append("parts")
+			if self.factories["clothing"] == 0 and self.resource_base["cotton"] >= 1:
+				options.append("clothing")
+			if self.factories["clothing"] == 1 and "power_loom" in self.technologies and self.resource_base["cotton"] >= 1.8:
+				options.append("clothing")
+			if self.factories["furniture"] == 0 and self.resource_base["wood"] >= 1:
+				options.append("furniture")
+			if self.factories["furniture"] == 1 and "electricity" in self.technologies and self.resource_base["wood"] >= 1.4 and self.resource_base["cotton"] >= 0.9:
+				options.append("furniture")
+			if self.factories["paper"] == 0 and self.resource_base["wood"] >= 1:
+				options.append("paper")
+			if self.factories["paper"] == 1 and "pulping" in self.technologies and self.resource_base["wood"] >= 1.8:
+				options.append("paper")
+			if self.factories["cannons"] == 0:
+				options.append("cannons")
+			if self.factories["cannons"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.6:
+				options.append("cannons")
+			if self.factories["chemicals"] == 0 and "chemistry" in self.technologies and self.resource_base["coal"] > 1.2:
+				options.append("chemicals")
+			if self.factories["chemicals"] == 1 and "dyes" in self.technologies and self.resource_base["coal"] > 2:
+				options.append("chemicals")
+			if self.factories["gear"] < 2 and "electricity" in self.technologies:
+				options.append("gear")
+			if self.factories["radio"] < 2 and "radio" in self.technologies:
+				options.append("radio")
+			if self.factories("telephone") < 2 and "telephone" in self.technologies:
+				options.append("telephone")
+			if self.factories("fighter") < 2 and "flight" in self.technologies:
+				options.append("fighter")
+			if self.factories("auto") < 2 and "automobile" in self.technologies:
+				options.append("auto")
+			if self.factories("tank") < 2 and "mobile_warfare" in self.technologies:
+				options.append("tank")
+		if len(options) == 0:
+			print("You cannot build any factories at this time")
 			return
+		choice = ""
+		while choice not in options:
+			print("What kind of factry would you like to build?")
+			for o in options:
+				print (options)
+			choice = input()
 
-	def build_steam_ship_yard(self):
-		if "iron_clad" not in self.technologies:
-			print("The Ironclad technology is required to build a Steam Ship Port \n")
-			return
-		if(self.goods["parts"] < 1 or self.resources["iron"] < 1 or self.resources["wood"]):
-			print("You do not have sufficient resources to build a ship yard \n")
-			return
-		if(self.AP < 1):
-			print("You do not have enough action points \n")
-			return
-		if self.steam_ship_yard == True:
-			print("You have already built a steap ship yard")
-		if(self.new_development < 1):
-			print("You do not have enough development points \n")
-			return
-		else:
-			self.goods["parts"] -= 1
-			self.resources["iron"] -= 1
-			self.resources["wood"] -= 1
-			self.AP -1
-			self.new_development -1
-			self.steam_ship_yard = True
-			print("Your empire now has a steam shipyard and can begin builing mighty Ironclad Ships! %s \n" % (player.fortification))
+		self.AP -= 1
+		self.resources["iron"] -= 1.0
+		self.goods["parts"] -= 1.0
+		self.factories[choice] += 1
+		market.global_factories[choice] += 1
+		self.stability -= 0.33
+		self.new_development -= 1
+		print("You have constructed a %s factory \n" % (choice))
+		return
 
 	def improve_fortifications(self):
 		if self.AP < 1:
@@ -561,38 +656,32 @@ class Human(Player):
 		"paper": {"wood": 1.0},
 		"clothing": {"cotton": 0.8, "dyes": 0.2},
 		"furniture": {"wood": 0.65, "cotton": 0.35},
-		"chemicals": {"coal": 0.5}
-				}
+		"chemicals": {"coal": 0.5},
+		"gear": {"rubber": 0.5, "iron": 0.3, "coal": 0.2},
+		"radio": {"gear": 0.85, "wood": 0.15},
+		"telephone": {"gear": 0.85, "wood": 0.15},
+		"fighter": {"wood": 0.5, "gear": 0.5, "parts": 0.5, "arms": 1.0},   # 2.5 
+		"auto": {"rubber": 0.5, "gear": 0.5, "parts": 0.5, "iron": 0.5},		#2
+		"tank": {"auto": 1, "iron": 1.0, "arms": 1.5},  #4 
+		"frigate": {"cannons": 1.0, "wood": 1.0, "cotton": 1.0},
+		"iron_clad": {"cannons": 1.0, "iron": 1.0, "parts": 1.0},
+		"battle_ship": {"cannons": 3.0, "iron": 3.0, "parts": 1.0, "gear": 1.0 }  #8 
+			}
 		stab_rounds = round(self.stability * 2) / 2
 		if(self.AP < 1):
 			print("You do not have any Action Points left \n")
 			return
 		_type =  " "
 		while _type not in self.goods.keys():
-			_type = input("What kind of good do you want to produce with factory?: parts cannons clothes paper furniture chemicals \n")
-		if(_type not in self.factories):
+			for k in self.factories.keys():
+				print(k)
+			_type = input("What kind of good do you want to produce with factory? \n")
+		if self.factories[_type] == 0:
 			print("You do not have a %s factory \n" % (_type))
 			return
 		else:
-			max_amount = self.factory_throughput * stability_map[stab_rounds]
+			max_amount = self.factories[_type] * stab_rounds * 4
 			material_mod = 1 - (self.midPOP["managers"]["number"] / 3)
-			if(_type == "parts"):
-				if("bessemer_process" in self.technologies):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
-			elif(_type == "cannons"):
-				if("bessemer_process" in self.technologies):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
-			elif(_type == "paper"):
-				if("pulping" in self.technologies):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
-			elif(_type == "furniture"):
-				if("electricity" in self.technologies):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
-			elif(_type == "clothing"):
-				if("power_loom" in self.technologies):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
-			elif(_type == "chemicals"):
-					max_amount = (self.factory_throughput + 3) * stability_map[stab_rounds]
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
 			amount = int(amount)
 			if(amount > max_amount):
@@ -600,12 +689,20 @@ class Human(Player):
 				return
 			else:
 				for i in manufacture[_type]:
-					if(manufacture[_type][i] * amount * material_mod > self.resources[i]):
-						print("You do not have sufficient %s for your factory to produce %s %s \n" % (i, amount, _type))
-						return
+					if i in self.resources.keys():
+						if(manufacture[_type][i] * amount * material_mod > self.resources[i]):
+							print("You do not have sufficient %s for your factory to produce %s %s \n" % (i, amount, _type))
+							return
+					if i in self.goods.keys():
+						if(manufacture[_type][i] * amount * material_mod > self.goods[i]):
+							print("You do not have sufficient %s for your factory to produce %s %s \n" % (i, amount, _type))
+							return
 					else:
 						for i in manufacture[_type]:
-							self.resources[i] -= manufacture[_type][i] * amount * material_mod
+							if i in self.resources.keys():
+								self.resources[i] -= manufacture[_type][i] * amount * material_mod
+							else:
+								self.goods[i] -= manufacture[_type][i] * amount * material_mod
 						self.goods_produced[_type] += amount
 						self.AP -= 1
 						print("Next turn you will receive %s %s" % (self.goods_produced[_type], _type))
@@ -640,7 +737,7 @@ class Human(Player):
 
 
 	def use_culture(self):
-		if self.culture < 1:
+		if self.culture_points < 1:
 			print("Your barbaric nation does not have any culture points at this time")
 			return
 		_choices = list(range(1,6))
@@ -651,48 +748,66 @@ class Human(Player):
 				print("%s: %s" % (k,v))
 			choice = input()
 		if choice == "1":
-			self.culture -= 1
-			self.stability += 1
+			self.culture_points -= 1
+			self.stability += 0.5
 		if choice == "2":
 			options = []
 			for p, prov in provinces():
-				if p.culture != self.name:
+				if p.culture != self.culture and p.cultre not in self.accepted_cultures:
 					options.append(prov)
 			if len(options) == 0:
 				print("Fortunately, you have no provinces in need of assimalation")
 				return
 			else:
-				print("Which province would you like to assimilate?")
+				print("Which province would you like to try to include?")
 				for o in options:
 					print(o.name) 
 				opt = input()
-				self.province[opt].culture = player.name
+				self.culture_points -= 1
+				chance = uniform(0, 1)
+				if opt.type == "uncivilized":
+					if chance < 0.40:
+						self.accepted_cultures.add(opt.culture)
+						print("Assimlated Culture")
+				if opt.type == "old":
+					if chance < 0.20:
+						self.accepted_cultures.add(opt.culture)
+						print("Assimlated Culture") 
+				if opt.type == "civilized":
+					if chance < 0.10:
+						opt.culture = self.culture
+						self.accepted_cultures.add(opt.culture)
+						print("Included Culture")
 		if choice == "3":
 			for p in players.values():
 				if p.type == "major":
 					p.resources["gold"] -= 1
 					self.resources["gold"] += 1
 		if choice == "4":
-			if len(self.borders) == 0:
-				print("Since you do not border any other nations, you cannot spread your culture")
-				return
-			if self.culture < 2:
-				print("You do not have enough culture points to spread your culture at this time")
+			if self.culture_points < 2:
+				print("You do not have enough culture points at this time")
 				return 
 			else:
-				print("To which nation would you like to spread your culture?")
-				for other in player.borders:
-					print(other)
+				print("On which nation would you like to remove an accepted culture?")
+				for p, player in players.items():
+					if player.accepted_cultures > 1:
+						print(other)
 				opt = input()
 				other = players[opt]
-				for p, prov in other.provinces.items():
-					print("Name: %s, Resource: %s, Quality: %s, Dev Level:  %s" % (p.name, p.resource, p.quality, p.development_level))
-				print("To which province shall we spread our elevated culture?")
+				print("Which culture shall to attempt to remove?")
+				for c in other.accepted_cultures:
+					print (c)
 				popt = input()
-				p.provinces[popt].culture = self.name
+				chance = uniform(0, 1)
+				if chance < 0.2:
+					other.accepted_cultures.discard(popt)
+					print("Sucess! You have removed %s from the accepted culture of %s" (popt, other.name))
+				else:
+					print("You have failed to spread your culture this time around")
+				self.culture_points -= 2
 		if choice == "5":
-			if self.culture < 3:
-				print("You do not have enough culture points to steap mid POPs at this time")
+			if self.culture_points < 3:
+				print("You do not have enough culture points to steal mid POPs at this time")
 				return 
 			options = []
 			for o, other in players.items():
@@ -715,6 +830,6 @@ class Human(Player):
 				self.numMidPOP += 0.25
 				self.resources["gold"] += 5
 				self.POP += 0.25
-				self.culture -= 3
+				self.culture_points -= 3
 
 
