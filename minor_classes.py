@@ -13,6 +13,7 @@ class Province(object):
 		self.powered = False
 		self.quality = _quality
 		self.type = _type  # civilized, old, uncivilized
+		self.colony = False
 		self.culture = _culture
 		self.religion = ""
 		self.AI_priority = 0
@@ -40,6 +41,7 @@ class Uncivilized_minor(object):
 			"manouver": 0.75,
 			"ammo_use": 0.025
 			}
+		self.harsh = False
 
 class Relation(object):
 	def __init__ (self, _relata):

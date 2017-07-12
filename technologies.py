@@ -15,7 +15,7 @@ technology_dict = {
 	"professional_armies": {"requirement": {"pre_industry_1"}, "cost": 1, "min_mid": 0},
 	"pre_industry_1": { "requirement": {"pre_modern"}, "cost": 1, "min_mid": 0},
 	"pre_industry_2": {"requirement": {"pre_industry_1"}, "cost": 1, "min_mid": 0},
-	"pre_industry_3" {"requirement": {"pre_industry_2"}, "cost": 1, "min_mid": 0},
+	"pre_industry_3": {"requirement": {"pre_industry_2"}, "cost": 1, "min_mid": 0},
 	"high_pressure_steam_engine": {"requirement": {"pre_industry_3"}, "cost": 1, "min_mid": 0.5},
 	"square_timbering": {"requirement": {"high_pressure_steam_engine"}, "cost": 1, "min_mid": 1},
 	"cotton_gin": {"requirement": {"high_pressure_steam_engine"}, "cost": 1, "min_mid": 1},

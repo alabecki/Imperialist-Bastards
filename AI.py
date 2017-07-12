@@ -50,6 +50,9 @@ class AI(Player):
 			"science_culture": 0.0
 		}
 
+		self.rival_target = []
+
+		self.allied_target = ""
 
 		self.mid_class_priority = {
 			"researchers": 1.0,
@@ -486,6 +489,7 @@ class AI(Player):
 
 	def assign_priorities_to_provs(self):
 		for p, prov in self.provinces.items():
+			print(p, prov)
 			kind = prov.resource
 			prov.AI_priority = self.resource_priority[kind] * prov.quality
 		sorted_provinces = sorted(self.provinces.values(), key = lambda x: (x.AI_priority), reverse = True)

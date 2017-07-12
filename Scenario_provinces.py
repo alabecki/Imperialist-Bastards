@@ -23,7 +23,7 @@ def create_provinces():
 	Whales = Province("Whales", "coal", 1.1,  "civilized", "English" )
 	Whales.x = 2
 	Whales.y = 4
-	provinces["whales"] = Whales
+	provinces["Whales"] = Whales
 	
 	NorthEngland = Province("England5", "coal", 1.2, "civilized", "English")
 	NorthEngland.x = 1
@@ -42,13 +42,13 @@ def create_provinces():
 	provinces["Ireland"] = Ireland
 
 	
-	Champagne = Province("Champagne", "coal", 0.8, "Champagne", "French" )
+	Champagne = Province("Champagne", "iron", 1.0, "Champagne", "French" )
 	Champagne.x = 6
 	Champagne.y = 6
 	Champagne.ocean = False
 	provinces["Champagne"] = Champagne
 	
-	Brittany = Province("Brittany", "iron", 1.0, "civilized", "French")
+	Brittany = Province("Brittany", "food", 1.0, "civilized", "French")
 	Brittany.x = 6 
 	Brittany.y = 4
 	provinces["Brittany"] = Brittany
@@ -64,7 +64,7 @@ def create_provinces():
 	Aquitaine.y = 5
 	provinces["Aquitaine"] = Aquitaine
 	
-	Alps = Province("Alps", "food", 1.4, "civilized", "French")
+	Alps = Province("Alps", "food", 1.0, "civilized", "French")
 	Alps.x = 8
 	Alps.y = 6
 	provinces["Alps"] = Alps
@@ -73,6 +73,14 @@ def create_provinces():
 	Normandy.x = 6
 	Normandy.y =5
 	provinces["Normandy"] = Normandy
+
+	Loire = Province("Loire", "coal", 0.85, "civilized", "French")
+	Loire.x = 7
+	Loire.y = 5
+	provinces["Loire"] = Loire
+
+
+
 
 	EastPrussia = Province("EastPrussia", "food", 1.0, "civilized", "German")
 	EastPrussia.x = 5
@@ -174,7 +182,7 @@ def create_provinces():
 	Crimea  = Province("Crimea ", "coal", 1.0, "civilized", "Russian")
 	Crimea.x = 7
 	Crimea.y =12  
-	provinces["Crimea "] = Crimea 
+	provinces["Crimea"] = Crimea 
 	
 	Novgorod = Province("Novgorod", "food", 0.75, "civilized", "Russian")
 	Novgorod.x = 4
@@ -245,7 +253,7 @@ def create_provinces():
 	Irkutsk = Province("Irkutsk", "wood", 0.4, "uncivilized", "Siberian")
 	Irkutsk.x = 5
 	Irkutsk.y = 23
-	Irkusk.ocean = False
+	Irkutsk.ocean = False
 	provinces["Irkutsk"] = Irkutsk
 
 
@@ -353,6 +361,7 @@ def create_provinces():
 	La_Mancha = Province("La_Mancha", "food", 1.1, "civilized", "Spanish")
 	La_Mancha.x = 10
 	La_Mancha.y = 5
+	provinces["La_Mancha"] = La_Mancha
 
 
 	Holland = Province("Holland", "food", 1.2, "civilized", "Dutch")
@@ -502,7 +511,7 @@ def create_provinces():
 	United_Provinces.x = 9
 	United_Provinces.y = 19
 	United_Provinces.ocean = False
-	provinces["United Provinces"] = United_Provinces
+	provinces["United_Provinces"] = United_Provinces
 	Rajputana = Province("Rajputana", "cotton", 1.0, "old", "Indian")
 	Rajputana.x = 10
 	Rajputana.y = 18
@@ -547,7 +556,7 @@ def create_provinces():
 	Laos = Province("Loas", "food", 1.2, "old", "Thia")
 	Laos.x = 10
 	Laos.y = 22
-	Loas.ocean = False
+	Laos.ocean = False
 	provinces["Laos"] = Laos
 
 	North_Dai_Nam = Province("North_Dai_Nam", "food", 1.25, "old",  "Vietnamese")
@@ -774,25 +783,25 @@ def create_provinces():
 	Madagascar.y = 13
 	provinces["Madagascar"] = Madagascar
 
-	New_South_Wales = Province("New South Wales", "food", 0.9, "uncivilized", "Aboriginal")
+	New_South_Wales = Province("New_South_Wales", "food", 0.9, "uncivilized", "Aboriginal")
 	New_South_Wales.x = 18
 	New_South_Wales.y = 31
-	provinces["New South Whales"] = New_South_Wales
+	provinces["New_South_Wales"] = New_South_Wales
 
 	Queensland = Province("Queensland", "food", 0.8, "uncivilized", "Aboriginal")
 	Queensland.x = 17
 	Queensland.y = 31
 	provinces["Queensland"] = Queensland
 
-	South_Australia = Province("South Australia", "cotton", 0.85, "uncivilized", "Aboriginal")
+	South_Australia = Province("South_Australia", "cotton", 0.85, "uncivilized", "Aboriginal")
 	South_Australia.x = 18
 	South_Australia.y = 30
-	provinces["South Australia"] = South_Australia
+	provinces["South_Australia"] = South_Australia
 
-	West_Australia = Province("West Australia", "gold", 1.0, "uncivilized", "Aboriginal")
+	West_Australia = Province("West_Australia", "gold", 1.0, "uncivilized", "Aboriginal")
 	West_Australia.x = 17
 	West_Australia.y = 30
-	provinces["West Australia"] = West_Australia 
+	provinces["West_Australia"] = West_Australia 
 
 	New_Zealand = Province("New Zealand", "cotton", 0.8, "uncivilized", "Aboriginal")
 	New_Zealand.x = 15

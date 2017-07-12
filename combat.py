@@ -10,8 +10,11 @@ import random
 from pprint import pprint
 from copy import deepcopy
 
+
+
+
 #
-def combat(p1, p2):
+def combat(p1, p2, prov):
 	print("War has broken out between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
 	cont = input()
 	att_initial_army = calculate_number_of_units(p1)
@@ -118,10 +121,10 @@ def combat(p1, p2):
 			done = True
 		if(done == True):
 			if att_number_units_army > def_number_units_army:
-				combat_outcome(p1.name, p1, p2)
+				combat_outcome(p1.name, p1, p2, prov)
 				return
 			else:
-				combat_outcome(p2.name, p1, p2)
+				combat_outcome(p2.name, p1, p2, prov)
 				return
 		else:
 			if type(p1) == Human:
@@ -355,8 +358,8 @@ def combat_outcome(winner, p1, p2):
 		if p1.stability > 3:
 			p1.stability = 3
 		p1.CB.discard(p2.name)
-		if(p2.type == "old_empire" or p2.type == "old_minor"):
-			old_empire_defeat(p1, p2)
+		if prov in p2.provinces:
+			gain_province(p1, p2, prov)
 		loot = p2.resources["gold"]/2.0
 		p1.resources["gold"] += loot
 		p2.resources["gold"] -= loot
@@ -386,29 +389,22 @@ def combat_outcome(winner, p1, p2):
 				p1.CB.remove(p2.name)
 
 
-def old_empire_defeat(p1, p2):
+def gain_province(p1, p2, prov):
 	win_name = p1.name
 	loss_name = p2.name
 	annex = " "
-	if type(p1) == Human:
-		print("%s has defeated the Old Empre (or Old_minor) %s and may now claim one of her provinces \n" % (win_name, loss_name))
-		for k, p in p2.provinces.items():
-			pprint (vars(p))
-		annex = input("Please type in the name of the province you would like to take \n")
+	print("%s has defeated %s for the province of %s \n" % (win_name, loss_name, prov.name))
+	new = deepcopy(p2.provinces[prov])
 	if type(p1) == AI:
-		priorities = sorted(p1.resource_priority, key= p1.resource_priority.get, reverse = True) 
-		for r in priorities:
-			for p, prov in p2.provinces.items():
-						if r == prov.resource:
-							annex = p 
-	new = deepcopy(p2.provinces[annex])
-	if type(p1) == AI:
-		p1.resource_base[new.resource] += new.quality 
+		p1.resource_base[new.resource] += new.quality
+		p1.ai_modify_priorities_from_province(p1.provinces[new.name].resource)
 	p1.provinces[new.name] = new
-	p1.provinces[new.name].type = "old"
+	#p1.provinces[new.name].type = "old"
 	p1.provinces[new.name].worked = True
-	p1.ai_modify_priorities_from_province(p1.provinces[new.name].resource)
-	p2.provinces.pop(annex)
+	p2.provinces.pop(prov.name)
+	if p2.type == "old_empire" or p2.type == "old_minor" or prov.colony == True:
+		p1.colonization -= 1 + (player.num_colonies * 2)
+		p1.provinces[new.name].colony == True
 	p1.POP += 1
 	p1.numLowerPOP += 1
 	p1.reputation -= 0.1
@@ -592,31 +588,23 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 			done = True
 		if(done == True):
 			if player_number_units_army > unciv.number_irregulars:
-				if len(unciv.provinces) == 1:
-				print("%s is now in the hands of %s \n" % (unciv.name, player.name))
-				else:
-					if type(player) == Human:
-						print("Which province will you take from %s ?" % (unciv.name))
-						#cprov = ""
-						while cprov not in unciv.provinces.keys():
-							for p, prov in unciv.provinces.items():
-								print(p.name, p.resource, p.quality)
-							cprov = input()
-					else:
-						player.resource_base[cprov.resource] += cprov.quality
-						player.ai_modify_priorities_from_province(player.provinces[cprov].resource)
-					player.provinces[cprov] = unciv.provinces[cprov]
-					player.provinces[cprov].type = "uncivilized"
-					player.provinces[cprov].worked = False
-					unciv.provinces.pop(cprov)		
-				player.colonization -= (1 + player.num_colonies)
-				player.num_colonies +=1
-				player.stability -= 0.15
+				print("%s has defeated %s for the province of %s \n" % (win_name, loss_name, prov.name))
+				new = deepcopy(unciv.provinces[cprov])
+				if type(player) == AI:
+					player.resource_base[new.resource] += new.quality
+					player.ai_modify_priorities_from_province(p1.provinces[new.name].resource)
+				player.provinces[new.name] = new
+				#p1.provinces[new.name].type = "old"
+				player.provinces[new.name].worked = False
+				unciv.provinces.pop(prov.name)
+				player.type = "uncivilized"
+				player.colony = True
+				player.reputation -= 0.1
+				player.colonization -= 1 + (player.num_colonies * 2)
+				player.num_colonies += 1
+				player.stability -= 0.1
 				if player.stability < - 3.0:
 					player.stability = - 3.0
-				print("%s is now in possession of %s, which produces %s \n" % (player.name, cprov.name, cprov.resource))
-				unciv.provinces.clear()
-				return
 			else:
 				print("%s's attept to take %s has ended in failure, what an embarresment! \n" % (player.name, unciv.name))
 				player.stability -= 0.5
@@ -637,7 +625,7 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 					return
 
 
-def amph_combat(p1, p2, p1_forces):
+def amph_combat(p1, p2, p1_forces, prov):
 	print("War has broken out between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
 	cont = input()
 	att_initial_army = calculate_amphib_num_units(p1, p1_forces)
@@ -748,10 +736,10 @@ def amph_combat(p1, p2, p1_forces):
 			done = True
 		if(done == True):
 			if att_number_units_army > def_number_units_army:
-				combat_outcome(p1.name, p1, p2)
+				combat_outcome(p1.name, p1, p2, prov)
 				return
 			else:
-				combat_outcome(p2.name, p1, p2)
+				combat_outcome(p2.name, p1, p2, prov)
 				return
 		else:
 			if type(p1) == Human:
@@ -865,7 +853,7 @@ def calculate_oil_needed_navy(player):
 	return amount
 
 
-def naval_battle(p1, p2):
+def naval_battle(p1, p2, prov = " "):
 	print("A naval battle is being fought between %s and %s !!_____________________________ \n" % (p1.name, p2.name))
 	cont = input()
 	winner = ""
@@ -935,6 +923,8 @@ def naval_battle(p1, p2):
 		elif(def_number_units_navy <= def_initial_navy * 0.4):
 			print("%s had defeated %s at sea! \n" % (p1.name, p2.name))
 			winner = p1.name
+			if prov in p2.provinces:
+				gain_province(p1, p2, prov)
 			return winner
 		else:
 			if type(p1) == Human:
@@ -952,4 +942,35 @@ def naval_battle(p1, p2):
 				else:
 					continue
 
+def amphib_prelude(player, other, annex):
+	amount = naval_transport(player)
+	if type(other) == Human:
+		print("That dastardly %s is sending an armada filled with soldiers to your homeland! \n" % (player.name))
+		print("His navy has %s frigates and %s ironclads. Your navy has %s frigates and %s ironclads" \
+			% (player.military["frigates"], (player.military["iron_clad"]), other.military["frigates"], other.military["iron_clad"] ))
+		inter = ""
+		while inter != "y" and inter != "n":
+			inter = input("Do you wish to send your army to intercept? (y/n)")
+		if inter == "n":
+			print("We will meet the enemy on the ground! \n")
+			amph_combat(player, other, amount)
+		else:
+			print("Let us stop them in their tracks! \n")
+			result = naval_battle(player, other)
+			if result == other.name:
+				print("%s attempts to sail his army to %s has failed\n" % (player.name, other.name))
+			elif result == player.name:
+				print:("%s has sailed his navy to %s and is about to invade! \n" % (player.name, other.name))
+				amph_combat(player, other, amount, annex)
+	elif calculate_naval_strength(other) >= calculate_naval_strength(player):
+		result = naval_battle(player, other)
+		if result == other.name:
+			print("%s attempts to sail his army to %s has failed\n" % (player.name, other.name))
+		elif result == player.name:
+			print:("%s has sailed his navy to %s and is about to invade! \n" % (player.name, other.name))
+			amph_combat(player, other, amount, annex)
+	else:
+		amph_combat(player, other, amount, annex)
+
+	
 

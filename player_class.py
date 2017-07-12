@@ -41,7 +41,7 @@ class Player(object):
 
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
-		self.type = _type				# major, old_empire, old_minor
+		self.type = _type				# major, old_empire, old_minor, civ_minor
 		self.name = _name	
 		self.number = number
 		self.stability = 0.0
@@ -374,3 +374,43 @@ class Player(object):
 		self.colonization += col_gain
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0
+
+
+	def b_borders_a(self, p2, provinces):
+		bBa = set()
+		for v1 in self.provinces.values():
+			for v2 in p2.provinces.values():
+				if abs(v1.x - v2.x) <= 1 and abs(v1.y - v2.y) <= 1:
+					bBa.add(v2)
+		return bBa
+
+	def check_for_border(self, p2, provinces):
+		self_core = self.core(provinces)
+		other_core = p2.core(provinces)
+		for c1 in self_core:
+			for c2 in other_core:
+				if abs(c1.x - c2.x) <= 1 and abs(c1.y - c2.y) <= 1:
+					return True
+		return False
+
+	
+	def core_provinces(self, provinces):
+		core = []
+		consider = Queue(100)
+		first = self.provinces[self.capital]
+		consider.put(first)
+		while len.consider >= 1:
+			thing = get(consider)
+			for p in self.provinces.values():
+				if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:
+					if p not in core:
+						consider.put(p)
+				core.append(thing)
+		return core
+
+	def check_for_ground_invasion(self, prov, provinces):
+		core = core_provinces(self, provinces)
+		for c in core: 
+			if abs(core.x - prov.x) <= 1 and abs(core.y - prov.y) <= 1:
+				return True
+		return False
