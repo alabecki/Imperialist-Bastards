@@ -85,7 +85,6 @@ def initialize_modern_minor(player):
 
 	#player.technologies.add("high_pressure_steam_engine")
 
-	player.numMidPOP = 1.0
 
 	player.resources["gold"] = 7.0
 	

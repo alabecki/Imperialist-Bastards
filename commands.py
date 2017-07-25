@@ -40,19 +40,25 @@ foreign_intelligence = {
 	"2": "View national comparisons"
 }
 
+national_comparisons = {
+	"1": "Points-per-turn comparisons",
+	"2": "Production Comparisons",
+	"3": "Military Comparisons",
+	"4": "Other"
+}
 
 
 produce_goods = {
-	"1": "Manifacture with Artisans",
-	"2": "Manifacture with Factories",
+	"1": "Manufacture with Artisans",
+	"2": "Manufacture with Factories",
 	"3": "Use Chemicals",
 }
 
 use_chemicals = {
 	"1": "Change Chemicals into dyes (requires dyes technology)",
-	"2": "Use Chemicals to improve farmland (requires fertlizer technology)",
+	"2": "Use Chemicals to improve farmland (requires fertilizer technology)",
 	"3": "Change Chemicals into rubber (requires synthetic rubber technology)",
-	"4": "Change Chemicals into oil (requires snythetic oil technology)",
+	"4": "Change Chemicals into oil (requires synthetic oil technology)",
 }
 
 build = {
@@ -99,21 +105,18 @@ build_unit = {
 diplomacy = {
 	"1": "Improve Relations",
 	"2": "Damage Relations",
-	"3": "Fabricate casus belli",
-	"4": "Propose Non-Agression Treaty",
-	"5": "Propose Defensive Alliance Alliance",
-	"6": "Propose Full Alliance",
-	"7": "Destablize Nation",
-	"8": "Offer Loan",
-	"9": "Offer to Sell Arms",
-	"10": "Ask to Buy Arms"
+	"3": "Sabatage Relations",
+	"4": "Destablize Nation",
+	"5": "Offer Loan",
+	"6": "Offer to Sell Arms",
+	"7": "Ask to Buy Arms"
 }
 
 culture_commands = {
-		"1": "Increase Stability",
-		"2": "Assimilate Province",
-		"3": "Export Culture",
-		"4": "Spread Culture",
-		"5": "Steal Middle POP",
-		"6": "Use Spice for Stability"
+	"1": "Increase Stability",
+	"2": "Assimilate Province",
+	"3": "Export Culture",
+	"4": "Spread Culture",
+	"5": "Steal Middle POP",
+	"6": "Use Spice for Stability"
 	}

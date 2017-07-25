@@ -3,6 +3,8 @@
 import random
 import minor_classes
 from technologies import technology_dict
+from globe import*
+from queue import*
 
 
 stability_map = {
@@ -49,6 +51,7 @@ class Player(object):
 		self.culture = ""
 		self.accepted_cultures = set()
 		self.religion = ""
+		self.capital = ""
 
 		self.stability_mod = 0.0
 		self.AP = 0.0
@@ -87,7 +90,7 @@ class Player(object):
 			"spice": 1.0,
 			"dyes": 0.0,
 			"rubber": 0.0,
-			"oil": 0.0
+			"oil": 0.0,
 		}
 
 		self.goods = {
@@ -105,7 +108,7 @@ class Player(object):
 			"iron_clad": 0.0,
 			"battle_ship": 0.0,
 			"fighter": 0.0,
-			"tank": 0.0
+			"tank": 0.0,
 		}
 
 		self.goods_produced = {
@@ -263,9 +266,24 @@ class Player(object):
 		self.sprawl = False
 
 
-	def collect_resources(self):
+	def collect_resources(self, globe):
 		print("%s collects resources: \n" % (self.name))
 		stab_rounds = round(self.stability * 2) / 2
+		res_dict = {
+			
+			"gold": 0,
+			"food": 0,
+			"iron": 0,
+			"wood": 0,
+			"cotton": 0,
+			"coal": 0,
+			"dyes": 0,
+			"spice": 0,
+			"rubber": 0,
+			"oil": 0,
+		
+		}
+
 		for k, p in self.provinces.items():
 			#if(self.provinces[i]["worked"] == True):
 			if(p.worked == True):
@@ -279,18 +297,21 @@ class Player(object):
 						c_mod = 0.75
 				if p.resource == "rubber" and "electricity" not in self.technologies:
 					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.6
-					self.resources["wood"] += gain
+					res_dict["food"] += gain
+					#self.resources["wood"] += gain
 					continue 
 				if p.resource == "oil" and p.development_level == 0:
 					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.6
-					self.resources["food"] += gain
+					res_dict["food"] += gain
+					#self.resources["food"] += gain
 					continue
 				if p.powered == True:
 					gain = development_map[dev] * stability_map[stab_rounds] * p.quality * c_mod
 					print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
-					self.resources[p.resource] += gain
+					res_dict[p.resource] += gain
+					#self.resources[p.resource] += gain
 				else:
 					if p.resource == "oil":
 						continue
@@ -298,7 +319,18 @@ class Player(object):
 					print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
-					self.resources[p.resource] += gain
+					#self.resources[p.resource] += gain
+					print(p.resource)
+					res_dict[p.resource] += gain
+		for r, res in res_dict.items():
+			
+			print(r)
+			self.resources[r] += res
+			#if globe.resources[r]:
+			#	globe.resources[r].append([self.name, res])
+			#else:
+			#	globe.resources[r] = [(self.name, res)]
+
 
 	def collect_goods(self):
 		print("%s collects: " % (self.name))
@@ -349,16 +381,19 @@ class Player(object):
 
 		#return stab_change
 
-	def turn(self):
+	def turn(self, globe):
 		stab_rounds = round(self.stability * 2) / 2
-		self.collect_resources()
+		self.collect_resources(globe)
 		self.collect_goods()
 		self.payMaintenance()
-		for p in self.provinces:
+		for p in self.provinces.values():
 			if p.culture != self.culture and p.culture not in self.accepted_cultures:
 				self.stability -= 0.05 
-
-		self.culture_points+= (0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5)
+		cps = 0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5
+		self.culture_points+= cps
+		##for g in globe.culture:
+			#print(g)
+		#globe.culture.append([self.name, cps])
 		print("Culture points gained: %s " % (0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5))
 		self.can_train = 1 + self.midPOP["officers"]["number"] * 4
 		self.AP = int(self.proPOP) * self.production_modifier
@@ -366,51 +401,143 @@ class Player(object):
 		research_gain = 0.5 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds] * 2) + self.midPOP["managers"]["number"] * 0.4
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
+		#globe.research.append([self.name, research_gain])
 		diplo_gain = 0.15 + (self.midPOP["bureaucrats"]["number"] * self.reputation)
 		self.diplo_action += diplo_gain
+		#globe.diplomacy.append([self.name, diplo_gain])
 		print("Diplo_action gain: %s " % (diplo_gain))
 		col_gain =  self.military["frigates"]/10 +  self.military["iron_clad"]/5 + self.military["battle_ship"]/2 \
 		+ self.midPOP["bureaucrats"]["number"]/5
 		self.colonization += col_gain
+		#globe.colonization.append([self.name, col_gain])
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0
 
 
-	def b_borders_a(self, p2, provinces):
+	def b_borders_a(self, p2):
 		bBa = set()
+		p1c = self()
 		for v1 in self.provinces.values():
 			for v2 in p2.provinces.values():
 				if abs(v1.x - v2.x) <= 1 and abs(v1.y - v2.y) <= 1:
 					bBa.add(v2)
 		return bBa
 
-	def check_for_border(self, p2, provinces):
-		self_core = self.core(provinces)
-		other_core = p2.core(provinces)
+	def check_for_border(self, p2):
+		self_core = self.core_provinces()
+		#print("Core Provs Self:")
+		#for p in self_core:
+		#	print(p.name)
+
+		if len(p2.provinces.keys()) < 1:
+			return False
+		other_core = p2.core_provinces()
+		#print("Core Provs " + p2.name)
+		#for o in other_core:
+		#	print (o.name)
 		for c1 in self_core:
 			for c2 in other_core:
+				#print(abs(c1.x - c2.x), abs(c1.y - c2.y))
 				if abs(c1.x - c2.x) <= 1 and abs(c1.y - c2.y) <= 1:
+					#print("True")
 					return True
+		#print("false")
 		return False
 
 	
-	def core_provinces(self, provinces):
-		core = []
+	def core_provinces(self):
+		core = set()
 		consider = Queue(100)
-		first = self.provinces[self.capital]
-		consider.put(first)
-		while len.consider >= 1:
-			thing = get(consider)
-			for p in self.provinces.values():
-				if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:
-					if p not in core:
-						consider.put(p)
-				core.append(thing)
-		return core
+		if self.capital == "":
+			return core
+		else:
+			first = self.provinces[self.capital]
+			consider.put(first)
+			while consider.qsize() >= 1:
+				thing = consider.get()
+				for p in self.provinces.values():
+					if p != thing:
+						if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:
+							#print("Yes")
+							if p not in core and p != thing:
+								consider.put(p)
+					
+				if thing not in core:
+					core.add(thing)
+			return core
 
 	def check_for_ground_invasion(self, prov, provinces):
-		core = core_provinces(self, provinces)
+		core = self.core_provinces()
 		for c in core: 
-			if abs(core.x - prov.x) <= 1 and abs(core.y - prov.y) <= 1:
+			if abs(c.x - prov.x) <= 1 and abs(c.y - prov.y) <= 1:
 				return True
 		return False
+
+
+	def calculate_base_attack_strength(self):
+		strength = 0.0
+		strength += self.military["infantry"] * self.infantry["attack"]
+		strength += self.military["cavalry"] * self.cavalry["attack"]
+		strength += self.military["artillery"] * self.artillery["attack"]
+		strength += self.military["tank"] * self.tank["attack"]
+		strength += self.military["fighter"] * self.fighter["attack"]
+		return strength
+
+
+	def calculate_base_defense_strength(self):
+		strength = 0.0
+		strength += self.military["irregulars"] * self.irregulars["defend"]
+		strength += self.military["infantry"] * self.infantry["defend"]
+		strength += self.military["cavalry"] * self.cavalry["defend"]
+		strength += self.military["artillery"] * self.artillery["defend"]
+		strength += self.military["tank"] * self.tank["defend"]
+		strength += self.military["fighter"] * self.fighter["defend"]
+		strength = strength * self.fortification
+		return strength
+
+
+	def ai_naval_projection(self):
+		forces = self.ai_transport_units()
+		strength = 0
+		for k, v in forces.items():
+			att = 0
+			if k == "infantry":
+				strength += forces[k] * self.infantry["attack"]
+			if k == "cavalry":
+				strength += forces[k] * self.cavalry["attack"]
+			if k == "artillery":
+				strength += forces[k] * self.artillery["attack"]
+			if k == "tank":
+				strength += forces[k] * self.tank["attack"]
+			if k == "fighter":
+				strength += forces[k] * self.fighter["attack"]
+		return strength
+
+
+	def ai_transport_units(self):
+		transport_limit = (self.military["frigates"] + self.military["iron_clad"] + self.military["battle_ship"]) * 2 
+		forces = {
+			"infantry": 0,
+			"cavalry": 0,
+			"artillery": 0,
+			"tank": 0,
+			"fighter": 0
+		}
+		number = 0
+		for v in range(int(transport_limit)):
+			tries = 0
+			while tries < 32:
+				_type = random.choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
+				if self.military[_type] - forces[_type] >= 1:
+					forces[_type] += 1
+				tries += 1
+		return forces
+
+
+	def calculate_naval_strength(self):
+		count = 0
+		
+		count += self.military["frigates"] * self.frigates["attack"]
+		count +=  self.military["iron_clad"] * self.iron_clad["attack"]
+		count +=  self.military["battle_ship"] * self.battle_ship["attack"]
+		return count

@@ -23,10 +23,18 @@ def save_game(file_name, players, relations, uncivilized_minors, market):
 
 	save["relations"] = relations
 
+	for p, prov in provinces.items():
+		save[prov.name] = prov
+
 	for uc, unciv in uncivilized_minors.items():
 		save[unciv.name] = unciv
+
 	save["market"] = market
+
+	save["globe"]
+
 	save.close()
+
 
 def load_game(file_name):
 	save = shelve.open(file_name)

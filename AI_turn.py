@@ -5,17 +5,17 @@ from AI_foreign_affairs import*
 from copy import deepcopy
 
 
-def AI_turn(players, player, market, turn, uncivilized_minors):
+def AI_turn(players, player, market, turn, uncivilized_minors, relations, provinces, globe):
 	
-	if len(player.provinces) < 1:
+	if len(player.provinces.keys()) < 1:
 		return
 	print("___________________________________________________________________")
 	print("It is now %s's turn \n" % (player.name))
 
 	print("___________________________________________________________________")
 
-	fact_set = deepcopy(player.factories)
 
+	player.calculate_resource_base()
 	player.update_priorities(market)
 	player.assign_priorities_to_provs()
 
@@ -32,9 +32,13 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	player.view_AI_inventory()
 
 	player.use_chemicals()
-
-	ai_destablize_empires(player, players)
-	ai_decide_colonial_war(player, players, uncivilized_minors)
+	ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
+	ai_decide_ally_target(player, players, provinces)
+	decide_rival_target(player, players, market, provinces, relations)
+	ai_destablize(player, players)
+	gain_cb(player, players, relations)
+	worsen_relations(player, players, relations)
+	attack_target(player, players, relations, provinces)
 	player.use_culture(players)
 
 	player.choose_technology()
@@ -44,12 +48,12 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 
 	player.early_game(turn, market)
 	#player.AI_set_objective(turn, market)
-	player.develop_industry(market)
+	player.develop_industry(market, globe)
 	#player.attempt_objective(market)
 	player.decide_build_navy(market)
 	player.build_army(market)
 	player.ai_increase_middle_class(market)
-	player.develop_industry(market)
+	player.develop_industry(market, globe)
 	player.decide_build_navy(market)
 
 
@@ -66,13 +70,6 @@ def AI_turn(players, player, market, turn, uncivilized_minors):
 	
 	player.spend_excess_cash(market)
 
-	fact2_set = player.factories
-	new_fact = [item for item in fact2_set if item not in fact_set]
-	for f in new_fact:
-		print (f)
-		for p in players.items():
-			if type(player) == AI:
-				if f != "cannons" and f != "ship_yard":
-					player.build_factory_priority[f] -= 0.2
+			
 
-	player.turn()
+	player.turn(globe)

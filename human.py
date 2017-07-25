@@ -10,26 +10,6 @@ class Human(Player):
 	def __init__(self, _name, _type, number, *args, **kwargs):
 		super(Human, self).__init__(_name, _type, number, *args, **kwargs)
 
-		#Good and Resources
-		self.resources = {
-			"gold": 0.0,
-			"food": 0.0,
-			"iron": 0.0,
-			"wood": 0.0,
-			"coal": 0.0,
-			"cotton": 0.0,
-			"spice": 0.0,
-			"dyes": 0.0
-		}
-
-		self.goods = {
-			"parts": 0.0,
-			"clothing": 0.0,
-			"paper": 0.0,
-			"cannons": 0.0,
-			"furniture": 0.0,
-			"chemicals": 0.0
-		}
 
 	def increase_pop(self):
 		med = False
@@ -833,3 +813,4 @@ class Human(Player):
 				self.culture_points -= 3
 
 
+				

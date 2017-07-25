@@ -52,7 +52,7 @@ class AI(Player):
 
 		self.rival_target = []
 
-		self.allied_target = ""
+		self.allied_target = []
 
 		self.mid_class_priority = {
 			"researchers": 1.0,
@@ -115,8 +115,10 @@ class AI(Player):
 		}
 
 		self.technology_priority = {
+			"pre_modern": 5,
 			"pre_industry_1": 6,
 			"pre_industry_2": 6,
+			"pre_industry_3": 6,
 			"professional_armies": 7,
 			"high_pressure_steam_engine": 7,
 			"square_timbering": 4,
@@ -157,11 +159,11 @@ class AI(Player):
 		}
 
 		self.resource_priority = {
-			"food":	1.2,
-			"iron": 1.2,
+			"food":	1.0,
+			"iron": 1.0,
 			"coal": 0.3,
 			"cotton": 0.75,
-			"wood": 0.5,
+			"wood": 1.0,
 			"spice": 2,
 			"dyes": 0.75,
 			"gold": 1.5,
@@ -194,6 +196,13 @@ class AI(Player):
 			"rubber": 0,
 			"oil": 0
 		}
+
+	def calculate_resource_base(self):
+		for k, v in self.resource_base.items():
+			self.resource_base[k] = 0
+		for p, prov in self.provinces.items():
+			self.resource_base[prov.resource] += (development_map[prov.development_level] * prov.quality)
+
 
 	def ai_increase_pop(self, market):
 		if self.freePOP > 2 or self.proPOP > 5:
@@ -312,7 +321,12 @@ class AI(Player):
 		allow = False
 		_type = sorted(self.mid_class_priority, key=self.mid_class_priority.get, reverse = True)
 		while tries < 4 and allow == False:
-			if self.midPOP[_type[tries]]["number"] >= 2:
+			#print(type(_type))
+			index = _type[tries]
+			#print(index)
+			#print(type(self.midPOP))
+			#print(self.midPOP["researchers"]["number"])
+			if self.midPOP[index]["number"] >= 2:
 				tries += 1
 			else: 
 				allow = True
@@ -334,20 +348,20 @@ class AI(Player):
 
 
 	def early_game(self, turn, market):
-			if turn > 10:
-				return
-			if self.factories["cannons"] == 0 and self.goods["cannons"] < 2.5:
-				if self.resources["iron"] >= 1 and market.market["cannons"] <= 2:
-					self.ai_craftman_production("cannons")
-			if self.factories["clothing"] == 0 and self.goods["clothing"] < 2:
-				if self.resources["cotton"] >= 1 and market.market["clothing"] <= 3 :
-					self.ai_craftman_production("clothing")
-			if self.factories["paper"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
-				if self.resources["wood"] >= 2 and market.market["paper"] <= 3:
-					self.ai_craftman_production("paper")
-			if self.factories["furniture"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
-				if self.resources["wood"] >= 1 and market.market["furniture"] <= 3:
-					self.ai_craftman_production("furniture")
+		if turn < 11:
+			return
+		if self.factories["cannons"] == 0 and self.goods["cannons"] < 2.5:
+			if self.resources["iron"] >= 1 and market.market["cannons"] <= 2:
+				self.ai_craftman_production("cannons")
+		if self.factories["clothing"] == 0 and self.goods["clothing"] < 2:
+			if self.resources["cotton"] >= 1 and market.market["clothing"] <= 3 :
+				self.ai_craftman_production("clothing")
+		if self.factories["paper"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
+			if self.resources["wood"] >= 2 and market.market["paper"] <= 3:
+				self.ai_craftman_production("paper")
+		if self.factories["furniture"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
+			if self.resources["wood"] >= 1 and market.market["furniture"] <= 3:
+				self.ai_craftman_production("furniture")
 
 	def num_army_units(self):
 		res = 0
@@ -361,7 +375,7 @@ class AI(Player):
 		return count
 
 
-	def try_factory(self, market):
+	def try_factory(self, market, globe):
 		flag = True
 		if self.goods["parts"] < 1:
 			print("Wants machine parts")
@@ -384,7 +398,7 @@ class AI(Player):
 			for o in options:
 				for p in priorities:
 					if p in options:
-						self.ai_build_build_factory(p, market)
+						self.ai_build_factory(p, market, globe)
 						return	
 
 
@@ -425,7 +439,7 @@ class AI(Player):
 					self.ai_develop_province(p)
 					return
 
-	def develop_industry(self, market):
+	def develop_industry(self, market, globe):
 		print("Development Points: %s" % (self.new_development))
 		if self.new_development < 1:
 			return
@@ -433,6 +447,10 @@ class AI(Player):
 		print("Development options_________________")
 		for o in opt:
 			print(o)
+		print("Resource Base")
+		for k, v in self.resource_base.items():
+			print(k, v)
+
 		fact = self.ai_factory_options()
 		print("Factory options:_________________")
 		for f in fact:
@@ -441,7 +459,7 @@ class AI(Player):
 			#print("Able to develop provice or build factory")
 			number_factories =  self.num_factories()
 			if number_factories == 1:
-				self.try_factory(market)
+				self.try_factory(market, globe)
 			if number_factories >= self.number_developments and len(self.factories) >= 2:
 				print("Wants to develop province")
 				self.try_development(market)
@@ -449,14 +467,14 @@ class AI(Player):
 				pick = uniform(0, 1)
 				if pick <=  0.35:
 					print("Wants to build factory")
-					self.try_factory(market)
+					self.try_factory(market, globe)
 				else:
 					print("Wants to improve province")
 					self.try_development(market)
 		elif len(opt) > 0:
 			self.try_development(market)
 		elif "high_pressure_steam_engine" in self.technologies and len(self.ai_factory_options()) >= 1:
-			self.try_factory(market)
+			self.try_factory(market, globe)
 			
 				
 
@@ -489,7 +507,7 @@ class AI(Player):
 
 	def assign_priorities_to_provs(self):
 		for p, prov in self.provinces.items():
-			print(p, prov)
+			#print(p, prov.resource)
 			kind = prov.resource
 			prov.AI_priority = self.resource_priority[kind] * prov.quality
 		sorted_provinces = sorted(self.provinces.values(), key = lambda x: (x.AI_priority), reverse = True)
@@ -532,23 +550,22 @@ class AI(Player):
 	def AI_assign_POP(self):
 		#priorities = (sorted(self.resource_priority.items(), key=lambda x:x[1], reverse=True )
 		priorities = self.assign_priorities_to_provs()
-		desired_producers = int(self.POP / 3.8)
+		for p in priorities:
+				print(p.name)
+		desired_producers = int(self.POP / 3.7)
+		print(desired_producers)
 		#min_producers = int(self.freePOP/3.25)
 		#min_producers = 2
 		for i in range(desired_producers):
 			if self.freePOP >= 2:
 				self.proPOP += 1
 				self.freePOP -=1
-		count = 0
-		while self.freePOP >= 1 and count < len(self.provinces):
-			for p in priorities:
-				temp = p.name
-				if temp in self.provinces.keys() and self.provinces[temp].worked == False:
-					self.provinces[temp].worked = True
+		for p in priorities:
+			if self.freePOP > 1:
+			#print("Number free pop: %s" % self.freePOP)
+				if self.provinces[p.name].worked == False:
+					self.provinces[p.name].worked = True
 					self.freePOP -= 1
-				if self.freePOP < 1:
-					break
-				count += 1
 		while self.freePOP >= 1.5:
 			self.proPOP += 1
 			self.freePOP -=1
@@ -605,7 +622,9 @@ class AI(Player):
 		print("freePOP: %s, proPOP: %s " % (self.freePOP, self.proPOP))
 		print("Stability: %s, Diplo: %s, Reputation: %s " % (self.stability, self.diplo_action, self.reputation))
 		print("Colonize: %s, Num Colonies: %s" % (self.colonization, self.num_colonies))
+			
 		for m, mid in self.midPOP.items():
+			print(m, mid)
 			print(m, mid["number"])
 		print("\n")
 		print("%s Inventory \n" % (self.name))
@@ -1129,10 +1148,10 @@ class AI(Player):
 				self.ai_buy("gear", amount, market)
 
 
-				if self.goods["parts"] < 7:
-					amount == ceil(8 - self.goods["parts"])
-					amount = min(amount, int(market.market["parts"]))
-					self.ai_buy("parts", amount, market)
+			if self.goods["parts"] < 7:
+				amount == ceil(8 - self.goods["parts"])
+				amount = min(amount, int(market.market["parts"]))
+				self.ai_buy("parts", amount, market)
 
 
 	def ai_modify_priorities_from_province(self, resource):
@@ -1220,12 +1239,13 @@ class AI(Player):
 
 	def choose_technology(self):
 		options = []
-		print("Options: %s \n" % (options))
+		
 		for k, t in technology_dict.items():
 			if k not in self.technologies and t["requirement"] <= self.technologies  \
 			 and self.numMidPOP >= t["min_mid"] and t["cost"] <= self.research:
 				print(k, t)
 				options.append(k)
+		print("Options: %s \n" % (options))
 		if len(options) == 0:
 			return None
 		#priorities = sorted([self.technology_priority(v,k) for (k,v) in self.technology_priority], reverse=True)
@@ -1465,7 +1485,7 @@ class AI(Player):
 				self.ai_build_frigates()
 
 
-	def ai_build_build_factory(self, _type, market):
+	def ai_build_factory(self, _type, market, globe):
 		if _type == "parts" or _type == "cannons":
 			self.resource_priority["coal"] += 0.3
 			self.resource_priority["iron"] += 0.3
@@ -1502,7 +1522,7 @@ class AI(Player):
 		self.resources["iron"] -= 1.0
 		self.goods["parts"] -= 1.0
 		self.factories[_type] += 1
-		market.global_factories[_type] += 1
+		#globe.factories[_type] += 1
 		self.build_factory_priority[_type] -= 0.2
 		self.stability -= 0.33
 		if self.stability < - 3.0:
@@ -1754,15 +1774,15 @@ class AI(Player):
 					chance = uniform(0, 1)
 					if p.type == "uncivilized":
 						if chance < 0.4:
-							self.accepted_cultures.add(opt.culture)
+							self.accepted_cultures.add(p.culture)
 							print("Assimlated Culture")
 					if p.type == "old":
 						if chance < 0.2:
-							self.accepted_cultures.add(opt.culture)
+							self.accepted_cultures.add(p.culture)
 							print("Assimlated Culture") 
 					if p.type == "civilized":
 						if chance < 0.1:
-							self.accepted_cultures.add(opt.culture)
+							self.accepted_cultures.add(p.culture)
 							print("Assimlated Culture")
 					return
 		if self.stability < 1.0:

@@ -21,6 +21,7 @@ class Market(object):
 			"dyes": 2,
 			"rubber": 0,
 			"oil": 0,
+			"gold": 1,
 
 			"parts": 0,
 			"clothing": 3,
@@ -112,7 +113,7 @@ class Market(object):
 
 	def buy_price(self, _type):
 		if(_type in self.resources):
-			amount = self.market[_type] + 1
+			amount = self.market[_type]
 			if(amount < 1):
 				price = 100000
 				return price
@@ -136,6 +137,7 @@ class Market(object):
 
 
 	def total_buy_price(self, _type, amount):
+		print("Check")
 		total = 0
 		for i in range(amount):
 			total += self.buy_price(_type)
@@ -146,11 +148,10 @@ class Market(object):
 
 	def buy_item(self, _type, player):
 		amount = int(input("How many %s do you wish to buy? \n" % (_type)))
-		if(_type in self.goods):
-			stock = self.market[_type]
-			if(stock < amount):
-				print("There are currently onlys %s %s available on the market\n " % (stock, _type))
-				return
+		stock = self.market[_type]
+		if(stock < amount):
+			print("There are currently only %s %s available on the market\n " % (stock, _type))
+			return
 		else:
 			price = self.total_buy_price(_type, amount)
 			ok = input("%s %s will cost %s gold, is this okay? (y/n) \n" % (amount, _type, price ))
@@ -180,7 +181,7 @@ class Market(object):
 
 	def sell_price(self, _type):
 		if(_type in self.resources):
-			amount = self.market[_type]
+			amount = self.market[_type] + 1 
 			if(amount < 1):
 				price = 7
 				return price
@@ -209,17 +210,17 @@ class Market(object):
 			if _type == "battle_ship":
 				mod = 9
 			if(amount < 1):
-				price = 8 * mod
-				#return price
-			if(amount >= 22 and amount < 26):
+				price = 100
+				return price
+			if(amount >= 21 and amount < 26):
 				price = 2 * mod
-				#return price
+				return price
 			if(amount >= 26 and amount <= 30):
 				price = 1 * mod
-				#return price
+				return price
 			if(amount > 30):
 				price = 0.5 * mod
-				#return price
+				return price
 			else:
 				price = self.goods_sell_price[amount] * mod
 			return price 
