@@ -6,8 +6,6 @@ from player_class import*
 from minor_classes import*
 from market import Market
 from technologies import*
-from empire_class import*
-from Old_Minor_Class import*
 
 
 def create_new_save_game(players, relations, uncivilized_minors, market):

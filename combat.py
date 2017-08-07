@@ -1,6 +1,5 @@
 
 from player_class import Player
-from empire_class import Empire
 from technologies import*
 from human import Human
 from AI import AI
@@ -355,10 +354,10 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 def combat_outcome(winner, p1, p2, prov, players):
 	if winner == p1.name:
 		print("%s has sucessfuly invaded %s ! \n" % (p1.name, p2.name))
-		p1.stability += 1
+		p1.stability += 0.5
 		if p1.stability > 3:
 			p1.stability = 3
-		p1.CB.discard(p2.name)
+		p1.CB.discard(p2)
 		print(prov.name)
 		for p, pr in p2.provinces.items():
 			print(p, pr.name)
@@ -372,10 +371,10 @@ def combat_outcome(winner, p1, p2, prov, players):
 		print("%s loots %s gold from %s \n" % (p1.name, loot, p2.name))
 		return
 	elif winner == p2.name:
-		p1.stability -= 1
+		p1.stability -= 0.5
 		if p1.stability < -3.0:
 			p1.stability = -3.0
-		p2.stability += 1
+		p2.stability += 0.5
 		if p1.stability > 3.0:
 			p1.stability = 3.0
 		print("%s has repelled %s's pitiful invasion! \n" % (p1.name, p2.name))
@@ -388,11 +387,11 @@ def combat_outcome(winner, p1, p2, prov, players):
 					res = input("Does %s accept %s's offer of a white pease? (y/n) \n" % (p2.name))
 					if(res == "y"):
 						Print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
-						p1.CB.remove(p2.name)
+						p1.CB.remove(p2)
 		else:
 			print("The war between %s and %s has ended in a white pease \n" % (p1.name, p2.name))
 			if p2.name in p1.CB:
-				p1.CB.remove(p2.name)
+				p1.CB.remove(p2)
 
 
 def gain_province(p1, p2, prov, players):
@@ -409,9 +408,9 @@ def gain_province(p1, p2, prov, players):
 	p1.provinces[prov.name].worked = True
 	p2.provinces.pop(prov.name)
 	if p2.capital == prov.name and len(p2.provinces.keys()) > 0:
-		opts = p2.provinces.keys()
+		opts = list(p2.provinces.keys())
 		ch = choice(opts)
-		p2.capital = choice
+		p2.capital = ch
 
 	if p2.type == "old_empire" or p2.type == "old_minor" or prov.colony == True:
 		p1.colonization -= 1 + (p1.num_colonies * 2)
@@ -627,8 +626,8 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 				player.colonization -= 1 + (player.num_colonies * 2)
 				player.num_colonies += 1
 				player.stability -= 0.1
-				if player.stability < - 3.0:
-					player.stability = - 3.0
+				if player.stability < -3.0:
+					player.stability = -3.0
 			else:
 				print("%s's attept to take %s has ended in failure, what an embarresment! \n" % (player.name, unciv.name))
 				player.stability -= 0.5
@@ -695,7 +694,7 @@ def amph_combat(p1, p2, p1_forces, prov, players):
 			print("%s out-manouvers %s \n" % (p1.name, p2.name))
 			att_str = att_str * 1.20
 			if "indirect_fire" in p1.technologies:
-				att_str += (att_current_makeup[2] * p1.artillery["attack"]) * 0.5
+				att_str += (att_current_makeup["artillery"] * p1.artillery["attack"]) * 0.5
 		else:
 			print("%s out-manouvers %s \n" % (p2.name, p1.name))
 			def_str = def_str * 1.20
@@ -806,11 +805,16 @@ def naval_transport(player):
 	if type(player) == AI:
 		for v in range(int(transport_limit)):
 			tries = 0
-			while tries < 32:
+			while tries < 40:
 				_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
-				if player.military[_type] - forces[_type] >= 1:
+				if (player.military[_type] - forces[_type]) >= 1:
+					print("Load %s " % (_type))
 					forces[_type] += 1
+					break
 				tries += 1
+	print("forces:")
+	for j, k in forces.items():
+		print(j, k)
 	return forces
 
 
@@ -830,7 +834,9 @@ def ai_transport_units(player):
 			_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
 			if player.military[_type] - forces[_type] >= 1:
 				forces[_type] += 1
+				break
 			tries += 1
+
 	return forces
 
 
@@ -847,9 +853,8 @@ def calculate_naval_strength(player):
 	return count
 
 
-
 def distribute_naval_losses(player, losses, num_units):
-	while(losses > 0.5 and num_units >= 0.1):
+	while(losses > 0.5 and num_units >= 0.5):
 		while(player.military["frigates"] > 0.5 and losses > 0.5):
 		#	print("Losses %s, num_units %s \n" % (losses, num_units))
 			player.military["frigates"] -=0.5

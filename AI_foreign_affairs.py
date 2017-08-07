@@ -16,14 +16,16 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 
 	if player.type == "old_empire" or player.type =="old_minor":
 		return
+	print("Col Check 0")
 	if player.colonization < 1 + (player.num_colonies * 2) or player.diplo_action < 1 or transport_limit < 4:
 		return
-
+	print("Col Check 1")
 	priorities = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True) 
 	self_strength = player.calculate_base_attack_strength()
 	self_naval_projection_strength = player.ai_naval_projection()
 	if self_strength < 3.5:
 		return
+	print("Col Check 2")
 
 	c_options = set()
 	p_options = set()
@@ -50,6 +52,8 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	#				c_options.add(p1)
 	#				p_options.add(prov)
 	if len(c_options) !=0:
+		print("Col Check 3")
+
 		p_target = []
 		c_target = []
 		for r in priorities:
@@ -67,6 +71,9 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 							return
 
 def	decide_rival_target(player, players, market, provinces, relations):
+	if len(player.rival_target) > 0 and (len(player.rival_target[0].provinces.keys()) == 0 \
+		or player.rival_target[1].name not in player.rival_target[0].provinces.keys() ):
+		player.rival_target = []
 	if len(player.rival_target) > 0:
 		return
 	need = set()
@@ -81,6 +88,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 		return
 	self_strength = player.calculate_base_attack_strength()
 	self_naval_projection_strength = player.ai_naval_projection()
+	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 	#c_options = set()
 	#p_options = set()
 	for k, v in players.items():
@@ -89,9 +97,8 @@ def	decide_rival_target(player, players, market, provinces, relations):
 		relata = frozenset([player.name, v.name])
 		#print(relata)
 		other_strength = calculate_base_defense_strength(v)
-	
 		if v in player.borders and self_strength > (other_strength * 1.25)\
-		or (self_naval_projection_strength > other_strength * 1.5):
+		or (self_naval_projection_strength > other_strength * 1.5 and transport_limit >= 4):
 			for p, pr in v.provinces.items():
 				if v.type == "major" and pr.culture == v.culture:
 					continue
@@ -113,6 +120,8 @@ def	decide_rival_target(player, players, market, provinces, relations):
 					elif relations[relata].relationship < 1.5:
 						player.rival_target = [other,  pr]
 			else:
+				if transport_limit < 4:
+					return
 				relata = frozenset([player.name, other.name])
 				p_navy_str = calculate_naval_strength(player)
 				o_navy_str = calculate_naval_strength(other)
@@ -121,7 +130,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 					for p, pr in other.provinces.items():
 						if other.type == "major" and pr.culture == other.culture:
 							continue
-						if other.type == "major" and other.type != colony and player.check_for_ground_invasion(pr, provinces) == False:
+						if other.type == "major" and pr.type != "colony" and player.check_for_ground_invasion(pr, provinces) == False:
 							continue
 						elif relations[relata].relationship < 1.5:
 							player.rival_target = [other,  pr]
@@ -139,6 +148,8 @@ def worsen_relations(player, players, relations):
 		relations[relata].relationship -= min(1, 10/(target.POP + 0.001))
 
 def gain_cb(player, players, relations):
+	if player.diplo_action < 1.2:
+		return
 	if player.rival_target == []:
 		return
 	target = player.rival_target[0]
@@ -159,6 +170,9 @@ def attack_target(player, players, relations, provinces):
 	prov = player.rival_target[1]
 	print("Target nation: %s" % (target.name))
 	print("Target prov: %s" % (prov.name))
+	if target.type == "old_empire" or target.type == "old_minor" or prov.type == "colony":
+		if player.colonization < 1 + (player.num_colonies) * 2:
+			return
 	relata = frozenset([player.name, target.name])
 	if target not in player.CB:
 		return
@@ -168,41 +182,55 @@ def attack_target(player, players, relations, provinces):
 	self_naval_projection_strength = player.ai_naval_projection()
 	if target.type == "old_minor" or target.type == "old_empire" or target.type == "civ_minor":
 		if target not in player.borders:
+			print("Not border")
 			amphib_prelude(player, target, annex, players)
 			player.reputation -= 0.1
 			player.rival_target = []
+			if target in player.CB:
+				player.CB.remove(target)
+
 		else:
+			print("Border")
 			combat(player, target, annex, players)
 			player.reputation -= 0.1
 			player.rival_target = []
+			if target in player.CB:
+				player.CB.remove(target)
 
 	else:
 		if player.check_for_ground_invasion(annex, provinces): 
 			self_strength = player.calculate_base_attack_strength()
-			if self_strength > (other_strength * 1.2):
+			if self_strength > (other_strength * 1.25):
 				combat(player, target, annex, players)
 				player.diplo_action -= 1.0
 				player.reputation -= 0.25
 				player.rival_target = []
+				if target in player.CB:
+					player.CB.remove(target)
 
 		else:
 			sea = calculate_naval_strength(player)/(calculate_naval_strength(target) + 0.1)
 			land = self_strength/other_strength	
 			if annex.colony and other in player.borders:
-				if sea < 1.18 and land < 1.18:
+				if sea < 1.25 and land < 1.25:
 					return
 				else:
 					if land < sea:
 						combat(player, target, prov, players)
-					elif self_naval_projection_strength > other_strength * 1.2:
+					elif self_naval_projection_strength > other_strength * 1.25:
 						naval_battle(player, target, prov)
 					player.reputation -= 0.2
 					player.rival_target = []
+					if target in player.CB:
+						player.CB.remove(target)
+
 			else:
-				if sea > 1.2 and self_naval_projection_strength > other_strength * 1.2:
+				if sea > 1.2 and self_naval_projection_strength > other_strength * 1.25:
 					naval_battle(player, target, prov)
 					player.reputation -= 0.2
 					player.rival_target = []
+					if rival_target in player.CB:
+						player.CB.remove(target)
 
 def ai_decide_ally_target(player, players, provinces):
 	if len(player.allied_target) > 2:

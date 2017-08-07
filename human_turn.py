@@ -13,8 +13,6 @@ from market import Market
 from technologies import*
 from combat import*
 #from naval import*
-from empire_class import*
-from Old_Minor_Class import*
 from commands import*
 from start import*
 from save import*

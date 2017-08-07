@@ -134,7 +134,6 @@ class Player(object):
 		self.number_developments = 0.0
 
 		self.factories = {
-			"ship_yard": 0,
 			"parts": 0,
 			"clothing": 0,
 			"furniture": 0,
@@ -256,12 +255,13 @@ class Player(object):
 		}
 
 
-
 		self.colonization = 0.0
 		self.num_colonies = 0
 
 		self.fortification = 1.0
 		self.max_fortification = 1.1
+
+		self.shipyard = 0
 
 		self.sprawl = False
 
@@ -343,7 +343,7 @@ class Player(object):
 
 
 	def payMaintenance(self):
-		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.4) + self.military["cavalry"] * 0.1
+		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.3) + self.military["cavalry"] * 0.1
 		if(self.resources["food"] < mFood ):
 			self.freePOP -= (self.resources["food"] - mFood)
 			self.stability -= 0.5
@@ -354,26 +354,28 @@ class Player(object):
 		else:
 			self.resources["food"] -= mFood
 
-		if(self.resources["coal"] < 0.2 * self.number_developments):
+		if(self.resources["coal"] < 0.1 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
 
-		for k, prov in self.provinces.items():
-			if self.resources["coal"] >= 0.2 and prov.development_level == 1:
-				self.resources["coal"]  -= 0.2
-				self.provinces[k].powered = True
-			elif self.resources["coal"] >= 0.2 and prov.development_level == 2:
-				self.resources["coal"]  -= 0.4
-				self.provinces[k].powered = True
+			for k, prov in self.provinces.items():
+				if self.resources["coal"] >= 0.1 and prov.development_level == 1:
+					self.resources["coal"]  -= 0.1
+					self.provinces[k].powered = True
+				elif self.resources["coal"] >= 0.2 and prov.development_level == 2:
+					self.resources["coal"]  -= 0.2
+					self.provinces[k].powered = True
 		else:
-			self.resources["coal"] -= self.number_developments * 0.2
+			self.resources["coal"] -= self.number_developments * 0.1
 			for k, prov in self.provinces.items():
 				self.provinces[k].powered = True
 		oil_need = 0
-		if self.numMidPOP - 8 > 0:
-			oil_need = self.numMidPOP - 8
+		if self.numMidPOP - 6 > 0:
+			oil_need = self.numMidPOP - 6
 		if self.resources["oil"] < oil_need:
 			penality = self.resources["oil"] - oil_need
 			self.stability += penality
+			if self.stability < -3:
+				self.stability = -3
 			self.resources["oil"] = 0
 		else:
 			self.resources["oil"] -= oil_need
@@ -389,16 +391,19 @@ class Player(object):
 		for p in self.provinces.values():
 			if p.culture != self.culture and p.culture not in self.accepted_cultures:
 				self.stability -= 0.05 
+		if self.stability < -3.0:
+			self.stability = -3.0
 		cps = 0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5
 		self.culture_points+= cps
 		##for g in globe.culture:
 			#print(g)
 		#globe.culture.append([self.name, cps])
-		print("Culture points gained: %s " % (0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5))
-		self.can_train = 1 + self.midPOP["officers"]["number"] * 4
+		print("Culture points gained: %s " % (0.2 + self.midPOP["artists"]["number"] * 2 + self.midPOP["bureaucrats"]["number"]/2))
+		self.can_train = 1 + self.midPOP["officers"]["number"] * 5
 		self.AP = int(self.proPOP) * self.production_modifier
 		self.reputation += self.midPOP["artists"]["number"] * 0.1
-		research_gain = 0.5 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds] * 2) + self.midPOP["managers"]["number"] * 0.4
+		research_gain = 0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
+		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.4)
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
 		#globe.research.append([self.name, research_gain])
@@ -412,6 +417,7 @@ class Player(object):
 		#globe.colonization.append([self.name, col_gain])
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0
+		
 
 
 	def b_borders_a(self, p2):

@@ -8,16 +8,15 @@ class Market(object):
 		self.gold = 2000
 
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
-		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio" \
-		"telephone", "fighter", "tank", "auto", "frigates", "iron_clad", "battle_ship"]
+		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto", "frigates", "iron_clad", "battle_ship"]
 
 		self.market = {
 			"food": 5,
 			"cotton": 5,
 			"iron": 5,
-			"wood": 5,
+			"wood": 8,
 			"coal": 3,
-			"spice": 3,
+			"spice": 4,
 			"dyes": 2,
 			"rubber": 0,
 			"oil": 0,
@@ -42,7 +41,7 @@ class Market(object):
 
 		self.global_factories = {
 
-			"ship_yard": 0,
+	
 			"parts": 0,
 			"clothing": 0,
 			"furniture": 0,
@@ -113,7 +112,7 @@ class Market(object):
 
 	def buy_price(self, _type):
 		if(_type in self.resources):
-			amount = self.market[_type]
+			amount = self.market[_type] 
 			if(amount < 1):
 				price = 100000
 				return price
@@ -125,10 +124,10 @@ class Market(object):
 			return price
 		if(_type in self.goods):
 			amount = self.market[_type]
-			if(amount < 2):
+			if(amount < 1):
 				price = 10000
 				return price
-			if(amount >= 21):
+			if(amount >= 22):
 				price = 2
 				return price
 			else:
@@ -181,7 +180,7 @@ class Market(object):
 
 	def sell_price(self, _type):
 		if(_type in self.resources):
-			amount = self.market[_type] + 1 
+			amount = self.market[_type] 
 			if(amount < 1):
 				price = 7
 				return price
@@ -196,8 +195,10 @@ class Market(object):
 				return price
 		if(_type in self.goods):
 			amount = self.market[_type]
+			#print("Amount in Market: %s" % (amount))
 			mod = 1
 			if _type == "radio" or _type == "telephone":
+				print("Type is radio or telephone")
 				mod = 1.25
 			if _type == "fighter":
 				mod = 3
@@ -207,10 +208,9 @@ class Market(object):
 				mod = 3.2
 			if _type == "auto":
 				mod = 2.5
-			if _type == "battle_ship":
-				mod = 9
+			
 			if(amount < 1):
-				price = 100
+				price = 10 * mod
 				return price
 			if(amount >= 21 and amount < 26):
 				price = 2 * mod

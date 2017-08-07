@@ -37,26 +37,26 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 7.00
+	player.POP = 6.80
 	player.freePOP = 5
 	player.milPOP = 1.0
 	player.numLowerPOP = 6
 
-	player.factories["ship_yard"] = 1
+	player.shipyard = 1
 
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
-
-	player.technologies.add("pre_industry_2")
-	player.technologies.add("professional_armies")
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies", "flintlock" }
+	#player.technologies.add("pre_industry_3")
+	#player.technologies.add("pre_industry_2")
+	#player.technologies.add("flintlock")
 	#player.technologies.add("high_pressure_steam_engine")
 
-	player.midPOP["researchers"]["number"] = 0.25
-	player.midPOP["officers"]["number"] = 0.25
+	player.midPOP["researchers"]["number"] = 0.20
+	player.midPOP["officers"]["number"] = 0.20
 	player.midPOP["managers"]["number"] = 0.0
-	player.midPOP["bureaucrats"]["number"] = 0.25
-	player.midPOP["artists"]["number"] = 0.25
+	player.midPOP["bureaucrats"]["number"] = 0.20
+	player.midPOP["artists"]["number"] = 0.20
 
-	player.numMidPOP = 1.0
+	player.numMidPOP = 0.8
 
 	player.resources["gold"] = 12.0
 	
@@ -81,9 +81,9 @@ def initialize_modern_minor(player):
 	player.milPOP = 0.4
 	player.numLowerPOP = 2.4
 
+
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
 
-	#player.technologies.add("high_pressure_steam_engine")
 
 
 	player.resources["gold"] = 7.0
@@ -111,6 +111,9 @@ def initialize_oldemp(player):
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+
+
 	player.techModifier = 0.75
 
 	player.reputation = 0.5
@@ -127,7 +130,8 @@ def initialize_old_minor(player):
 	player.POP = 2.6
 	player.numLowerPOP = 2.6
 	player.freePOP = 2
-	player.technologies = {"basic_civ", "pre_modern"}
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+
 
 	player.resources["gold"] = 5.0
 

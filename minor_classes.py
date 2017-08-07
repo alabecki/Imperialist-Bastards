@@ -10,6 +10,7 @@ class Province(object):
 		self.resource = _resource
 		self.development_level = 0
 		self.worked = False
+		self.workers = 0
 		self.powered = False
 		self.quality = _quality
 		self.type = _type  # civilized, old, uncivilized

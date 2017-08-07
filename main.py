@@ -137,7 +137,7 @@ while True:
 								print("Name: %s 	Resource: %s 	Development Level: %s 	Worked?: %s 	Quality: %s \n" % \
 									(province.name, province.resource, province.development_level, province.worked, province.quality))
 						if info_command == "3":
-							print("Population Overview: ######################################################################################### \n")
+							print("Population Overview: ####################################################################################### \n")
 							print("Total Population: %s 	Unassigned Pops: %s 	Lower Class Pops: %s 	Middle Class Pops: %s \n" % \
 							(player.POP, player.freePOP, player.numLowerPOP, player.numMidPOP))
 							print("Urban Worker Pops: %s 	Military Pops: %s \n" % (player.proPOP, player.milPOP))

@@ -17,6 +17,7 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 
 	player.calculate_resource_base()
 	player.update_priorities(market)
+	
 	player.assign_priorities_to_provs()
 
 	player.ai_increase_pop(market)
@@ -31,6 +32,8 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 	player.fulfill_needs(market)
 	player.view_AI_inventory()
 
+	player.early_game(turn, market)
+
 	player.use_chemicals()
 	ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	ai_decide_ally_target(player, players, provinces)
@@ -42,11 +45,11 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 	player.use_culture(players)
 
 	player.choose_technology()
-	
+	player.develop_industry(market, globe)
+
 	print("Decide Factory Production:")
 	player.ai_decide_factory_productions(market)
 
-	player.early_game(turn, market)
 	#player.AI_set_objective(turn, market)
 	player.develop_industry(market, globe)
 	#player.attempt_objective(market)

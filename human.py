@@ -51,7 +51,7 @@ class Human(Player):
 			return
 
 	def increase_middle_class(self):
-		if(self.freePOP < 0.5):
+		if(self.freePOP < 0.2):
 			print("You do not have any free POPs")
 			return
 		requirement = ["paper"]
@@ -103,18 +103,18 @@ class Human(Player):
 				return
 			else:
 				requirement.append("auto")
-		_type = input("What kind of middle class POP would you like to create?: researchers officers  \
-				bureaucrats artists managers \n")
+		_type = input("What kind of middle class POP would you like to create?: science military  \
+				bureaucrats culture management \n")
 		if(self.midPOP[_type] >= 2.0):
 			print("You have already created as many %s a permitted \n")
 			return
 		self.goods["spice"] -= 1
 		for r in requirement:
 			self.goods[r] -1
-		self.numLowerPOP -= 0.25
-		self.numMidPOP += 0.25
-		self.midPOP[_type] += 0.25
-		self.freePOP -= 0.25
+		self.numLowerPOP -= 0.20
+		self.numMidPOP += 0.20
+		self.midPOP[_type] += 0.20
+		self.freePOP -= 0.20
 		self.new_development += 0.5
 	
 
@@ -138,16 +138,26 @@ class Human(Player):
 			self.technologies.add(choice)
 			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n ")
 			print("Your ingenius researches have discovered %s \n " % (choice))
-			if(choice == "muzzle_loaded_arms"):
+			if choice == "flint_lock":
 				self.irregulars["attack"] += 0.15
 				self.irregulars["defend"] += 0.1
-				self.infantry["attack"] += 0.25
+				self.infantry["attack"] += 0.3
 				self.infantry["defend"] += 0.10
 				self.cavalry["attack"] += 0.20
 				self.cavalry["defend"] += 0.08
-				self.artillery["attack"] += 0.25
+				self.artillery["attack"] += 0.3
 				self.artillery["defend"] += 0.10
 				self.frigates["attack"] += 0.25
+
+			if(choice == "muzzle_loaded_arms"):
+				self.irregulars["attack"] += 0.15
+				self.irregulars["defend"] += 0.1
+				self.infantry["attack"] += 0.3
+				self.infantry["defend"] += 0.10
+				self.cavalry["attack"] += 0.20
+				self.cavalry["defend"] += 0.08
+				self.artillery["attack"] += 0.3
+				self.artillery["defend"] += 0.10
 				self.frigates["attack"] += 0.25
 			if(choice == "cement"):
 				self.max_fortification += 0.1
@@ -172,16 +182,13 @@ class Human(Player):
 				self.artillery["defend"] += 0.4
 				self.artillery["ammo_use"] += 0.05
 				self.iron_clad["attack"] += 0.25
-				self.iron_clad["defend"] += 0.25
-			if(choice == "steel_plate_armor"):
-				self.iron_clad["attack"] += 0.45
 			if(choice == "bombers"):
 				self.fighter["attack"] += 1
-				self.fighter["oil"] += 0.05
 				self.fighter["ammo"] += 0.1
 			if(choice == "radar"):
 				self.fighter["defend"] += 0.5
 				self.battle_ship["attack"] += 1
+
 
 	def spice_to_stability(self):
 		if self.resources["spice"] > 2:
@@ -661,7 +668,7 @@ class Human(Player):
 			return
 		else:
 			max_amount = self.factories[_type] * stab_rounds * 4
-			material_mod = 1 - (self.midPOP["managers"]["number"] / 3)
+			material_mod = 1 - (self.midPOP["management"]["number"] / 3)
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
 			amount = int(amount)
 			if(amount > max_amount):
@@ -791,7 +798,7 @@ class Human(Player):
 				return 
 			options = []
 			for o, other in players.items():
-				if other.type == "major" and other.midPOP["artists"]["number"] < self.midPOP["artists"]["number"]:
+				if other.type == "major" and other.midPOP["culture"]["number"] < self.midPOP["culture"]["number"]:
 					options.append(other)
 			if len(options) == 0:
 				print("Your worthless culture is not superior to anyone's! What is wrong with you?")
@@ -801,7 +808,7 @@ class Human(Player):
 				for o in options:
 					print(o.name, o.numMidPOP)
 				steal = input()
-				chance = choice(["researchers", "officers", "managers", "artists", "bureaucrats"])
+				chance = choice(["science", "military", "management", "culture", "bureaucrats"])
 				players[steal].midPOP[chance]["number"] -= 0.25
 				players[steal].numMidPOP -= 0.25
 				players[steal].resources["gold"] -= 5
