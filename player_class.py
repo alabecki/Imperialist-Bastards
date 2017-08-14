@@ -353,6 +353,7 @@ class Player(object):
 			self.midGrowth = False
 		else:
 			self.resources["food"] -= mFood
+			self.midGrowth = True
 
 		if(self.resources["coal"] < 0.1 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
@@ -487,6 +488,7 @@ class Player(object):
 		strength += self.military["artillery"] * self.artillery["attack"]
 		strength += self.military["tank"] * self.tank["attack"]
 		strength += self.military["fighter"] * self.fighter["attack"]
+		
 		return strength
 
 
@@ -536,6 +538,7 @@ class Player(object):
 				_type = random.choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
 				if self.military[_type] - forces[_type] >= 1:
 					forces[_type] += 1
+					break
 				tries += 1
 		return forces
 

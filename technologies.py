@@ -48,9 +48,10 @@ technology_dict = {
 	"automobile": {"requirement": {"combustion", "radio"}, "cost": 3.5, "min_mid": 0},					# auto factory
 	"telephone": {"requirement": {"telegraph"}, "cost": 3.5, "min_mid": 0},									# phone factory
 	"mobile_warfare": {"requirement": {"automobile", "flight"}, "cost": 4.0, "min_mid": 0},			# tanks
-	"bombers": {"requirement": {"flight", "automoblie"}, "cost": 4.0, "min_mid": 0}, 
+	"bombers": {"requirement": {"flight", "automoblie"}, "cost": 5, "min_mid": 0}, 
 	"oil_powered_ships": {"requirement": {"combustion", "machine_guns"}, "cost": 4.0, "min_mid": 0},				# Battleship - level 3 port
-	"synthetic_oil": { "requirement":{"oil_powered_ships", "mobile_warfare"}, "cost": 5, "min_mid": 0},		# Use chemicals for oil (3 for 1)
-	"synthetic_rubber": {"requirement": {"oil_powered_ships", "mobile_warfare"}, "cost": 5, "min_mid": 0},  # Use chemicals for rubber (3 for 1)
-	"radar": {"requirement": {"radio", "flight"}, "cost": 5, "min_mid": 0},
+	"synthetic_oil": { "requirement":{"oil_powered_ships", "mobile_warfare"}, "cost": 6, "min_mid": 0},		# Use chemicals for oil (3 for 1)
+	"synthetic_rubber": {"requirement": {"oil_powered_ships", "mobile_warfare"}, "cost": 6, "min_mid": 0},  # Use chemicals for rubber (3 for 1)
+	"radar": {"requirement": {"radio", "flight"}, "cost": 6, "min_mid": 0},
+	"rockets": {"requirement": {"synthetic_oil"}, "cost": 6, "min_mid": 0},
 }

@@ -37,10 +37,11 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 6.80
-	player.freePOP = 5
+	player.POP = 7.80
+	player.freePOP = 6
 	player.milPOP = 1.0
-	player.numLowerPOP = 6
+	player.numLowerPOP = 7
+	player.type = "major"
 
 	player.shipyard = 1
 
@@ -70,16 +71,19 @@ def initialize_major_power(player):
 	player.number_units = 5.0
 	player.colonization = 0.5
 	player.new_development = 1.0
-	player.diplo_action = 0.5
+	player.diplo_action = 2.0
 
 def initialize_modern_minor(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 1
 	player.POP = 2.4
-	player.freePOP = 5
+	player.freePOP = 2
 	player.milPOP = 0.4
 	player.numLowerPOP = 2.4
+	player.type = "minor"
+
+	player.military["infantry"] = 2.0
 
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
@@ -97,6 +101,7 @@ def initialize_oldemp(player):
 	player.stability = 0.0
 	player.milPOP = 1.0
 	player_government = "despotism"
+	player.type = "old_empire"
 
 	player.numMidPOP = 0.0
 	player.technologies = {"basic_civ", "pre_modern"}
@@ -126,6 +131,7 @@ def initialize_old_minor(player):
 	player.stability = -1.0
 	player.milPOP = 0.6
 	player.government = "despotism"
+	player.type = "old_minor"
 
 	player.POP = 2.6
 	player.numLowerPOP = 2.6

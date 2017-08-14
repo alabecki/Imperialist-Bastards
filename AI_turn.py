@@ -15,6 +15,11 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 	print("___________________________________________________________________")
 
 
+	print("Borders:")
+	for b in player.borders:
+		print (b.name)
+
+
 	player.calculate_resource_base()
 	player.update_priorities(market)
 	
@@ -66,7 +71,7 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 
 
 	player.AI_sell_surplus(market)
-
+	player.check_obsolete()
 	player.check_stability(market)
 	player.use_spice_stability()
 	#player.supply_factories_with_material(market)

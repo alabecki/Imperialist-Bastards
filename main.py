@@ -1,6 +1,8 @@
 
 #!/usr/bin/env python3
 
+#/usr/bin/python3
+
 from pprint import pprint
 from random import*
 from itertools import product, combinations

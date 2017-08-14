@@ -5,7 +5,7 @@ import player_class
 class Market(object):
 	def __init__ (self):
 
-		self.gold = 2000
+		self.gold = 3000
 
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto", "frigates", "iron_clad", "battle_ship"]
@@ -28,9 +28,9 @@ class Market(object):
 			"furniture": 2,
 			"paper": 2,
 			"chemicals": 0,
-			"frigates": 0,
-			"iron_clad": 0,
-			"battle_ship": 0,
+			#"frigates": 0,
+			#"iron_clad": 0,
+			#"battle_ship": 0,
 			"gear": 0,
 			"radio": 0,
 			"telephone": 0,
@@ -112,7 +112,7 @@ class Market(object):
 
 	def buy_price(self, _type):
 		if(_type in self.resources):
-			amount = self.market[_type] 
+			amount = self.market[_type] - 1
 			if(amount < 1):
 				price = 100000
 				return price
@@ -120,7 +120,7 @@ class Market(object):
 				price = 1
 				return price
 			else:
-				price = self.resources_sell_price[amount] - 1
+				price = self.resources_sell_price[amount]
 			return price
 		if(_type in self.goods):
 			amount = self.market[_type]
@@ -131,7 +131,7 @@ class Market(object):
 				price = 2
 				return price
 			else:
-				price = self.goods_sell_price[amount] - 1
+				price = self.goods_sell_price[amount]
 			return price
 
 
