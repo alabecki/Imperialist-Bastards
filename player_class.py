@@ -41,6 +41,7 @@ class Player(object):
 
 	player_count = 0
 
+
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
 		self.type = _type				# major, old_empire, old_minor, civ_minor
@@ -52,6 +53,7 @@ class Player(object):
 		self.accepted_cultures = set()
 		self.religion = ""
 		self.capital = ""
+		self.VP = 0.0
 
 		self.stability_mod = 0.0
 		self.AP = 0.0
@@ -82,7 +84,7 @@ class Player(object):
 		#Good and Resources
 		self.resources = {
 			"gold": 10.0,
-			"food": 0.0,
+			"food": 1.0,
 			"iron": 0.0,
 			"wood": 0.0,
 			"coal": 0.0,
@@ -104,12 +106,39 @@ class Player(object):
 			"radio": 0.0,
 			"telephone": 0.0,
 			"auto": 0.0,
-			"frigates": 0.0,
-			"iron_clad": 0.0,
-			"battle_ship": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0,
 		}
+
+
+		self.supply = {
+			"gold": 0.0,
+			"food": 0.0,
+			"iron": 0.0,
+			"wood": 0.0,
+			"coal": 0.0,
+			"cotton": 0.0,
+			"spice": 0.0,
+			"dyes": 0.0,
+			"rubber": 0.0,
+			"oil": 0.0,
+			"parts": 0.0,
+			"clothing": 0.0,
+			"paper": 0.0,
+			"cannons": 0.0,
+			"furniture": 0.0,
+			"chemicals": 0.0,
+			"gear": 0.0,
+			"radio": 0.0,
+			"telephone": 0.0,
+			"auto": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0,
+		}
+
+		self.embargo = []
+
+		self.sphere = []
 
 		self.goods_produced = {
 			"parts": 0.0,
@@ -122,9 +151,9 @@ class Player(object):
 			"radio": 0.0,
 			"telephone": 0.0,
 			"auto": 0.0,
-			"frigates": 0.0,
-			"iron_clad": 0.0,
-			"battle_ship": 0.0,
+			#"frigates": 0.0,
+			#"iron_clad": 0.0,
+			#"battle_ship": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0
 		}
@@ -384,6 +413,17 @@ class Player(object):
 
 		#return stab_change
 
+
+	def calculate_access_to_goods(self, market):
+		for k, v in self.supply.items():
+			self.supply[k] = 0
+		for k, v in self.supply.items():
+			for i in market.market[k]:
+				if i.owner in self.embargo:
+					continue
+				else:
+					self.supply[k] += 1
+
 	def turn(self, globe):
 		stab_rounds = round(self.stability * 2) / 2
 		self.collect_resources(globe)
@@ -488,6 +528,7 @@ class Player(object):
 		strength += self.military["artillery"] * self.artillery["attack"]
 		strength += self.military["tank"] * self.tank["attack"]
 		strength += self.military["fighter"] * self.fighter["attack"]
+		strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
 		
 		return strength
 
@@ -500,6 +541,7 @@ class Player(object):
 		strength += self.military["artillery"] * self.artillery["defend"]
 		strength += self.military["tank"] * self.tank["defend"]
 		strength += self.military["fighter"] * self.fighter["defend"]
+		strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
 		strength = strength * self.fortification
 		return strength
 

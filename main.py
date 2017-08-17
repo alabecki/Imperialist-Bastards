@@ -83,7 +83,7 @@ while True:
 		print("\n Turn: %s \n" % (turn))
 		print("Gold in market: %s \n" % (market.gold))
 		for k, v in market.market.items():
-			print (k, v)
+			print (k, len(v))
 		print("Players len: %s " % (len(players)))
 		cont = input()
 		order = list(players.keys())

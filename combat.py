@@ -22,8 +22,8 @@ def combat(p1, p2, prov, players):
 	while(True):
 		att_number_units_army = calculate_number_of_units(p1)
 		def_number_units_army = calculate_number_of_units(p2)
-		att_str = calculate_base_attack_strength(p1)
-		def_str = calculate_base_defense_strength(p2)
+		att_str = p1.calculate_base_attack_strength()
+		def_str = p2.calculate_base_defense_strength()
 		att_ammo = calculate_ammo_needed(p1)
 		def_ammo = calculate_ammo_needed(p2)
 		att_oil = calculate_oil_needed(p1)
@@ -134,8 +134,8 @@ def combat(p1, p2, prov, players):
 					print("%s has given up the assult in %s and has retreated \n" % (p1.name, p2.name))
 					return
 			if type(p1) == AI:
-				att_str = calculate_base_attack_strength(p1)
-				def_str = calculate_base_defense_strength(p2)
+				att_str = p1.calculate_base_attack_strength()
+				def_str = p2.calculate_base_defense_strength()
 				if att_str * 0.85 < def_str:
 					return
 
@@ -146,25 +146,7 @@ def calculate_number_of_units(player):
 	 player.military["irregulars"] + player.military["tank"] + player.military["fighter"]
 	return count
 
-def calculate_base_attack_strength(p1):
-	strength = 0.0
-	strength += p1.military["infantry"] * p1.infantry["attack"]
-	strength += p1.military["cavalry"] * p1.cavalry["attack"]
-	strength += p1.military["artillery"] * p1.artillery["attack"]
-	strength += p1.military["tank"] * p1.tank["attack"]
-	strength += p1.military["fighter"] * p1.fighter["attack"]
-	return strength
 
-def calculate_base_defense_strength(p2):
-	strength = 0.0
-	strength += p2.military["irregulars"] * p2.irregulars["defend"]
-	strength += p2.military["infantry"] * p2.infantry["defend"]
-	strength += p2.military["cavalry"] * p2.cavalry["defend"]
-	strength += p2.military["artillery"] * p2.artillery["defend"]
-	strength += p2.military["tank"] * p2.tank["defend"]
-	strength += p2.military["fighter"] * p2.fighter["defend"]
-	strength = strength * p2.fortification
-	return strength
 
 def calculate_ammo_needed(p):
 	ammo_needed = 0.0
@@ -629,6 +611,11 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 				player.provinces[new.name].worked = False
 				player.provinces[new.name].colony = True
 				player.provinces[new.name].type = "uncivilized"
+				player.POP += 1
+				player.freePOP +=1
+				player.numLowerPOP += 1
+				player.resources["gold"] += 3
+
 
 				unciv.provinces.pop(cprov.name)
 				if type(player) == AI:
@@ -672,7 +659,7 @@ def amph_combat(p1, p2, p1_forces, prov, players):
 		def_number_units_army = calculate_number_of_units(p2)
 		att_number_units_army = calculate_amphib_num_units(p1, p1_forces)
 		att_str = calculate_amphib_strength(p1, p1_forces)
-		def_str = calculate_base_defense_strength(p2)
+		def_str = p2.calculate_base_defense_strength()
 		att_ammo = calculate_amphib_ammo(p1, p1_forces)
 		att_oil = calculate_amphib_oil(p1, p1_forces)
 		def_ammo = calculate_ammo_needed(p2)
@@ -785,7 +772,7 @@ def amph_combat(p1, p2, p1_forces, prov, players):
 					break
 			if type(p1) == AI:
 				att_str = calculate_amphib_strength(p1, p1_forces)
-				def_str = calculate_base_defense_strength(p2)
+				def_str = p2.calculate_base_defense_strength()
 				if att_str * 0.85 < def_str:
 					return
 
