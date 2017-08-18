@@ -37,28 +37,31 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 7.00
-	player.freePOP = 5
+	player.POP = 7.80
+	player.freePOP = 6
 	player.milPOP = 1.0
-	player.numLowerPOP = 6
+	player.numLowerPOP = 7
+	player.type = "major"
 
-	player.factories["ship_yard"] = 1
+	player.shipyard = 1
 
-	player.technologies.add("pre_industry_2")
-	player.technologies.add("professional_armies")
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies", "flintlock" }
+	#player.technologies.add("pre_industry_3")
+	#player.technologies.add("pre_industry_2")
+	#player.technologies.add("flintlock")
 	#player.technologies.add("high_pressure_steam_engine")
 
-	player.midPOP["researchers"]["number"] = 0.25
-	player.midPOP["officers"]["number"] = 0.25
+	player.midPOP["researchers"]["number"] = 0.20
+	player.midPOP["officers"]["number"] = 0.20
 	player.midPOP["managers"]["number"] = 0.0
-	player.midPOP["bureaucrats"]["number"] = 0.25
-	player.midPOP["artists"]["number"] = 0.25
+	player.midPOP["bureaucrats"]["number"] = 0.20
+	player.midPOP["artists"]["number"] = 0.20
 
-	player.numMidPOP = 1.0
+	player.numMidPOP = 0.8
 
 	player.resources["gold"] = 12.0
 	
-	player.goods["cannons"] = 1.0
+	player.goods["cannons"] = 1.5
 
 	player.military["infantry"] = 2.0
 	player.military["cavalry"] = 1.0
@@ -68,22 +71,24 @@ def initialize_major_power(player):
 	player.number_units = 5.0
 	player.colonization = 0.5
 	player.new_development = 1.0
-	player.diplo_action = 0.5
+	player.diplo_action = 2.0
 
-def advanced_minor(player):
+def initialize_modern_minor(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 1
-	player.POP = 2.4
-	player.freePOP = 5
+	player.POP = 2.9
+	player.freePOP = 2.5
 	player.milPOP = 0.4
-	player.numLowerPOP = 2.4
+	player.numLowerPOP = 2.9
+	player.type = "minor"
 
-	player.technologies.add("pre_industry_2")
-	player.technologies.add("professional_armies")
-	#player.technologies.add("high_pressure_steam_engine")
+	player.goods["cannons"] = 1.0
 
-	player.numMidPOP = 1.0
+
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
+
+
 
 	player.resources["gold"] = 7.0
 	
@@ -91,24 +96,28 @@ def advanced_minor(player):
 	player.number_units = 2
 
 
-def initialize_oldemp(player):
+def initialize_oldempire(player):
 
 	player.stability = 0.0
 	player.milPOP = 1.0
-	player_government = "despotism"
+	player.government = "despotism"
+	player.type = "old_empire"
 
 	player.numMidPOP = 0.0
-	player.technologies.add("pre_industry_1")
-	player.resources["gold"] = 12.0
+	player.technologies = {"basic_civ", "pre_modern"}
+	player.resources["gold"] = 14.0
 	player.resources["spice"] = 0.0
 	player.goods["clothing"] = 0.0
 	player.goods["paper"] = 0.0
-	player.goods["cannons"] = 0.0
+	player.goods["cannons"] = 1.0
 	player.goods["furniture"] = 0.0
 
 	player.military["irregulars"] = 4.0
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
+
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+
 
 	player.techModifier = 0.75
 
@@ -119,15 +128,18 @@ def initialize_oldemp(player):
 
 def initialize_old_minor(player):
 
-	player.stability = -1.0
+	player.stability = 0
 	player.milPOP = 0.6
 	player.government = "despotism"
+	player.type = "old_minor"
 
-	player.POP = 2.6
-	player.numLowerPOP = 2.6
-	player.freePOP = 2
-	player.technologies.add("pre_industry_1")
-	player.resources["gold"] = 5.0
+	player.POP = 3.6
+	player.numLowerPOP = 3.6
+	player.freePOP = 3
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+
+
+	player.resources["gold"] = 6.0
 
 
 	player.military["irregulars"] = 2.0
@@ -150,7 +162,7 @@ def initilize_uncivilized(player):
 	player.POP = 2.4
 	player.numLowerPOP = 2.4
 	player.freePOP = 2
-	player.technologies.add("pre_industry_1")
+	#player.technologies.add("pre_industry_1")
 	player.resources["gold"] = 4.0
 	player.military["irregulars"] = 2.0
 	player.techModifier = 0.5
@@ -259,8 +271,7 @@ def start_game():
 			assign_to_all_provinces(player)
 		if type(player) == AI:
 			for p, prov in player.provinces.items():
-				player.resource_base[prov.resource] += 1
-
+				player.resource_base[prov.resource] += prov.quality
 
 	print("Now the Old Empires shall be initialized \n")
 	i = 1
