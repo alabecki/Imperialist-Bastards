@@ -23,11 +23,13 @@ def get_name_from_major_choice(choice):
 		name = "Ottoman"
 	if choice == "8":
 		name = "Spain"
+	if choice == "9":
+		name = "Netherlands"
 	return name
 
 def get_name_from_minor_choice(choice):
 	if choice == "1":
-		name = "Netherlands"
+		name = "Demark"
 	if choice == "2":
 		name = "Sweden"
 	if choice == "3":
@@ -44,7 +46,7 @@ def historical():
 	i = 1
 
 	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Ottoman", "Italy", "Spain", "Netherlands"]
-	modern_minors = ["Sweden", "Portugal", "Norway"]
+	modern_minors = ["Denmark", "Sweden", "Portugal", "Norway"]
 	old_empires = ["China", "India", "Japan", "Persia"]
 	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dia Dam", "Siam", "Malaysia", \
 	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi"]
@@ -89,6 +91,8 @@ def historical():
 				ottoman(player, provinces)
 			if choice == "8":
 				spain(player)
+			if choice == "9":
+				netherlands(player)
 			human_choices.append(name)
 		if kind == "2":
 			print("Which Minor Modern nation will player " + i + " control? \n")
@@ -103,7 +107,7 @@ def historical():
 			player = players[name]
 			initialize_modern_minor(player)
 			if choice == "1":
-				netherlands(player, provinces)
+				denmark(player, provinces)
 			if choice == "2":
 				sweden(player)
 			if choice == "3":
@@ -140,6 +144,8 @@ def historical():
 				ottoman(player, provinces)
 			if player.name == "Spain":
 				spain(player, provinces)
+			if player.name == "Netherlands":
+				netherlands(player, provinces)
 			i += 1
 	for m in modern_minors:
 		if m not in human_choices:
@@ -147,8 +153,8 @@ def historical():
 			players[m] = new
 			player = players[m]
 			initialize_modern_minor(player)
-			if player.name == "Netherlands":
-				netherlands(player, provinces)
+			if player.name == "Denmark":
+				denmark(player, provinces)
 			if player.name == "Sweden":
 				sweden(player, provinces)
 			if player.name == "Portugal":
@@ -162,7 +168,8 @@ def historical():
 			new = AI(e, "old_empire", i)
 			players[e] = new
 			player = players[e]
-			initialize_oldemp(player)
+
+			initialize_oldempire(player)
 			if player.name == "China":
 				china(player, provinces)
 			if player.name == "India":
@@ -277,8 +284,16 @@ def historical():
 			madagascar(nation, provinces)
 		i += 1
 
+	print("Players")
+	for p, player in players.items():
+		print(player.name)
+
+
+	print("Unvivilized Nations:")
 	for unciv in uncivilized_minors.values():
 		print(unciv.name)
+		for p, prov in unciv.provinces.items():
+			print(p, prov.name)
 
 	for p, play in players.items():
 		if play.capital == "":
@@ -290,7 +305,7 @@ def historical():
 		for p, prov in play.provinces.items():
 			res = prov.resource
 			#print("What the fuck are you doing?---------------------------")
-			play.resources[res] += prov.quality
+			play.resources[res] += prov.quality * 1.5
 			#play.capital = play.provinces[x].name
 	for p1 in players.values():
 		borders = set()
@@ -312,8 +327,42 @@ def historical():
 		pair = frozenset(pair)
 		relations[pair] = Relation(pair)
 
+
 	for r, rel in relations.items():
 		print(r, rel.relata)
+
+	relations[frozenset({"England", "India"})].relationship = -2.5
+	relations[frozenset({"England", "France"})].relationship = -1.25
+	relations[frozenset({"England", "Italy"})].relationship = 1
+	relations[frozenset({"England", "Ottoman"})].relationship = 1
+	relations[frozenset({"England", "Russia"})].relationship = -1
+	relations[frozenset({"England", "Persia"})].relationship = 1.25
+	relations[frozenset({"England", "Egypt"})].relationship = -1.25
+	relations[frozenset({"England", "Spain"})].relationship = 0.75
+	relations[frozenset({"England", "Germany"})].relationship = -0.5
+	relations[frozenset({"France", "Algeria"})].relationship = -1.5
+	relations[frozenset({"France", "Germany"})].relationship = -1.75
+	relations[frozenset({"France", "Russia"})].relationship = 1.5
+	relations[frozenset({"France", "Spain"})].relationship = 1
+	relations[frozenset({"France", "Dia Dam"})].relationship = -1
+	relations[frozenset({"France", "India"})].relationship = 0.5
+	relations[frozenset({"France", "Italy"})].relationship = -0.75
+	relations[frozenset({"France", "Ottoman"})].relationship = 0.5
+	relations[frozenset({"Italy", "Libya"})].relationship = -1.0
+	relations[frozenset({"Germany", "Austria"})].relationship = 2
+	relations[frozenset({"Germany", "Italy"})].relationship = 1
+	relations[frozenset({"Germany", "Russia"})].relationship = -0.75
+	relations[frozenset({"Germany", "Ottoman"})].relationship = 1
+	relations[frozenset({"Austria", "Russia"})].relationship = -0.5
+	relations[frozenset({"Austria", "Italy"})].relationship = -1
+	relations[frozenset({"Russia", "Ottoman"})].relationship = -1
+	relations[frozenset({"China", "Russia"})].relationship = -1
+	relations[frozenset({"Spain", "Philippines"})].relationship -1
+
+
+
+	#for r, rel in relations.items():
+	#	print(r, rel.relata)
 
 
 	market = Market()
