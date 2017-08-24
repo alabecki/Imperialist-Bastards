@@ -47,12 +47,12 @@ def human_turn(player, cont):
 				print("Lower Class Pops: %s  _______  Middle Class Pops: %s \n" % (player.numLowerPOP, player.numMidPOP))
 				print("Development Points: %s  _____ Development Level: %s \n" % (player.new_development, player.number_developments))
 				print("Factories:")
-				for f in player.factories:
-					print(f)
+				for k, v in player.factories.items():
+					print(k, v)
 			if info_command == "2":
 				print("Province Overview: ######################################################################################## \n")
 				for k, province in player.provinces.items():
-					print("Name: %s 	Resource: %s 	Development Level: %s 	Worked?: %s 	Quality: %s \n" % \
+					print("Name: %30s 	Resource: %10s 	Development Level: %s 	Worked?: %s 	Quality: %s \n" % \
 						(province.name, province.resource, province.development_level, province.worked, province.quality))
 			if info_command == "3":
 				print("Population Overview: ######################################################################################### \n")

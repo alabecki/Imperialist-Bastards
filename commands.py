@@ -42,9 +42,8 @@ foreign_intelligence = {
 
 national_comparisons = {
 	"1": "Points-per-turn comparisons",
-	"2": "Production Comparisons",
-	"3": "Military Comparisons",
-	"4": "Other"
+	"2": "Military Comparisons",
+	"3": "Production Comparisons",
 }
 
 
@@ -63,9 +62,9 @@ use_chemicals = {
 
 build = {
 	"1": "Develop Province",
-	"2": "Build Factory",
-	"3": "Build/Develop Fortifications",
-	"4": "Build Steam Shipyard",
+	"2": "Build/Upgrade Factory",
+	"3": "Build/Upgrade Fortifications",
+	"4": "Build/Upgrade Shipyard",
 	"5": "Build Unit"
 }
 
@@ -86,9 +85,12 @@ build_factory = {
 }
 
 military_action = {
-	"1": "Declare war on Uncivilized Nation",
-	"2": "Declare war on Old Minor or Old Empire",
-	"3": "Declare war on a Modern Nations"
+	"1": "Go to war with an Uncivilized Nation",
+	"2": "Go to war with an Old World Minor Power",
+	"3": "Go to war with an Old World Old Empire",
+	"4": "Colonial war with a Major Power",
+	"5": "Minor war with a Major Power",
+	"6": "Great War with a Major Power"
 }
 
 build_unit = {
@@ -105,18 +107,21 @@ build_unit = {
 diplomacy = {
 	"1": "Improve Relations",
 	"2": "Damage Relations",
-	"3": "Sabatage Relations",
-	"4": "Destablize Nation",
-	"5": "Offer Loan",
-	"6": "Offer to Sell Arms",
-	"7": "Ask to Buy Arms"
+	"3": "Gain CB",
+	"4": "Sabatage Relations",
+	"5": "Destablize Nation",
+	"6": "Offer Loan",
+	"7": "Embargo/Life Embargo"
+	#"6": "Offer to Sell Arms",
+	#"7": "Ask to Buy Arms"
 }
 
 culture_commands = {
 	"1": "Increase Stability",
-	"2": "Assimilate Province",
-	"3": "Export Culture",
-	"4": "Spread Culture",
-	"5": "Steal Middle POP",
-	"6": "Use Spice for Stability"
+	"2": "Improve Reputation",
+	"3": "Integrate Culture of a Province",
+	"4": "Export Culture",
+	#"4": "Spread Culture",
+	#"5": "Steal Middle POP",
+	"5": "Use Spice for Stability"
 	}

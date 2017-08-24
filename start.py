@@ -61,7 +61,7 @@ def initialize_major_power(player):
 
 	player.resources["gold"] = 12.0
 	
-	player.goods["cannons"] = 1.0
+	player.goods["cannons"] = 1.5
 
 	player.military["infantry"] = 2.0
 	player.military["cavalry"] = 1.0
@@ -71,19 +71,19 @@ def initialize_major_power(player):
 	player.number_units = 5.0
 	player.colonization = 0.5
 	player.new_development = 1.0
-	player.diplo_action = 2.0
+	player.diplo_action = 1.0
 
 def initialize_modern_minor(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 1
-	player.POP = 2.4
-	player.freePOP = 2
+	player.POP = 2.9
+	player.freePOP = 2.5
 	player.milPOP = 0.4
-	player.numLowerPOP = 2.4
+	player.numLowerPOP = 2.9
 	player.type = "minor"
 
-	player.military["infantry"] = 2.0
+	player.goods["cannons"] = 1.0
 
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
@@ -96,20 +96,20 @@ def initialize_modern_minor(player):
 	player.number_units = 2
 
 
-def initialize_oldemp(player):
+def initialize_oldempire(player):
 
 	player.stability = 0.0
 	player.milPOP = 1.0
-	player_government = "despotism"
+	player.government = "despotism"
 	player.type = "old_empire"
 
 	player.numMidPOP = 0.0
 	player.technologies = {"basic_civ", "pre_modern"}
-	player.resources["gold"] = 12.0
+	player.resources["gold"] = 14.0
 	player.resources["spice"] = 0.0
 	player.goods["clothing"] = 0.0
 	player.goods["paper"] = 0.0
-	player.goods["cannons"] = 0.0
+	player.goods["cannons"] = 1.0
 	player.goods["furniture"] = 0.0
 
 	player.military["irregulars"] = 4.0
@@ -128,18 +128,18 @@ def initialize_oldemp(player):
 
 def initialize_old_minor(player):
 
-	player.stability = -1.0
+	player.stability = 0
 	player.milPOP = 0.6
 	player.government = "despotism"
 	player.type = "old_minor"
 
-	player.POP = 2.6
-	player.numLowerPOP = 2.6
-	player.freePOP = 2
+	player.POP = 3.6
+	player.numLowerPOP = 3.6
+	player.freePOP = 3
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
 
 
-	player.resources["gold"] = 5.0
+	player.resources["gold"] = 6.0
 
 
 	player.military["irregulars"] = 2.0

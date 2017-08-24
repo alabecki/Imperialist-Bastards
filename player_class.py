@@ -1,6 +1,6 @@
 
 
-import random
+from random import*
 import minor_classes
 from technologies import technology_dict
 from globe import*
@@ -33,13 +33,17 @@ development_map = {
 government_map = {
 	"despotism": 		0.75,
 	"absolute monarchy": 1.0,
-	"oligarchy":  1.25
+	"oligarchy":  1.1
 }
+
+military_doctrines = ["Infantry_Offense", "Infantry_Defense", "Mobile_Offense", "Mobile_Defense", "Artillery_Offense",
+"Artillery_Defense", "Fighter_Offense", "Fighter_Defense", "Sea_Doctrine1", "Sea_Doctrine2", "Enhanced_Mobility"]
 
 
 class Player(object):
 
 	player_count = 0
+
 
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
@@ -52,6 +56,8 @@ class Player(object):
 		self.accepted_cultures = set()
 		self.religion = ""
 		self.capital = ""
+		self.VP = 0.0
+		self.defeated = False
 
 		self.stability_mod = 0.0
 		self.AP = 0.0
@@ -63,6 +69,7 @@ class Player(object):
 		self.POP = 5.8
 		self.freePOP = 5.0
 		self.proPOP = 0.0
+
 		self.production_modifier = 1.0
 		self.milPOP = 0.8
 		self.POP_increased = 0
@@ -82,12 +89,12 @@ class Player(object):
 		#Good and Resources
 		self.resources = {
 			"gold": 10.0,
-			"food": 0.0,
+			"food": 1.0,
 			"iron": 0.0,
 			"wood": 0.0,
 			"coal": 0.0,
 			"cotton": 0.0,
-			"spice": 1.0,
+			"spice": 0.0,
 			"dyes": 0.0,
 			"rubber": 0.0,
 			"oil": 0.0,
@@ -104,12 +111,39 @@ class Player(object):
 			"radio": 0.0,
 			"telephone": 0.0,
 			"auto": 0.0,
-			"frigates": 0.0,
-			"iron_clad": 0.0,
-			"battle_ship": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0,
 		}
+
+
+		self.supply = {
+			"gold": 0.0,
+			"food": 0.0,
+			"iron": 0.0,
+			"wood": 0.0,
+			"coal": 0.0,
+			"cotton": 0.0,
+			"spice": 0.0,
+			"dyes": 0.0,
+			"rubber": 0.0,
+			"oil": 0.0,
+			"parts": 0.0,
+			"clothing": 0.0,
+			"paper": 0.0,
+			"cannons": 0.0,
+			"furniture": 0.0,
+			"chemicals": 0.0,
+			"gear": 0.0,
+			"radio": 0.0,
+			"telephone": 0.0,
+			"auto": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0,
+		}
+
+		self.embargo = []
+
+		self.sphere = []
 
 		self.goods_produced = {
 			"parts": 0.0,
@@ -122,9 +156,9 @@ class Player(object):
 			"radio": 0.0,
 			"telephone": 0.0,
 			"auto": 0.0,
-			"frigates": 0.0,
-			"iron_clad": 0.0,
-			"battle_ship": 0.0,
+			#"frigates": 0.0,
+			#"iron_clad": 0.0,
+			#"battle_ship": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0
 		}
@@ -147,6 +181,8 @@ class Player(object):
 			"auto": 0,
 			"tank": 0
 		}
+
+
 
 		#self.factories = set()
 		self.factory_throughput = 4.0
@@ -218,8 +254,8 @@ class Player(object):
 		}
 
 		self.fighter = {
-			"attack": 0.6,
-			"defend": 1.0,
+			"attack": 0.8,
+			"defend": 1.2,
 			"manouver": 6.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.1
@@ -248,12 +284,13 @@ class Player(object):
 			}
 
 		self.battle_ship = {
-			"attack": 8,
+			"attack": 7,
 			"HP": 4,
 			"ammo_use": 0.6,
 			"oil_use": 0.2
 		}
 
+		self.doctrines = set()
 
 		self.colonization = 0.0
 		self.num_colonies = 0
@@ -266,7 +303,42 @@ class Player(object):
 		self.sprawl = False
 
 
-	def collect_resources(self, globe):
+	def determine_middle_class_need(self):
+		requirement = ["paper"]
+		if self.numMidPOP >= 1 and self.numMidPOP < 2:
+			requirement = ["paper", "furniture"]
+		if self.numMidPOP >= 2 and self.numMidPOP < 2.5:
+			requirement = ["paper", "clothing", "furniture"]
+		if self.numMidPOP >= 2.5 and self.numMidPOP < 3:
+			requirement = ["paper", "paper", "clothing", "furniture"]
+		if self.numMidPOP >= 3 and self.numMidPOP < 3.5:
+			requirement = ["paper", "paper", "clothing", "furniture", "chemicals"]
+		if self.numMidPOP >= 3.5 and self.numMidPOP < 4:
+			requirement = ["paper", "paper", "clothing", "furniture", "radio", "radio"]
+		if self.numMidPOP >= 4 and self.numMidPOP < 4.5:
+			requirement = ["paper", "paper", "clothing", "furniture", "telephone", "radio", "telephone"]
+		if self.numMidPOP > 4.5:
+			requirement = ["paper", "paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
+		#print("Mid class requirments:")
+		#for r in requirement:
+		#	print(r)
+		return requirement
+
+
+	def check_mid_requirement(self, requirement):
+		if self.resources["spice"] < 1 and self.numMidPOP < 4.5:
+			return False
+		for r in requirement:
+			if self.goods[r] < 1: 
+				return False
+		if self.numMidPOP >= 3 and self.goods["paper"] < 2:
+			return False
+		if self.freePOP < 0.3 and self.proPOP < 2:
+			return False
+		return True
+
+
+	def collect_resources(self, market):
 		print("%s collects resources: \n" % (self.name))
 		stab_rounds = round(self.stability * 2) / 2
 		res_dict = {
@@ -307,7 +379,7 @@ class Player(object):
 					continue
 				if p.powered == True:
 					gain = development_map[dev] * stability_map[stab_rounds] * p.quality * c_mod
-					print("%s gains %s %s" % (self.name, gain, p.resource))
+					#print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
 					res_dict[p.resource] += gain
@@ -316,7 +388,7 @@ class Player(object):
 					if p.resource == "oil":
 						continue
 					gain = stability_map[stab_rounds] * p.quality * c_mod
-					print("%s gains %s %s" % (self.name, gain, p.resource))
+					#print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
 						gain == gain * 5
 					#self.resources[p.resource] += gain
@@ -324,12 +396,27 @@ class Player(object):
 					res_dict[p.resource] += gain
 		for r, res in res_dict.items():
 			
-			print(r)
+			print(r, res)
 			self.resources[r] += res
-			#if globe.resources[r]:
-			#	globe.resources[r].append([self.name, res])
-			#else:
-			#	globe.resources[r] = [(self.name, res)]
+			
+			if r == "food":
+				market.food_production[self.name] = res
+			if r == "iron":
+				market.iron_production[self.name] = res
+			if r == "wood":
+				market.wood_production[self.name] = res 
+			if r == "cotton":
+				market.cotton_production[self.name] = res 
+			if r == "coal":
+				market.coal_production[self.name] = res
+			if r == "gold":
+				market.gold_production[self.name] = res 
+			if r == "spice":
+				market.spice_production[self.name] = res 
+			if r == "rubber":
+				market.rubber_production[self.name] = res
+			if r == "oil":
+				market.oil_production[self.name] = res
 
 
 	def collect_goods(self):
@@ -384,36 +471,51 @@ class Player(object):
 
 		#return stab_change
 
-	def turn(self, globe):
+
+	def calculate_access_to_goods(self, market):
+		for k, v in self.supply.items():
+			self.supply[k] = 0
+		for k, v in self.supply.items():
+			for i in market.market[k]:
+				if i.owner in self.embargo:
+					continue
+				else:
+					self.supply[k] += 1
+
+	def turn(self, market):
 		stab_rounds = round(self.stability * 2) / 2
-		self.collect_resources(globe)
+		self.collect_resources(market)
 		self.collect_goods()
 		self.payMaintenance()
 		for p in self.provinces.values():
-			if p.culture != self.culture and p.culture not in self.accepted_cultures:
-				self.stability -= 0.05 
+			if p.culture != self.culture:
+				if p.culture not in self.accepted_cultures:
+					self.stability -= 0.05
+				else:
+					self.stability -= 0.025 
+
 		if self.stability < -3.0:
 			self.stability = -3.0
-		cps = 0.1 + self.midPOP["artists"]["number"] + self.midPOP["bureaucrats"]["number"]/5
-		self.culture_points+= cps
+		culture_gain = 0.2 + self.midPOP["artists"]["number"] * 2
+		self.culture_points+= culture_gain
 		##for g in globe.culture:
 			#print(g)
 		#globe.culture.append([self.name, cps])
-		print("Culture points gained: %s " % (0.2 + self.midPOP["artists"]["number"] * 2 + self.midPOP["bureaucrats"]["number"]/2))
+		print("Culture points gained: %s " % (culture_gain))
 		self.can_train = 1 + self.midPOP["officers"]["number"] * 5
 		self.AP = int(self.proPOP) * self.production_modifier
-		self.reputation += self.midPOP["artists"]["number"] * 0.1
-		research_gain = 0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
-		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.4)
+		#self.reputation += self.midPOP["artists"]["number"] * 0.1
+		research_gain = (0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
+		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.4)) * government_map[self.government]
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
 		#globe.research.append([self.name, research_gain])
-		diplo_gain = 0.15 + (self.midPOP["bureaucrats"]["number"] * self.reputation)
+		diplo_gain = 0.2 + (self.midPOP["bureaucrats"]["number"] * self.reputation * 2)
 		self.diplo_action += diplo_gain
 		#globe.diplomacy.append([self.name, diplo_gain])
 		print("Diplo_action gain: %s " % (diplo_gain))
-		col_gain =  self.military["frigates"]/10 +  self.military["iron_clad"]/5 + self.military["battle_ship"]/2 \
-		+ self.midPOP["bureaucrats"]["number"]/5
+		col_gain =  self.military["frigates"]/10 +  self.military["iron_clad"]/6 + self.military["battle_ship"]/3 \
+		+ self.midPOP["bureaucrats"]["number"]/4
 		self.colonization += col_gain
 		#globe.colonization.append([self.name, col_gain])
 		print("Colonization point gain: %s" % (col_gain))
@@ -488,6 +590,7 @@ class Player(object):
 		strength += self.military["artillery"] * self.artillery["attack"]
 		strength += self.military["tank"] * self.tank["attack"]
 		strength += self.military["fighter"] * self.fighter["attack"]
+		#strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
 		
 		return strength
 
@@ -500,6 +603,7 @@ class Player(object):
 		strength += self.military["artillery"] * self.artillery["defend"]
 		strength += self.military["tank"] * self.tank["defend"]
 		strength += self.military["fighter"] * self.fighter["defend"]
+		#strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
 		strength = strength * self.fortification
 		return strength
 
@@ -535,7 +639,7 @@ class Player(object):
 		for v in range(int(transport_limit)):
 			tries = 0
 			while tries < 32:
-				_type = random.choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
+				_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
 				if self.military[_type] - forces[_type] >= 1:
 					forces[_type] += 1
 					break

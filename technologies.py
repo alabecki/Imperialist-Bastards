@@ -7,8 +7,6 @@
 #
 #}
 
-
-
 technology_dict = {
 	"basic_civ": {"requirement": {}, "cost": 1, "min_mid": 0},
 	"pre_modern": {"requirement": {"basic_civ"}, "cost": 1, "min_mid": 0},
@@ -32,7 +30,7 @@ technology_dict = {
 	"chemistry": {"requirement": {"power_loom"}, "cost": 2.0, "min_mid": 0},
 	"pulping": {"requirement": {"chemistry"}, "cost": 2.0, "min_mid": 0},
 	"mechanical_reaper": {"requirement": {"power_loom", "steel_plows"}, "cost": 2, "min_mid": 0},
-	"iron_clad": {"requirement": {"breach_loaded_arms"}, "cost": 2.5, "min_mid": 0},
+	"iron_clad": {"requirement": {"breach_loaded_arms", "compound_steam_engine"}, "cost": 3, "min_mid": 0},
 	"electricity": {"requirement": {"chemistry"}, "cost": 2.5, "min_mid": 0},									#electrical gear factory, rubber
 	"medicine": {"requirement": {"chemistry"}, "cost": 2.5, "min_mid": 0},
 	"synthetic_dyes": {"requirement": {"chemistry", "fertlizer"}, "cost": 2.5, "min_mid": 0},					
@@ -42,9 +40,9 @@ technology_dict = {
 	"telegraph": {"requirement": {"electricity"}, "cost": 2.5, "min_mid": 0},
 	"radio": {"requirement": {"electricity"}, "cost": 3, "min_mid": 0},									#radio factory
 	"oil_drilling": {"requirement": {"chemistry", "dynamite"}, "cost": 3, "min_mid": 1.0},				#oil resource
-					
+	"photography": {"requirement": {"electricity"}, "cost": 3, "min_mid": 1.0},			
 	"combustion": {"requirement": {"oil_drilling", "compound_steam_engine"}, "cost": 3.5, "min_mid": 0},		
-	"flight": {"requirement": {"combustion", "machine_guns"}, "cost": 3.5, "min_mid": 0},		# plane factory
+	"flight": {"requirement": {"combustion", "machine_guns"}, "cost": 4, "min_mid": 0},		# plane factory
 	"automobile": {"requirement": {"combustion", "radio"}, "cost": 3.5, "min_mid": 0},					# auto factory
 	"telephone": {"requirement": {"telegraph"}, "cost": 3.5, "min_mid": 0},									# phone factory
 	"mobile_warfare": {"requirement": {"automobile", "flight"}, "cost": 4.0, "min_mid": 0},			# tanks

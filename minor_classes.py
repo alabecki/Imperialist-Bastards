@@ -52,3 +52,15 @@ class Relation(object):
 		self.defensive_alliance = False
 		self.full_alliance = False
 		self.war = False
+
+class MarketItem(object):
+	def __init__ (self, ID, kind, owner):
+		self.ID = ID 
+		self.kind = kind
+		self.owner = owner
+
+# Place each item to be sold in the queue for its kind 
+# Price of a kind determined by the number of kind in queue
+# When buying, AI will try first to buy from minors (probably just resources)
+# It will decide who do buy from based on their relations with that player.
+# For each player there is a list of players with whom he does not wish to trad

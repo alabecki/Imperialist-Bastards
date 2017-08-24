@@ -7,6 +7,8 @@ class Globe(object):
 
 	def __init__ (self):
 
+		defeated = []
+
 
 		self.factories = {
 			"parts":   0,
