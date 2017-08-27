@@ -45,11 +45,11 @@ def historical():
 	uncivilized_minors = dict()
 	i = 1
 
-	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Ottoman", "Italy", "Spain", "Netherlands"]
+	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Spain", "Netherlands"]
 	modern_minors = ["Denmark", "Sweden", "Portugal", "Norway"]
-	old_empires = ["China", "India", "Japan", "Persia"]
+	old_empires = ["China", "India", "Japan", "Persia", "Ottoman"]
 	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dia Dam", "Siam", "Malaysia", \
-	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi"]
+	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
 	unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
 	"South Australia", "New Zealand", "Zululand"]
 	unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
@@ -88,10 +88,8 @@ def historical():
 			if choice == "6":
 				italy(player)
 			if choice == "7":
-				ottoman(player, provinces)
-			if choice == "8":
 				spain(player)
-			if choice == "9":
+			if choice == "7":
 				netherlands(player)
 			human_choices.append(name)
 		if kind == "2":
@@ -178,6 +176,8 @@ def historical():
 				persia(player, provinces)
 			if player.name == "Japan":
 				japan(player, provinces)
+			if player.name == "Ottoman":
+				ottoman(player, provinces)
 			i += 1
 
 	for o in old_minors:
@@ -226,6 +226,8 @@ def historical():
 				brunei(player, provinces)
 			if player.name == "Sulawesi":
 				sulawesi(player, provinces)
+			if player.name == "Java":
+				java(player, provinces)
 
 	for u in unciv:
 		new = Uncivilized_minor(u)
@@ -304,8 +306,7 @@ def historical():
 	for p, play in players.items():
 		for p, prov in play.provinces.items():
 			res = prov.resource
-			#print("What the fuck are you doing?---------------------------")
-			play.resources[res] += prov.quality * 1.5
+			play.resources[res] += prov.quality * 1
 			#play.capital = play.provinces[x].name
 	for p1 in players.values():
 		borders = set()
@@ -331,24 +332,22 @@ def historical():
 	for r, rel in relations.items():
 		print(r, rel.relata)
 
-	relations[frozenset({"England", "India"})].relationship = -2.5
+	relations[frozenset({"England", "India"})].relationship = -1.5
 	relations[frozenset({"England", "France"})].relationship = -1.25
 	relations[frozenset({"England", "Italy"})].relationship = 1
 	relations[frozenset({"England", "Ottoman"})].relationship = 1
-	relations[frozenset({"England", "Russia"})].relationship = -1
 	relations[frozenset({"England", "Persia"})].relationship = 1.25
-	relations[frozenset({"England", "Egypt"})].relationship = -1.25
 	relations[frozenset({"England", "Spain"})].relationship = 0.75
 	relations[frozenset({"England", "Germany"})].relationship = -0.5
-	relations[frozenset({"France", "Algeria"})].relationship = -1.5
+	relations[frozenset({"England", "China"})].relationship = -1
+	relations[frozenset({"England", "Japan"})].relationship = 0.5
 	relations[frozenset({"France", "Germany"})].relationship = -1.75
 	relations[frozenset({"France", "Russia"})].relationship = 1.5
 	relations[frozenset({"France", "Spain"})].relationship = 1
-	relations[frozenset({"France", "Dia Dam"})].relationship = -1
-	relations[frozenset({"France", "India"})].relationship = 0.5
-	relations[frozenset({"France", "Italy"})].relationship = -0.75
+	relations[frozenset({"France", "Italy"})].relationship = -0.5
 	relations[frozenset({"France", "Ottoman"})].relationship = 0.5
-	relations[frozenset({"Italy", "Libya"})].relationship = -1.0
+	relations[frozenset({"France", "China"})].relationship = 0.5
+	relations[frozenset({"France", "Austria"})].relationship = -0.75
 	relations[frozenset({"Germany", "Austria"})].relationship = 2
 	relations[frozenset({"Germany", "Italy"})].relationship = 1
 	relations[frozenset({"Germany", "Russia"})].relationship = -0.75
@@ -356,8 +355,10 @@ def historical():
 	relations[frozenset({"Austria", "Russia"})].relationship = -0.5
 	relations[frozenset({"Austria", "Italy"})].relationship = -1
 	relations[frozenset({"Russia", "Ottoman"})].relationship = -1
-	relations[frozenset({"China", "Russia"})].relationship = -1
-	relations[frozenset({"Spain", "Philippines"})].relationship -1
+	relations[frozenset({"Italy", "Russia"})].relationship = 0.65
+	relations[frozenset({"Ottoman", "Italy"})].relationship = -0.75
+	relations[frozenset({"Spain", "Italy"})].relationship = 0.75
+
 
 
 
@@ -366,8 +367,9 @@ def historical():
 
 
 	market = Market()
+		
 
-	globe = Globe()
+	#globe = Globe()
 
 	initial = {
 		"players" : players, 
@@ -375,7 +377,7 @@ def historical():
 		"relations": relations, 
 		"uncivilized_minors": uncivilized_minors,
 		"market": market,
-		"globe": globe,
+		#"globe": globe,
 	 }
 
 	return initial
