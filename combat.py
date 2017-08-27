@@ -50,7 +50,7 @@ def combat(p1, p2, prov, players):
 			att_manouver -=  penalty
 
 		print("%s has %s units and base attack strength of %s \n" % (p1.name, att_number_units_army, att_str))
-		print("%s has %s units and base attack strength of %s \n" % (p2.name, def_number_units_army, def_str))
+		print("%s has %s units and base defense strength of %s \n" % (p2.name, def_number_units_army, def_str))
 
 		print("%s manouver = %s, %s manouver = %s \n" % \
 		(p1.name, att_manouver + att_manouver_roll, p2.name, def_manouver + def_manouver_roll))
@@ -369,7 +369,7 @@ def combat_outcome(winner, p1, p2, prov, players):
 		p2.stability += 0.5
 		if p1.stability > 3.0:
 			p1.stability = 3.0
-		print("%s has repelled %s's pitiful invasion! \n" % (p1.name, p2.name))
+		print("%s has repelled %s's pitiful invasion! \n" % (p2.name, p1.name))
 		if type(p2) == Human:
 			cont = input("Does %s wish to (1) remain at war with %s, or to make a white pease? " % (p2.name, p1.name))
 			if(cont == "1"):
@@ -405,7 +405,7 @@ def gain_province(p1, p2, prov, players):
 		p2.capital = ch
 
 	if p2.type == "old_empire" or p2.type == "old_minor" or prov.colony == True:
-		p1.colonization -= 1 + (p1.num_colonies * 2)
+		p1.colonization -= 1 + p1.num_colonies
 		p1.provinces[prov.name].colony == True
 		p1.num_colonies += 1
 	if prov.worked == True:
@@ -627,7 +627,7 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 					player.resource_base[new.resource] += int(new.quality)
 					player.ai_modify_priorities_from_province(player.provinces[new.name].resource)
 				player.reputation -= 0.1
-				player.colonization -= 1 + (player.num_colonies * 2)
+				player.colonization -= 1 + player.num_colonies 
 				player.num_colonies += 1
 				player.stability -= 0.1
 				if player.stability < -3.0:
@@ -691,7 +691,7 @@ def amph_combat(p1, p2, p1_forces, prov, players):
 			att_manouver -=  penalty
 
 		print("%s has %s units and base attack strength of %s \n" % (p1.name, att_number_units_army, att_str))
-		print("%s has %s units and base attack strength of %s \n" % (p2.name, def_number_units_army, def_str))
+		print("%s has %s units and base defense strength of %s \n" % (p2.name, def_number_units_army, def_str))
 
 		print("%s manouver = %s, %s manouver = %s \n" % (p1.name, att_manouver + att_manouver_roll, p2.name, def_manouver + def_manouver_roll))
 
@@ -755,20 +755,21 @@ def amph_combat(p1, p2, p1_forces, prov, players):
 			temp = def_losses - def_number_units_army
 			att_losses -= temp
 		done = False
-		if att_losses < 0.52 and def_losses < 0.52:
+		if att_losses < 0.50 and def_losses < 0.50:
 			done = True
 		print("%s losses: %s,  %s losses: %s \n" % (p1.name, att_losses, p2.name, def_losses))
 		att_current_makeup = distribute_losses_amph(p1, att_losses, att_number_units_army, att_current_makeup)
 		att_number_units_army = calculate_amphib_num_units(p1, att_current_makeup)
 		def_number_units_army = distribute_losses(p2, def_losses, def_number_units_army)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_army, p2.name, def_number_units_army))
-		done = False
 
-		if(att_number_units_army <= att_initial_army * 0.6):
+		if(att_number_units_army < att_initial_army * 0.4):
 			done = True
-		if(def_number_units_army <= def_initial_army * 0.5):
+		if(def_number_units_army < def_initial_army * 0.3):
 			done = True
-		if done == True:
+		if att_number_units_army < 1 or def_number_units_army < 1:
+			done = True
+		if done == True:	
 			if att_number_units_army > def_number_units_army:
 				combat_outcome(p1.name, p1, p2, prov, players)
 				return
@@ -799,19 +800,21 @@ def naval_transport(player):
 	}
 	if type(player) == Human:
 		number = 0
-		correct = False
 		print("Your transport capacity is %s" % (transport_limit))
 		for k, v in forces.items():
+			correct = False
 			while correct == False:
-				amount = input("How many %s would you like to send? (you have %s)" % (k, v))
+				amount = input("How many %s would you like to send? (you have %s)" % (k, player.military[k]))
+				amount = int(amount)
 				if number + amount > transport_limit:
 					print("The amount you specified exceeds your capacity \n")
 					continue
-				elif amount > player.military[v]:
+				elif amount > player.military[k]:
 					print("You only have %s %s" (v, k))
 					continue
 				else:
 					forces[k] = amount
+					number += amount
 					correct = True
 	if type(player) == AI:
 		for v in range(int(transport_limit)):
@@ -986,16 +989,27 @@ def naval_battle(p1, p2, prov = " "):
 		att_number_units_navy = distribute_naval_losses(p1, att_losses, att_number_units_navy)
 		def_number_units_navy = distribute_naval_losses(p2, def_losses, def_number_units_navy)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_navy, p2.name, def_number_units_navy))
+		done = False
+		if att_losses < 0.50 and def_losses < 0.50:
+			done = True
 		if(att_number_units_navy < att_initial_navy * 0.4):
-			print("%s had defeated %s at sea! \n"% (p2.name, p1.name))
-			winner = p2.name
-			return winner
-		elif(def_number_units_navy <= def_initial_navy * 0.4):
-			print("%s had defeated %s at sea! \n" % (p1.name, p2.name))
-			winner = p1.name
-			if prov in p2.provinces:
-				gain_province(p1, p2, prov, players)
-			return winner
+			done = True
+		if(def_number_units_navy < def_initial_navy * 0.3):
+			done = True
+		if att_number_units_navy < 1 or def_number_units_navy < 1:
+			done = True
+		if(done == True):
+			if att_number_units_navy > def_number_units_navy:
+				print("%s had defeated %s at sea! \n" % (p1.name, p2.name))
+				winner = p1.name
+				if prov in p2.provinces:
+					gain_province(p1, p2, prov, players)
+					return winner
+			else:
+				print("%s had defeated %s at sea! \n"% (p2.name, p1.name))
+				winner = p2.name
+				return winner
+
 		else:
 			if type(p1) == Human:
 				cont = input("%s, you currently have %s units, the enemy has %s units, would you like to continue the assult? (y,n)" \

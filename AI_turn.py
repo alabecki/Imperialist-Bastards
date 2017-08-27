@@ -5,12 +5,12 @@ from AI_foreign_affairs import*
 from copy import deepcopy
 
 
-def AI_turn(players, player, market, turn, uncivilized_minors, relations, provinces):
+def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 	
 	if len(player.provinces.keys()) < 1:
 		return
 
-	if player.type == "human":
+	if type(player) == Human:
 		return
 	print("___________________________________________________________________")
 	print("It is now %s's turn \n" % (player.name))
@@ -18,26 +18,44 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 	print("___________________________________________________________________")
 
 
+	player.AP += 1
+	print("AP = %s" % (player.AP))
+
+
 	player.calculate_access_to_goods(market)
 
 	player.calculate_resource_base()
 	player.update_priorities(market)
-	
-	player.assign_priorities_to_provs()
 
-	player.ai_increase_pop(market, relations, players)
-	player.ai_increase_pop(market, relations, players)
-	player.ai_increase_middle_class(market, relations, players)
 
-	player.AI_reset_POP()
-	player.AI_assign_POP()
 	player.calculate_resource_production()
 	player.calculate_resource_need()
 	player.calculate_resource_forecast()
 	player.fulfill_needs(market, relations, players)
 	player.view_AI_inventory()
 
-	player.early_game(turn, market, relations, players)
+	player.ai_increase_pop(market, relations, players)
+	player.ai_increase_pop(market, relations, players)
+
+	player.AI_reset_POP()
+	player.AI_assign_POP()
+
+	player.early_game(market, relations, players)
+	player.ai_increase_middle_class(market, relations, players)
+
+
+	player.assign_priorities_to_provs()
+	player.choose_technology()
+	player.develop_industry(market, relations, players)
+
+	player.decide_build_navy(market, relations, players)
+
+	print("Decide Factory Production!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:")
+	player.ai_decide_factory_productions(market, relations, players)
+	player.develop_industry(market, relations, players)
+
+	player.build_army(market, relations, players)
+
 
 	player.use_chemicals(market)
 
@@ -68,21 +86,14 @@ def AI_turn(players, player, market, turn, uncivilized_minors, relations, provin
 
 
 	player.use_culture(players)
-
-	player.choose_technology()
-	player.develop_industry(market, relations, players)
-
-	print("Decide Factory Production:")
-	player.ai_decide_factory_productions(market, relations, players)
-
+	
 	#player.AI_set_objective(turn, market)
 	player.develop_industry(market, relations, players)
 	#player.attempt_objective(market)
-	player.decide_build_navy(market)
-	player.build_army(market, relations, players)
+
 	player.ai_increase_middle_class(market, relations, players)
 	player.develop_industry(market, relations, players)
-	player.decide_build_navy(market)
+	player.decide_build_navy(market, relations, players)
 
 
 	#if player.AP >= 1:

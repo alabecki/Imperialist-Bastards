@@ -37,10 +37,10 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 7.80
-	player.freePOP = 6
+	player.POP = 8.4
+	player.freePOP = 6.6
 	player.milPOP = 1.0
-	player.numLowerPOP = 7
+	player.numLowerPOP = 7.6
 	player.type = "major"
 
 	player.shipyard = 1
@@ -104,7 +104,6 @@ def initialize_oldempire(player):
 	player.type = "old_empire"
 
 	player.numMidPOP = 0.0
-	player.technologies = {"basic_civ", "pre_modern"}
 	player.resources["gold"] = 14.0
 	player.resources["spice"] = 0.0
 	player.goods["clothing"] = 0.0
@@ -112,8 +111,8 @@ def initialize_oldempire(player):
 	player.goods["cannons"] = 1.0
 	player.goods["furniture"] = 0.0
 
-	player.military["irregulars"] = 4.0
-	player.military["cavalry"] = 1.0
+	player.military["irregulars"] = 3.0
+	player.military["cavalry"] = 2.0
 	player.military["frigates"] = 0.0
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}

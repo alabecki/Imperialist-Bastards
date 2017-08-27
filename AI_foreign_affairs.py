@@ -18,7 +18,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 
 	if player.type == "old_empire" or player.type =="old_minor":
 		return
-	if player.colonization < 1 + (player.num_colonies * 2) or player.diplo_action < 1 or transport_limit < 4 or \
+	if player.colonization < 1 + player.num_colonies or player.diplo_action < 1 or transport_limit < 4 or \
 	player.midPOP["bureaucrats"]["number"] < 0.4:
 		return
 	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
@@ -217,7 +217,7 @@ def attack_target(player, players, relations, provinces):
 	#print("Target nation: %s" % (target.name))
 	#print("Target prov: %s" % (prov.name))
 	if target.type == "old_empire" or target.type == "old_minor" or prov.type == "colony":
-		if player.colonization < 1 + (player.num_colonies) * 2:
+		if player.colonization < 1 + (player.num_colonies):
 			return
 	relata = frozenset([player.name, target.name])
 	if target not in player.CB and (target.type == "major" or target.type == "minor"):

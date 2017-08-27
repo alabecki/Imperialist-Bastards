@@ -51,6 +51,9 @@ class Human(Player):
 			return
 
 	def increase_middle_class(self):
+		if "pre_industry_2" not in self.technologies:
+			print("You must research pre_industry_3 before you can increase your middle class\n" )
+			return
 		if(self.freePOP < 0.2):
 			print("You do not have any free POPs")
 			return
@@ -65,14 +68,14 @@ class Human(Player):
 		else:
 			_type = ""
 			while _type not in self.midPOP.keys():
-				print("What kind of middle class POP would you like to create?\n")
-				for k, v in self.midPOP.values():
-					print(k)
+				print("What kind of middle class POP would you like to create?")
+				print("researchers, officers, bureaucrats", "artists", "managers \n")
 				_type = input()
 
 			self.resources["spice"] -= 1
 			for r in requirement:
-				self.goods[r] -1
+				self.goods[r] -= 1
+				print("Spends 1 %s" % (r))
 			self.numLowerPOP -= 0.20
 			self.numMidPOP += 0.20
 			self.midPOP[_type]["number"] += 0.20
@@ -194,8 +197,11 @@ class Human(Player):
 				self.battle_ship["attack"] += 1
 			if(choice == "telegraph"):
 				self.factory_throughput += 1
+				self.production_modifier += 0.15
 			if choice == "electricity":
 				self.factory_throughput += 1
+				self.production_modifier += 0.15
+
 
 
 
@@ -206,10 +212,11 @@ class Human(Player):
 		if self.stability >= 3:
 			print("Your stability cannot be further increased")
 		else:
-			self.resources["spice"] -=2
-			self.stability +1
+			self.resources["spice"] -= 1
+			self.stability + 0.5
 			if self.stability > 3:
 				self.stability = 3
+		print("Your stability is now %s " % (self.stability))
 
 	def assign_POP(self):
 		kind = " "
@@ -279,7 +286,7 @@ class Human(Player):
 		if self.resources["spice"] < 1:
 			print("You do not have enough spice")
 		else:
-			if self.resources["spice"] >= 1 and self.stability < 0:
+			if self.resources["spice"] >= 1 and self.stability < 3:
 				self.resources["spice"] -=1
 				self.stability += 2/(self.POP + 0.01) 
 			if self.stability > 3:
@@ -567,10 +574,9 @@ class Human(Player):
 		elif self.goods["cannons"] < 1:
 			print("You do not have enough cannoms \n")
 			return
-		elif self.fortification == 1.1:
-			if "cement" not in self.technologies:
-				print("You cannot further upgrade your fortifications without cement \n")
-				return
+		elif self.fortification == 1.1 and "cement" not in self.technologies:
+			print("You cannot further upgrade your fortifications without cement \n")
+			return
 		elif self.fortification == 1.2:
 			print("You have already upgraded your fortifications as much as possible \n")
 			return
@@ -589,7 +595,7 @@ class Human(Player):
 			print("You do not have any Action Points left \n")
 			return
 		if self.resources["wood"] < 1:
-			print("You do not have enough iron \n")
+			print("You do not have enough wood \n")
 			return
 		if(self.goods["parts"] < 1.0):
 			print("You do not have enough parts \n")
@@ -604,8 +610,9 @@ class Human(Player):
 			return
 		self.AP -= 1
 		self.goods["parts"] -= 1
-		self.good["wood"] -= 1
+		self.resources["wood"] -= 1
 		self.shipyard += 1
+		print("Your shipyard has been upgraded to level %s" % (self.shipyard))
 	
 
 	def develop_province(self):
@@ -669,6 +676,14 @@ class Human(Player):
 				max_dev = 0
 				if("compound_steam_engine" in self.technologies):
 					max_dev = 1
+			elif(self.provinces[prov].resource == "oil"):
+				max_dev = 0
+				if("oil_drilling" in self.technologies):
+					max_dev = 1
+			elif(self.provinces[prov].resource == "rubber"):
+				max_dev = 0
+				if("electricity" in self.technologies):
+					max_dev = 1
 			if self.provinces[prov].development_level == max_dev:
 				print("You cannot further develop this province at this time")
 				return
@@ -712,13 +727,13 @@ class Human(Player):
 
 	def factory_production(self):
 		manufacture = {
-			"parts": {"iron": 0.6, "coal": 0.4},
-			"cannons": {"iron": 0.6, "coal": 0.4},
+			"parts": {"iron": 0.67, "coal": 0.33},
+			"cannons": {"iron": 0.67, "coal": 0.33},
 			"paper": {"wood": 1.0},
-			"clothing": {"cotton": 1.0, "dyes": 0.2},
-			"furniture": {"wood": 0.7, "cotton": 0.3},
-			"chemicals": {"coal": 0.5},
-			"gear": {"rubber": 0.4, "iron": 0.3, "coal": 0.3},
+			"clothing": {"cotton": 0.95, "dyes": 0.25},
+			"furniture": {"wood": 0.67, "cotton": 0.33},
+			"chemicals": {"coal": 1},
+			"gear": {"rubber": 0.5, "iron": 0.3, "coal": 0.2},
 			"radio": {"gear": 0.85, "wood": 0.15},
 			"telephone": {"gear": 0.85, "wood": 0.15},
 			"fighter": {"wood": 1, "gear": 1, "parts": 1, "cannons": 1.0},   # 2.5 
@@ -745,6 +760,7 @@ class Human(Player):
 			stab_mod = stability_map[stab_rounds]
 			max_amount = self.factories[_type] * stab_mod * self.factory_throughput
 			material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+			max_amount = max_amount/(material_mod + 0.0001)
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
 			amount = int(amount)
 			if(amount > max_amount):
@@ -784,6 +800,7 @@ class Human(Player):
 	def view_inventory_production_needs(self):
 		stab_rounds = round(self.stability * 2) / 2
 		for key, value in self.resources.items():
+			need = 0
 			if(key == "food" or key =="coal" or key == "oil"):
 				if(key == "food"):
 					need = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.3) + self.military["cavalry"] * 0.1

@@ -168,18 +168,18 @@ class Player(object):
 		self.number_developments = 0.0
 
 		self.factories = {
-			"parts": 0,
-			"clothing": 0,
-			"furniture": 0,
-			"paper": 0,
-			"cannons": 0,
-			"chemicals": 0,
-			"gear": 0,
-			"radio": 0,
-			"telephone": 0,
+			"tank": 0,
 			"fighter": 0,
 			"auto": 0,
-			"tank": 0
+			"parts": 0,
+			"clothing": 0,
+			"cannons": 0,
+			"paper": 0,
+			"furniture": 0,
+			"chemicals": 0,
+			"gear": 0,
+			"telephone": 0,
+			"radio": 0,
 		}
 
 
@@ -364,16 +364,16 @@ class Player(object):
 				c_mod = 1.0
 				if p.culture != self.culture:
 					if p.culture in self.accepted_cultures:
-						c_mod = 0.9
+						c_mod = 0.85
 					else:
-						c_mod = 0.75
+						c_mod = 0.70
 				if p.resource == "rubber" and "electricity" not in self.technologies:
-					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.6
+					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.75
 					res_dict["food"] += gain
 					#self.resources["wood"] += gain
 					continue 
 				if p.resource == "oil" and p.development_level == 0:
-					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.6
+					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.75
 					res_dict["food"] += gain
 					#self.resources["food"] += gain
 					continue
@@ -381,7 +381,7 @@ class Player(object):
 					gain = development_map[dev] * stability_map[stab_rounds] * p.quality * c_mod
 					#print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
-						gain == gain * 5
+						gain = gain * 5
 					res_dict[p.resource] += gain
 					#self.resources[p.resource] += gain
 				else:
@@ -390,7 +390,7 @@ class Player(object):
 					gain = stability_map[stab_rounds] * p.quality * c_mod
 					#print("%s gains %s %s" % (self.name, gain, p.resource))
 					if p.resource == "gold":
-						gain == gain * 5
+						gain = gain * 5
 					#self.resources[p.resource] += gain
 					print(p.resource)
 					res_dict[p.resource] += gain
@@ -457,8 +457,8 @@ class Player(object):
 			for k, prov in self.provinces.items():
 				self.provinces[k].powered = True
 		oil_need = 0
-		if self.numMidPOP - 6 > 0:
-			oil_need = self.numMidPOP - 6
+		if self.numMidPOP - 4.4 > 0:
+			oil_need = (self.numMidPOP - 4.4)/2
 		if self.resources["oil"] < oil_need:
 			penality = self.resources["oil"] - oil_need
 			self.stability += penality
@@ -487,12 +487,13 @@ class Player(object):
 		self.collect_resources(market)
 		self.collect_goods()
 		self.payMaintenance()
-		for p in self.provinces.values():
-			if p.culture != self.culture:
-				if p.culture not in self.accepted_cultures:
-					self.stability -= 0.05
-				else:
-					self.stability -= 0.025 
+		if market.turn >= 20:
+			for p in self.provinces.values():
+				if p.culture != self.culture:
+					if p.culture not in self.accepted_cultures:
+						self.stability -= 0.05
+					else:
+						self.stability -= 0.025 
 
 		if self.stability < -3.0:
 			self.stability = -3.0
@@ -504,9 +505,10 @@ class Player(object):
 		print("Culture points gained: %s " % (culture_gain))
 		self.can_train = 1 + self.midPOP["officers"]["number"] * 5
 		self.AP = int(self.proPOP) * self.production_modifier
+
 		#self.reputation += self.midPOP["artists"]["number"] * 0.1
 		research_gain = (0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
-		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.4)) * government_map[self.government]
+		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.33)) * government_map[self.government]
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
 		#globe.research.append([self.name, research_gain])
