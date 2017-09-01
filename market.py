@@ -8,14 +8,14 @@ from minor_classes import*
 class Market(object):
 	def __init__ (self):
 
-		self.defeated = []
+		self.turn = 0
 
-		self.gold = 3000
+		self.defeated = []
 
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
-		
+		self.market_keys = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
 		self.market = {
 			"food": [],
@@ -161,7 +161,7 @@ class Market(object):
 			price = self.buy_price(_type, stock)
 			ok = input(" A %s will cost %s gold, is this okay? (y/n) \n" % (_type, price ))
 			if ok == "n":
-				self.market[_type] += amount
+				#self.market[_type] += amount
 				return
 			else:
 				if(player.resources["gold"] < price):
@@ -180,13 +180,16 @@ class Market(object):
 						for t in temp:
 							print(t)
 						buy_from = input()
+					
 					for i in self.market[_type]:
-						if i.owner == buy_from:
-							self.market[_type].remove(i)
+						#print("Owner: %s, Other: %s" % (i.owner.name, buy_from))
+						if i.owner.name == buy_from:
 							print("Removing item...%s" % (i.owner))
+							self.market[_type].remove(i)
+							del i
 							break
-					player.resources["gold"] -= price
 					other = players[buy_from]
+					player.resources["gold"] -= price
 					other.resources["gold"] += price
 					other.new_development +=  0.2
 					#self.market[_type].remove(s)
@@ -283,10 +286,9 @@ class Market(object):
 
 
 
-
-
-	def show_market(self):
-		print("Gold in market: %s \n" % (self.gold))
-		for i in self.market:
-			print("%s : amount %s price %s \n" % (i, len(self.market[i]), self.buy_price(i, len(self.market[i])) ))
+	def show_market(self, player):
+		print("Market _____________________________________________________________________________________________")
+		for i in self.market_keys:
+			print("%s : amount %s price %s \n" % (i, player.supply[i], self.buy_price(i, player.supply[i]) ))
+		print("_____________________________________________________________________________________________________")
 		return

@@ -9,6 +9,10 @@ from itertools import product, combinations
 import sys
 import shelve
 import operator
+import gc
+import os
+import shelve
+
 
 from name_generator import*
 
@@ -51,6 +55,7 @@ while True:
 	print("--------------------------------------- Exit ----------(E) --------------------------------------     \n" )
 	print("______________________________________________________________________________________________ \n")
 
+	initial = dict()
 	selection = " "
 	while selection not in ["N", "S", "L", "O", "E"]:
 		selection = input()
@@ -75,19 +80,24 @@ while True:
 				players[k] = v
 			if type(v) == Province:
 				provinces[k] = v
+			if type(v) == Relation:
+				relations[k] = v
 			if k == "relations":
 				relations = v
 			if k == "market":
-				market = v
+				market = deepcopy(v)
 			if k == "provinces":
 				provinces = v
-		print("Players:")
-		for k in players.keys():
-			print(k)
+		copy_state = deepcopy(list(state.keys()))
+		for k in copy_state:
+			del state[k]
+		del state
+		del copy_state
+	
 		initial = {"players": players, "provinces": provinces, "relations": relations, "market": market, "uncivilized_minors": uncivilized_minors}
 
-		#for k, v in players.items():
-		#	print(k, v)
+		for k, v in players.items():
+			print(k, v)
 	elif selection == "O":
 		print("Did you really think we were going to give you options? \n")
 		print("Maybe we will give you some options someday... \n")
@@ -102,6 +112,19 @@ while True:
 	market = initial["market"]
 	#globe = initial["globe"]
 
+	AUTO_SAVE = False
+	auto_name = "auto_save"
+	print("\n")
+	print("Would you like to turn auto save on? (y/n) \n")
+	auto = input()
+	if auto == "y":
+		AUTO_SAVE = True
+		print("Please choose a name for the auto save file ...")
+		auto_name = input()
+		print("Saving game as %s ....." % (auto_name))
+		save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
+
+
 						
 	_continue = True
 	while(_continue == True):
@@ -109,9 +132,12 @@ while True:
 		market.turn +=1
 		print("\n Turn: %s \n" % (market.turn))
 		#print("Gold in market: %s \n" % (market.gold))
-		for k, v in market.market.items():
-			print (k, len(v))
-		print("Players len: %s " % (len(players)))
+		for k in market.market_keys:
+		#for k, v in market.market.items():
+			print (k, len(market.market[k]))
+		print("Players len: %s " % (len(players.keys())))
+		print("Prov len: %s" % (len(provinces.keys())))
+		print("Relations len %s" % (len(relations.keys())))
 		cont = input()
 		order = list(players.keys())
 		print("order len %s" % (len(order)))
@@ -138,6 +164,7 @@ while True:
 					
 					player.calculate_access_to_goods(market)
 					print("%s, what is your imperial decree? \n" % (player.name))
+					print("AP: %s    " % (player.AP))
 					for key, value in commands.items():
 						print(key, value)
 					command = ""
@@ -151,41 +178,46 @@ while True:
 						while info_command not in information.keys():
 							info_command = input()
 						if info_command == "1":
+
 							print("Currently, your glorious empire has: ###################################################################\n")
 									#print("Gold: %s 				Action Points: %s \n" % (player.gold, player.AP))
-							print("Stability: %s  ______________  Total Population: %s\n" % (player.stability, player.POP))
-							print("Gold: %s  ___________________  Action Points: %s \n" % (player.resources["gold"], player.AP))
-							print("Diplomatic: %s  _____________  Science Points: %s \n " % (player.diplo_action, player.research))
-							print("Colonization: %s  ___________  Reputation: %s \n" % (player.colonization, player.reputation))
-							print("Lower Class Pops: %s  _______  Middle Class Pops: %s \n" % (player.numLowerPOP, player.numMidPOP))
-							print("Development Points: %s  _____ Development Level: %s \n" % (player.new_development, player.number_developments))
-							print("Free POPs: %s  _______________ Culture Points: %s" % (player.freePOP, player.culture_points))
+							print("Stability: %.2f  ______________  Total Population: %.2f\n" % (player.stability, player.POP))
+							print("Gold: %.2f  ___________________  Action Points: %.2f \n" % (player.resources["gold"], player.AP))
+							print("Diplomatic: %.2f  _____________  Science Points: %.2f \n " % (player.diplo_action, player.research))
+							print("Colonization: %.2f  ___________  Reputation: %.2f \n" % (player.colonization, player.reputation))
+							print("Number of colonies: %s ______  Col. points needed for next colony: %s "% (player.num_colonies, 1 + player.num_colonies * 1.5))
+							print("Lower Class Pops: %.2f  _______  Middle Class Pops: %.2f \n" % (player.numLowerPOP, player.numMidPOP))
+							print("Development Points: %.2f  _____ Development Level: %.2f \n" % (player.new_development, player.number_developments))
+							print("Free POPs: %.2f  _______________ Culture Points: %.2f" % (player.freePOP, player.culture_points))
 							print("Factories:")
+
 							for k, v in player.factories.items():
 								print(k,v)
 						if info_command == "2":
 							print("Province Overview: ######################################################################################## \n")
 							for k, province in player.provinces.items():
-								print("Name: %-20s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %s \n" % \
+								print("Name: %-20s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %.2f \n" % \
 									(province.name, province.resource, province.development_level, province.worked, province.quality))
 						if info_command == "3":
 							print("Population Overview: ####################################################################################### \n")
-							print("Total Population: %s 	Unassigned Pops: %s 	Lower Class Pops: %s 	Middle Class Pops: %s \n" % \
+							print("Total Population: %.2f 	Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Middle Class Pops: %.2f \n" % \
 							(player.POP, player.freePOP, player.numLowerPOP, player.numMidPOP))
-							print("Urban Worker Pops: %s 	Military Pops: %s \n" % (player.proPOP, player.milPOP))
+							print("Urban Worker Pops: %.2f 	Military Pops: %.2f \n" % (player.proPOP, player.milPOP))
 							print("Middle Class POPs: \n")
 							for k, v in player.midPOP.items():
-								print("%s: %s, priority: %s \n"  % (k, v["number"], v["priority"]))
+								print("%s: %.2f"  % (k, v["number"]))
 						if info_command == "4" :
 							print("Military Overview: ################################################################################################ \n")
 							for k, v in player.military.items():
-								print(" %s: %s " % (k, v) )
+								print(" %s: %.2f " % (k, v) )
 						if info_command == "5":
 							print("Inventory: ##########################################################################################################\n")
-							for k, v in player.resources.items():
-								print(" %s: %s " % (k, v) )
-							for k, v in player.goods.items():
-								print(" %s: %s " % (k, v) )
+							for k in market.resources:
+							#for k, v in player.resources.items():
+								print(" %s: %.2f " % (k, player.resources[k]) )
+							#for k, v in player.goods.items():
+							for k in market.goods:
+								print(" %s: %.2f " % (k, player.goods[k]) )
 						if info_command == "6":
 							player.view_inventory_production_needs()
 						if info_command == "7":
@@ -200,15 +232,17 @@ while True:
 								print("Information Report on %s: ###################################################################\n" % (nation.name))
 										#print("Gold: %s 				Action Points: %s \n" % (player.gold, player.AP))
 								print("Type: %s ____________________   Culture: %s" % (nation.type, nation.culture))
-								print("Stability: %s  ______________  Total Population: %s\n" % (nation.stability, nation.POP))
-								print("Gold: %s  ___________________  Action Points: %s \n" % (nation.resources["gold"], nation.AP))
-								print("Diplomatic: %s  _____________  Science Points: %s \n " % (nation.diplo_action, nation.research))
-								print("Colonization: %s  ___________  Number of Colonies: %s \n " % (nation.colonization, nation.num_colonies))
-								print("Government: %s  _____________  Reputation: %s \n" % (nation.government, nation.reputation))
-								print("Lower Class Pops: %s  _______  Middle Class Pops: %s \n" % (nation.numLowerPOP, nation.numMidPOP))
-								print("Development Points: %s  _____  Development Level: %s \n" % (nation.new_development, nation.number_developments))
-								print("Free POPS: %s _______________  ProPops: %s\n" % (nation.freePOP, nation.proPOP))
+								print("Stability: %.2f  ____________    Total Population: %.2f\n" % (nation.stability, nation.POP))
+								print("Gold: %s  _____________________  Action Points: %.2f \n" % (nation.resources["gold"], nation.AP))
+								print("Diplomatic: %.2f  _____________  Science Points: %.2f \n " % (nation.diplo_action, nation.research))
+								print("Colonization: %.2f  ___________  Number of Colonies: %s \n " % (nation.colonization, nation.num_colonies))
+								print("Government: %s  _____________  Reputation: %.2f \n" % (nation.government, nation.reputation))
+								print("Lower Class Pops: %.2f  _______  Middle Class Pops: %.2f \n" % (nation.numLowerPOP, nation.numMidPOP))
+								print("Development Points: %.2f  _____  Development Level: %.2f \n" % (nation.new_development, nation.number_developments))
+								print("Free POPS: %.2f _______________  ProPops: %.2f\n" % (nation.freePOP, nation.proPOP))
 								print("Factories:")
+
+
 								for k, v in nation.factories.items():
 									print(k, v)
 								print("Province Overview: ######################################################################################## \n")
@@ -217,10 +251,10 @@ while True:
 									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 								print("Population Overview: ######################################################################################### \n")
 								for k, v in nation.midPOP.items():
-									print("%s: %s, priority: %s \n"  % (k, v["number"], v["priority"]))
+									print("%.2f: %s, priority: %.2f \n"  % (k, v["number"], v["priority"]))
 								print("Military Overview: ################################################################################################ \n")
 								for k, v in nation.military.items():
-									print(" %s: %s " % (k, v) )
+									print(" %s: %.2f " % (k, v) )
 								print("Inventory: ##########################################################################################################\n")
 								for v, k in nation.resources.items():
 									print(v, k)
@@ -738,7 +772,7 @@ while True:
 							for k, v in relations.items():
 								if player.name in v.relata:
 									#pprint(vars(v))
-									print(v, relata, v.relationship)
+									print(v, v.relata, v.relationship)
 					if command == "2":
 						print("How would you like to manage your population? ################################################\n")
 						_choices = list(range(1, 4))
@@ -816,37 +850,35 @@ while True:
 													player.goods["chemicals"] -= 1
 													print("%s now has a quality rating of: %s \n" % (v.name, v.quality))
 													amount -= 1
-								if chem == "3":
-									if "synthetic_rubber" not in technologies:
-										print ("You need the synthetic rubber technology to do this")
-									elif players.resources["oil"] < 3:
-										print("You do not have enough oil \n")
-									else:
-										player.resources["oil"] -= 3
-										player.resources["rubber"] += 1
-										rint("You now have %s rubber and %s oil" % (player.resources["rubber"], \
-											player.resources["oil"]))
-								if chem == "4":
-									if "synthetic_oil" not in technologies:
-										print ("You need the synthetic oil technology to do this")
-									elif players.goods["chemicals"] < 3:
-										print("You do not have enough chemicals \n")
-									else:
-										player.goods["chemicals"] -= 3
-										player.resources["oil"] += 1
-										rint("You now have %s oil and %s chemicals" % (player.resources["oil"], \
-											player.goods["chemicals"]))
+							if chem == "3":
+								if "synthetic_rubber" not in player.technologies:
+									print ("You need the synthetic rubber technology to do this")
+								elif players.resources["oil"] < 3:
+									print("You do not have enough oil \n")
+								else:
+									player.resources["oil"] -= 3
+									player.resources["rubber"] += 1
+									rint("You now have %s rubber and %s oil" % (player.resources["rubber"], \
+										player.resources["oil"]))
+							if chem == "4":
+								if "synthetic_oil" not in player.technologies:
+									print ("You need the synthetic oil technology to do this")
+								elif players.goods["chemicals"] < 3:
+									print("You do not have enough chemicals \n")
+								else:
+									player.goods["chemicals"] -= 3
+									player.resources["oil"] += 1
+									rint("You now have %s oil and %s chemicals" % (player.resources["oil"], \
+										player.goods["chemicals"]))
 
 
 
 					if command == "4":
 						print("What sort of item would you like to build? #################################################################################### \n")
-						for k, v in build.items():
-							print(k, v)
 						sort = " "
-						_choices = list(range(1, 6))
-						choices = ''.join(str(e) for e in _choices)
-						while (str(sort) not in choices):
+						while (sort not in build.keys()):
+							for k, v in build.items():
+								print(k, v)
 							sort = input()
 						if sort == "1":
 							player.develop_province()
@@ -866,6 +898,9 @@ while True:
 						elif sort == "5":
 							player.build_unit()
 
+						elif sort == "6":
+							player.disband_unit()
+
 					if command == "5":
 						action = " "
 						while action not in military_action.keys():
@@ -877,18 +912,18 @@ while True:
 						if action == "1":
 							if player.diplo_action < 1:
 								print("You do not have any diplomatic points")
-							elif player.colonization < 1 + player.num_colonies:
+							elif player.colonization < 1 + (player.num_colonies * 1.5):
 								print("You do not have enough colonization points")
 							else:
 								options = set()
 								print("On what uncivilized nation would you like to declare war? \n")
-								for k, v in uncivilized_minors.items():
+								for uc, unciv in uncivilized_minors.items():
 									if unciv.harsh == True and ("medicine" in player.technologies or "breach_loaded_arms" in player.technologies):
 										continue
 									if len(unciv.provinces) < 1:
 										continue
-									print(v.name)
-									options.add(v.name)
+									print(unciv.name)
+									options.add(unciv.name)
 									other = " "
 									while other not in options:
 										other = input()
@@ -918,7 +953,7 @@ while True:
 						if action == "2":
 							if player.diplo_action < 1:
 								print("You do not have any diplomatic points")
-							elif player.colonization < 1 + player.num_colonies * 2:
+							elif player.colonization < 1 + (player.num_colonies * 1.5):
 								print("You do not have enough colonization points")
 							else:
 								options = set()
@@ -959,7 +994,7 @@ while True:
 						if action == "3":
 							if player.diplo_action < 1:
 								print("You do not have any diplomatic points")
-							elif player.colonization < 1 + player.num_colonies * 2:
+							elif player.colonization < 1 + (player.num_colonies * 1.5):
 								print("You do not have enough colonization points")
 							else:
 								options = set()
@@ -1008,17 +1043,25 @@ while True:
 								other = " "
 								while other not in c_options:
 									print("On which Modern nation do you intend wage a colonial war?\n")
+									for co in c_options:
+										print(co)
 									other = input()
 								p_options = set()
-								print("The following provinces are colonies belonging to %s" % (other.name))
+								other = players[other]
 								for prov in other.provinces.values():
-									if prov.colony == True and prov.ocean == True:
-										print(prov.name, prov.resources, prov.quality)
-										p_options.add(prov.name)
-							
-								if player.check_for_border(other) and annex.colony:
-									print("You may either try to capture %s by establishing naval domination or by \
-										invading %s and taking it as a prize for victory")
+									#print(prov.name, prov.colony)
+									#if prov.colony == True:
+										#print(prov.name, prov.resources, prov.quality)
+									p_options.add(prov.name)
+								annex = " "
+								while annex not in p_options:
+									print("The following provinces are colonies belonging to %s" % (other.name))
+									for po in p_options:
+										print(po)
+									annex = input()
+								annex = provinces[annex]
+								if player.check_for_border(other):
+									print("You may to capture %s by establishing naval domination or by invading %s and taking it as a prize for victory" % (annex.name, other.name))
 									landOrSea = " "
 									while landOrSea != "l" and landOrSea != "s":
 										landOrSea = input("Do you choose land (l) or sea (s)?")
@@ -1026,8 +1069,8 @@ while True:
 										naval_battle(player, other, annex)
 										player.reputation -= 0.2
 									else:
-										combat(player, other, annex)
-								elif annex.colony:
+										combat(player, other, annex, players)
+								else:
 									print("You do not neighbor %s and so you must capture %s by establishing naval \
 									dominance" % (other.name, annex.name))
 									naval_battle(player, other, annex)
@@ -1044,7 +1087,7 @@ while True:
 											non_national = True
 									if non_national == True and v in player.CB:
 										a_options.add(v.name)
-							if len(c_options) == 0:
+							if len(a_options) == 0:
 								print("There are currently no major powers on whom you may wage a minor war \n")
 							else:
 								other = " "
@@ -1126,7 +1169,7 @@ while True:
 								relata = frozenset([player.name, other.name])
 								player.diplo_action -=1
 								relations[relata].relationship += min(1, 5/(other.POP + 0.001))
-								player.reputation += 0.025
+								player.reputation += 0.02
 								print("Your relation with %s is now %s " % (other.name, relations[relata].relationship))
 							
 							elif dip == "2":
@@ -1140,12 +1183,31 @@ while True:
 								relata = frozenset([player.name, other.name])
 								player.diplo_action -=1
 								relations[relata].relationship -= min(1, 10/(other.POP + 0.001))
-								player.reputation -= 0.025
+								player.reputation -= 0.02
 								print("Your relation with %s is now %s " % (other.name, relations[relata].relationship))
 								player.diplo_action -=1
 
-
 							elif dip == "3":
+								print("Please choose a Nation:\n" )
+								for p in players.values():
+									print(p.name)
+								_other = " "
+								while _other not in players.keys():
+									_other = input()
+								other = players[_other]
+								relata = frozenset([player.name, other.name])
+
+								pay = max(2, other.resources["gold"]/10)
+								if pay > player.resources["gold"]/5:
+									print("You do not have enough gold to bribe %s at this time" % (other.name))
+								else:
+									relata = frozenset([player.name, other.name])
+									relations[relata].relationship += 0.5
+									player.resources["gold"] -= pay
+									print("Your relation with %s is now %s" % (other.name, relations[relata].relationship))
+
+
+							elif dip == "4":
 								options = []
 								for k, v in players.items():
 									if v.type == "major" or v.type == "old_empire":
@@ -1170,21 +1232,24 @@ while True:
 									player.reputation -= 0.025
 
 
-							elif dip == "4":
+							elif dip == "5":
 								print("Pick a pair of nations, whose relations you would like to damage:")
-								print("Please choose Nation A:\n" )
-								for p in players.values():
-									print(p.name)
 								PA = " "
-								while PA not in player.keys():
+								while PA not in players.keys():
+									print("Please choose Nation A:\n" )
+									for p in players.keys():
+										print(p)
+									print("Please choose Nation A:\n" )
 									PA = input()
-								print("Pick a pair of nations, whose relations you would like to damage:")
-								print("Please choose Nation A:\n" )
-								for p in players.values():
-									print(p.name)
-									PB = " "
-									while PB not in player.keys():
-										PB = input()
+
+								PB = " "
+								while PB not in players.keys():
+									print("Please choose Nation B:\n" )
+									for p in players.keys():
+										print(p)
+									print("Please choose Nation B:\n" )
+									PB = input()
+
 								relata = frozenset([PA, PB])
 								PA = players[PA]
 								PB = players[PB]
@@ -1193,16 +1258,19 @@ while True:
 								print("Relations between %s and %s have been reduced by %s to %s" % \
 									(PA.name, PB.name, modifier, relations[relata].relationship))
 								player.diplo_action -= 1
+								player.reputation -= 0.025
 
 
-							elif dip == "5":
+
+							elif dip == "6":
 								other = " "
 								while other not in players.keys():
 									print("Which nation would you like to destabilize?\n")
 									for p, pl in players.items():
-										print("%s: stability: %" % (p, pl.stability))
-										other = input()
+										print("%-16s stability: %.2f" % (p, pl.stability))
+									other = input()
 								amount = 0
+								other = players[other]
 								if other.type == "old_empire" or other.type == "old_minor":
 									amount = random()/2
 								else:
@@ -1211,49 +1279,57 @@ while True:
 								if other.stability < -3.0:
 									other.stability = -3.0
 								player.diplo_action -=1
-								player.reputation -= 0.1
+								player.reputation -= 0.033
 								relata = frozenset([player.name, other.name])
 								relations[relata].relationship -= 0.2
 								print("The stability of %s has been reduced by %s and is now %s \n" % (other.name, amount, other.stability ))
 						
-							elif dip == "6":
+							elif dip == "7":
 								print ("This feature has not yet been implemented \n")
 
-							elif dip == "7":
+							elif dip == "8":
 								print("Would you like to place an embargo on a nation (1) or lift an embargo (2)? \n")
 								dec = input()
 								options = []
 								if dec == "1":
 									for k, v in players.items():
 										relata = frozenset([player.name, v.name])
-										if relation[relata].relationship < -1.5:
-											options.append(v)
+										if len(relata) == 1:
+										 	continue
+										if relations[relata].relationship < -1.5:
+											options.append(v.name)
 									if len(options) < 1:
 										print("You cannot place an embargo on any nation at this time (relations too good \n")
 									else:
 										ch = " "
 										while ch not in options:
 											print("On which nation would you like to place a trade embargo? \n")
+											for o in options:
+												print(o)
 											ch = input()
-											other = players[ch]
-											other.embargo.add(player)
-											relata = frozenset(player.name, other.name)
-											relations[relata].relationship -= 0.25
-											player.diplo_action -= 1
+										other = players[ch]
+										other.embargo.add(player)
+										relata = frozenset([player.name, other.name])
+										relations[relata].relationship -= 0.25
+										player.diplo_action -= 1
+										print("%s is no longer able to purchse your resources or goods on the world market" % (other.name))
 								if dec == "2":
-									for k, v in player.items():
+									for k, v in players.items():
 										if player in v.embargo:
-											option.append(v)
+											options.append(v.name)
 									if len(options) < 1:
 										print("You are not currently placing any nation under embargo\n")
 									else:
 										ch = " "
 										while ch not in options:
 											print("Which nation do you wish to release from embargo? \n")
+											for o in options:
+												print(o)
 											ch = input()
-										other = layers[ch]
-										player.discard(other)
+										other = players[ch]
+										player.embargo.discard(other)
 										player.diplo_action -= 1
+										print("You have lifed the trade embargo on %s" % (other.name))
 
 
 					if command == "7":
@@ -1263,7 +1339,7 @@ while True:
 					if command == "8":
 						choice = input("Would you like to buy (1) or sell (2)? \n")
 						if choice == "1":
-							market.show_market()
+							market.show_market(player)
 							_type = " "
 							while _type not in market.market.keys():
 								_type = input("What would you like to buy? \n")
@@ -1297,10 +1373,18 @@ while True:
 
 
 					if command == "12":
+						print("Saving....\n")
+						save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
 						_continue = False
 						break
-		#print("Saving....\n")
-		#save_game("auto_save", players, relations, uncivilized_minors, market, provinces)
+		gc.collect()
+		
+		if AUTO_SAVE == True:
+	
+			if market.turn % 2 == 1:
+
+				print("Saving....\n")
+				save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
 
 	
 		#globe.world_update(players)

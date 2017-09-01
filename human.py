@@ -326,6 +326,47 @@ class Human(Player):
 		else:
 			return
 
+
+	def disband_unit(self):
+		kind = " "
+		while kind not in self.military.keys():
+			print("What kind of unit would you like to disband?")
+			for k, v in self.military.items():
+				if v >= 1:
+					print(k, v)
+			kind = input()
+		self.milPOP -= 0.2
+		self.freePOP += 0.2
+		self.number_units -= 1
+		if kind == "infantry":
+			self.military["infantry"] -= 1
+			self.resources["iron"] += 1
+		if kind == "irregulars":
+			self.military["irregulars"] -= 1
+		if kind == "cavalry":
+			self.military["cavalry"] -= 1
+			self.resources["iron"] += 1
+		if kind == "artillery":
+			self.military["artillery"] -= 1
+			self.resources["iron"] += 2
+		if kind == "frigates":
+			self.military["frigates"] -= 1
+			self.resources["iron"] += 1
+		if kind == "iron_clad":
+			self.military["iron_clad"] -= 1
+			self.resources["iron"] += 3
+		if kind == "fighter":
+			self.military["fighter"] -= 1
+			self.resources["iron"] += 2
+		if kind == "tank":
+			self.military["tank"] -= 1
+			self.resources["iron"] += 3
+		if kind == "battle_ship":
+			self.military["battle_ship"] -= 1
+			self.resources["iron"] += 7
+
+
+
 	def build_infantry(self):
 		if self.can_train < 1:
 			print("You cannon train any more land units this turn")
@@ -381,7 +422,7 @@ class Human(Player):
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.military["tank"] += 1.0
-		self.number_unitsu += 1.0
+		self.number_units += 1.0
 		self.can_train -= 1.0
 		print("You now have %s tanks \n" % (self.military["tank"]))
 
@@ -430,6 +471,10 @@ class Human(Player):
 			return
 
 	def build_ironclad(self):
+		if self.shipyard < 2:
+			print("You need a level 2 shipyard before you may build Iron Clad")
+			print("(Building a level 2 shipyard required that you research the 'iron_clad' technology.)")
+			return
 		if self.AP < 1:
 			print("You do not have enough action points")
 			return
@@ -456,6 +501,10 @@ class Human(Player):
 			return
 
 	def build_battleship(self):
+		if self.shipyard < 3:
+			print("You need a level 3 shipyard before you may build Battleship")
+			print("(Building a level 3 shipyard required that you research the 'oil_powered_ships' technology.)")
+			return
 		if self.AP < 2:
 			print("You do not have enough action points")
 			return
@@ -574,10 +623,10 @@ class Human(Player):
 		elif self.goods["cannons"] < 1:
 			print("You do not have enough cannoms \n")
 			return
-		elif self.fortification == 1.1 and "cement" not in self.technologies:
+		elif self.fortification >= 1.1 and "cement" not in self.technologies:
 			print("You cannot further upgrade your fortifications without cement \n")
 			return
-		elif self.fortification == 1.2:
+		elif self.fortification >= 1.2:
 			print("You have already upgraded your fortifications as much as possible \n")
 			return
 		else:
@@ -808,7 +857,7 @@ class Human(Player):
 					need = 0.1 * self.number_developments
 				if(key == "oil"):
 					if self.numMidPOP > 4.5:
-						need = (sef.numMidPOP - 4.5)/2
+						need = (self.numMidPOP - 4.5)/2
 				current_production  = 0
 				for k, p in self.provinces.items():
 					if p.resource == key and p.worked == True:
@@ -855,19 +904,28 @@ class Human(Player):
 				opt = self.provinces[opt]
 				self.culture_points -= 1
 				chance = uniform(0, 1)
+				print("Roll: %s" % (chance))
 				if opt.type == "uncivilized":
 					if chance < 0.66:
 						self.accepted_cultures.add(opt.culture)
 						print("Integrated Culture")
+					else:
+						print("Not this time :(")
 				if opt.type == "old":
 					if chance < 0.33:
 						self.accepted_cultures.add(opt.culture)
 						print("Integrated Culture") 
+					else:
+						print("Not this time :(")
+
 				if opt.type == "civilized":
 					if chance < 0.25:
 						opt.culture = self.culture
 						self.accepted_cultures.add(opt.culture)
 						print("Integrated Culture")
+					else:
+						print("Not this time :(")
+
 		if choice == "4":
 			gain = 0
 			for p in players.values():

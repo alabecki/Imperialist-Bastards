@@ -403,10 +403,11 @@ def gain_province(p1, p2, prov, players):
 		opts = list(p2.provinces.keys())
 		ch = choice(opts)
 		p2.capital = ch
-
+	if prov.colony == True:
+		p2.num_colonies -= 1
 	if p2.type == "old_empire" or p2.type == "old_minor" or prov.colony == True:
-		p1.colonization -= 1 + p1.num_colonies
-		p1.provinces[prov.name].colony == True
+		p1.colonization -= 1 + (p1.num_colonies * 1.5)
+		p1.provinces[prov.name].colony = True
 		p1.num_colonies += 1
 	if prov.worked == True:
 		p1.POP += 1
@@ -627,7 +628,7 @@ def combat_against_uncivilized(player, unciv, cprov = ""):
 					player.resource_base[new.resource] += int(new.quality)
 					player.ai_modify_priorities_from_province(player.provinces[new.name].resource)
 				player.reputation -= 0.1
-				player.colonization -= 1 + player.num_colonies 
+				player.colonization -= 1 + (player.num_colonies * 1.5) 
 				player.num_colonies += 1
 				player.stability -= 0.1
 				if player.stability < -3.0:
@@ -810,7 +811,7 @@ def naval_transport(player):
 					print("The amount you specified exceeds your capacity \n")
 					continue
 				elif amount > player.military[k]:
-					print("You only have %s %s" (v, k))
+					print("You only have %s %s" %(v, k))
 					continue
 				else:
 					forces[k] = amount
@@ -1004,7 +1005,7 @@ def naval_battle(p1, p2, prov = " "):
 				winner = p1.name
 				if prov in p2.provinces:
 					gain_province(p1, p2, prov, players)
-					return winner
+				return winner
 			else:
 				print("%s had defeated %s at sea! \n"% (p2.name, p1.name))
 				winner = p2.name
@@ -1050,9 +1051,11 @@ def amphib_prelude(player, other, annex, players):
 		result = naval_battle(player, other)
 		if result == other.name:
 			print("%s attempts to sail his army to %s has failed\n" % (player.name, other.name))
+			return
 		elif result == player.name:
 			print("%s has sailed his navy to %s and is about to invade! \n" % (player.name, other.name))
 			amph_combat(player, other, amount, annex, players)
+			return
 	else:
 		amph_combat(player, other, amount, annex, players)
 

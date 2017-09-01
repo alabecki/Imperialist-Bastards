@@ -45,7 +45,9 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 
 
 	player.assign_priorities_to_provs()
+	
 	player.choose_technology()
+
 	player.develop_industry(market, relations, players)
 
 	player.decide_build_navy(market, relations, players)
@@ -60,7 +62,7 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 	player.use_chemicals(market)
 
 
-	diplomacy = [0, 1, 2, 3, 4, 5]
+	diplomacy = [0, 1, 2, 3, 4]
 	shuffle(diplomacy)
 	ai_decide_ally_target(player, players, provinces)
 	decide_rival_target(player, players, market, provinces, relations)
@@ -77,11 +79,11 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 			worsen_relations(player, players, relations)
 		if i ==	2:
 			attack_target(player, players, relations, provinces)
+		#if i == 3:
+			#ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 		if i == 3:
-			ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
-		if i == 4:
 			ai_improve_relations(player, players, relations)
-		if i == 5:
+		if i == 4:
 			ai_bribe(player, players, relations)
 
 

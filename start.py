@@ -61,7 +61,7 @@ def initialize_major_power(player):
 
 	player.resources["gold"] = 12.0
 	
-	player.goods["cannons"] = 1.5
+	player.goods["cannons"] = 2
 
 	player.military["infantry"] = 2.0
 	player.military["cavalry"] = 1.0

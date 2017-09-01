@@ -65,7 +65,8 @@ build = {
 	"2": "Build/Upgrade Factory",
 	"3": "Build/Upgrade Fortifications",
 	"4": "Build/Upgrade Shipyard",
-	"5": "Build Unit"
+	"5": "Build Unit",
+	"6": "Disband Unit"
 }
 
 build_factory = {
@@ -107,11 +108,12 @@ build_unit = {
 diplomacy = {
 	"1": "Improve Relations",
 	"2": "Damage Relations",
-	"3": "Gain CB",
-	"4": "Sabatage Relations",
-	"5": "Destablize Nation",
-	"6": "Offer Loan",
-	"7": "Embargo/Life Embargo"
+	"3": "Bribe Nation",
+	"4": "Gain CB",
+	"5": "Sabatage Relations",
+	"6": "Destablize Nation",
+	"7": "Offer Loan",
+	"8": "Embargo/Life Embargo"
 	#"6": "Offer to Sell Arms",
 	#"7": "Ask to Buy Arms"
 }

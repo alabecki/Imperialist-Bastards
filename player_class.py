@@ -141,9 +141,9 @@ class Player(object):
 			"tank": 0.0,
 		}
 
-		self.embargo = []
+		self.embargo = set()
 
-		self.sphere = []
+		self.sphere = set()
 
 		self.goods_produced = {
 			"parts": 0.0,
@@ -310,15 +310,15 @@ class Player(object):
 		if self.numMidPOP >= 2 and self.numMidPOP < 2.5:
 			requirement = ["paper", "clothing", "furniture"]
 		if self.numMidPOP >= 2.5 and self.numMidPOP < 3:
-			requirement = ["paper", "paper", "clothing", "furniture"]
+			requirement = ["paper", "clothing", "furniture"]
 		if self.numMidPOP >= 3 and self.numMidPOP < 3.5:
-			requirement = ["paper", "paper", "clothing", "furniture", "chemicals"]
+			requirement = ["paper", "clothing", "furniture", "chemicals"]
 		if self.numMidPOP >= 3.5 and self.numMidPOP < 4:
-			requirement = ["paper", "paper", "clothing", "furniture", "radio", "radio"]
+			requirement = ["paper", "clothing", "furniture", "radio", "radio"]
 		if self.numMidPOP >= 4 and self.numMidPOP < 4.5:
-			requirement = ["paper", "paper", "clothing", "furniture", "telephone", "radio", "telephone"]
+			requirement = ["paper", "clothing", "furniture", "telephone", "radio", "telephone"]
 		if self.numMidPOP > 4.5:
-			requirement = ["paper", "paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
+			requirement = ["paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
 		#print("Mid class requirments:")
 		#for r in requirement:
 		#	print(r)
@@ -331,8 +331,8 @@ class Player(object):
 		for r in requirement:
 			if self.goods[r] < 1: 
 				return False
-		if self.numMidPOP >= 3 and self.goods["paper"] < 2:
-			return False
+		#if self.numMidPOP >= 3 and self.goods["paper"] < 2:
+		#	return False
 		if self.freePOP < 0.3 and self.proPOP < 2:
 			return False
 		return True
