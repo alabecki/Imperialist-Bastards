@@ -289,13 +289,14 @@ def historical():
 	print("Players")
 	for p, player in players.items():
 		print(player.name)
+	
 
 
-	print("Unvivilized Nations:")
-	for unciv in uncivilized_minors.values():
-		print(unciv.name)
-		for p, prov in unciv.provinces.items():
-			print(p, prov.name)
+	#print("Unvivilized Nations:")
+	#for unciv in uncivilized_minors.values():
+	#	print(unciv.name)
+	#	for p, prov in unciv.provinces.items():
+	#		print(p, prov.name)
 
 	for p, play in players.items():
 		if play.capital == "":
@@ -329,10 +330,10 @@ def historical():
 		relations[pair] = Relation(pair)
 
 
-	for r, rel in relations.items():
-		print(r, rel.relata)
+	#for r, rel in relations.items():
+	#	print(r, rel.relata)
 
-	relations[frozenset({"England", "India"})].relationship = -1.5
+	relations[frozenset({"England", "India"})].relationship = -1
 	relations[frozenset({"England", "France"})].relationship = -1.25
 	relations[frozenset({"England", "Italy"})].relationship = 1
 	relations[frozenset({"England", "Ottoman"})].relationship = 1
@@ -349,7 +350,7 @@ def historical():
 	relations[frozenset({"France", "China"})].relationship = 0.5
 	relations[frozenset({"France", "Austria"})].relationship = -0.75
 	relations[frozenset({"Germany", "Austria"})].relationship = 2
-	relations[frozenset({"Germany", "Italy"})].relationship = 1
+	relations[frozenset({"Germany", "Italy"})].relationship = 0.5
 	relations[frozenset({"Germany", "Russia"})].relationship = -0.75
 	relations[frozenset({"Germany", "Ottoman"})].relationship = 1
 	relations[frozenset({"Austria", "Russia"})].relationship = -0.5
@@ -358,6 +359,16 @@ def historical():
 	relations[frozenset({"Italy", "Russia"})].relationship = 0.65
 	relations[frozenset({"Ottoman", "Italy"})].relationship = -0.75
 	relations[frozenset({"Spain", "Italy"})].relationship = 0.75
+	relations[frozenset({"Sweden", "Russia"})].relationship = -1.25
+	relations[frozenset({"Sweden", "Germany"})].relationship = 1.0
+	relations[frozenset({"Sweden", "Norway"})].relationship = -1.0
+	relations[frozenset({"Sweden", "Denmark"})].relationship = 1
+	relations[frozenset({"Sweden", "Austria"})].relationship = 0.5
+	relations[frozenset({"Japan", "Korea"})].relationship = -1
+	relations[frozenset({"Japan", "China"})].relationship = -1
+	relations[frozenset({"China", "Korea"})].relationship = 2
+	relations[frozenset({"Portugal", "Spain"})].relationship = 2
+	relations[frozenset({"Portugal", "France"})].relationship = 1
 
 
 
@@ -367,6 +378,8 @@ def historical():
 
 
 	market = Market()
+
+	market_items = dict()
 		
 
 	#globe = Globe()

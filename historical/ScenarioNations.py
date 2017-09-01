@@ -1,5 +1,6 @@
 from player_class import*
 from minor_classes import*
+from AI import*
 
 def england(player, provinces):
 
@@ -13,8 +14,11 @@ def england(player, provinces):
 	player.military["artillery"] = 0
 	player.military["frigates"] = 2.0
 	player.colonization = 2
+	player.diplo_action = 2	####################
 
-	player.resources["gold"] = 16
+	player.resources["gold"] = 16    ##############
+	player.research = 20
+
 
 
 	player.provinces["SouthEastEngland"] = provinces["SouthEastEngland"]
@@ -30,15 +34,15 @@ def england(player, provinces):
 	player.iron_clad["attack"] += 0.32
 	player.battle_ship["attack"] += 1
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.15
-		player.personality["Navy"] = 1.1
+		player.personality["Navy"] = 0.9
 		player.improve_province_priority["shipyard"] = 2.3
 		player.personality["Offensive"] = 0.55
-		player.build_factory_priority["parts"] += 0.5
-
-
-
+		player.build_factory_priority["parts"] += 0.35
+		player.build_factory_priority["clothing"] += 0.25
+		player.resource_priority["cotton"] += 0.25
+		player.reputation = 1.1
 
 
 
@@ -61,9 +65,9 @@ def france(player, provinces):
 	player.doctrines = {"Artillery_Offense"}
 	player.artillery["attack"] += 0.4
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.2
-		player.personality["Navy"] = 0.72
+		player.personality["Navy"] = 0.75
 		player.improve_province_priority["shipyard"] = 1.8
 		player.personality["Offensive"] = 0.38
 
@@ -98,11 +102,10 @@ def germany(player, provinces):
 	player.cavalry["attack"] += 0.3
 	player.tank["attack"] += 0.5
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.3
-		player.personality["Navy"] = 0.62
-		player.build_factory_priority["paper"] += 0.65
-		player.build_factory_priority["parts"] -= 0.15
+		player.personality["Navy"] = 0.65
+		player.build_factory_priority["paper"] += 0.25
 		player.personality["Offensive"] = 0.68
 
 
@@ -115,6 +118,8 @@ def austria(player, provinces):
 	player.capital = "_Austria"
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
+
+	player.resources["food"] = 2
 
 	player.military["frigates"] = 0
 	player.military["cavalry"] = 2
@@ -135,11 +140,11 @@ def austria(player, provinces):
 	player.provinces["WestUkraine"] = provinces["WestUkraine"]
 
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.5
-		player.improve_province_priority["shipyard"] = 1.5
-		player.build_factory_priority["paper"] += 0.2
+		player.improve_province_priority["shipyard"] = 1.3
+		player.build_factory_priority["paper"] += 0.1
 
 
 
@@ -188,13 +193,13 @@ def russia(player, provinces):
 	player.provinces["Yakutsk"] = provinces["Yakutsk"]
 	player.provinces["Okhotsk"] = provinces["Okhotsk"]
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.25
-		player.personality["Navy"] = 0.4
+		player.personality["Navy"] = 0.45
 		player.personality["Offensive"] = 0.40
-		player.build_factory_priority["paper"] += 0.3
-		player.build_factory_priority["furniture"] += 0.25
-		player.resource_priority["wood"] += 0.25
+		player.build_factory_priority["paper"] += 0.2
+		player.build_factory_priority["furniture"] += 0.15
+		player.resource_priority["wood"] += 0.15
 
 
 
@@ -214,10 +219,10 @@ def italy(player, provinces): #major
 	player.provinces["Sicily"] = provinces["Sicily"]
 
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.15
 		player.personality["Navy"] = 0.8
-		player.build_factory_priority["furniture"] += 0.25
+		player.build_factory_priority["furniture"] += 0.2
 		player.build_factory_priority["clothing"] += 0.25
 
 
@@ -253,7 +258,7 @@ def ottoman(player, provinces):
 	player.midPOP["bureaucrats"]["number"] = 0
 	player.midPOP["managers"]["number"] = 0
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.6
 
@@ -311,7 +316,7 @@ def spain(player, provinces):
 	player.provinces["Galicia"] = provinces["Galicia"]
 	player.provinces["La_Mancha"] = provinces["La_Mancha"]
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.15
 		player.personality["Navy"] = 0.75
 		player.improve_province_priority["shipyard"] = 1.9
@@ -344,11 +349,13 @@ def netherlands(player, provinces): # major power
 	player.provinces["Gelderland"] = provinces["Gelderland"]
 	player.provinces["Wallonie"] = provinces["Wallonie"]
 
-	if type(player) == "AI":
+	if type(player) == AI:
 		player.personality["Army"] = 1.2
-		player.personality["Navy"] = 0.85
+		player.personality["Navy"] = 0.9
 		player.improve_province_priority["shipyard"] = 2.3
 		player.personality["Offensive"] = 0.4
+		player.resource_priority["spice"] += 1.0
+
 
 
 
@@ -384,8 +391,8 @@ def portugal(player, provinces): # old_minor
 	player.borders.add("Spain")
 	player.provinces["_Portugal"] = provinces["_Portugal"]
 
-	if type(player) == "AI":
-		player.personality["Army"] = 1.2
+	if type(player) == AI:
+		player.personality["Army"] = 1.3
 		player.personality["Navy"] = 1.4
 		player.improve_province_priority["shipyard"] = 2.3
 
@@ -494,9 +501,10 @@ def persia(player, provinces): # Old Empire
 	player.culture = "Persian"
 	player.capital = "Tehran"
 
-	player.POP = 6
-	player.numLowerPOP = 6
-	player.freePOP = 5
+	player.POP = 7
+	player.numLowerPOP = 7
+	player.freePOP = 6
+	player.colonization = -2
 
 	player.resources["gold"] = 10
 
@@ -507,7 +515,7 @@ def persia(player, provinces): # Old Empire
 	player.provinces["Khorasan"] = provinces["Khorasan"]
 
 	if type(player) == "AI":
-		player.personality["Navy"] = 0.6
+		player.personality["Navy"] = 0.4
 
 
 def nejd(player, provinces): #old minor
@@ -549,7 +557,7 @@ def india(player, provinces): # Old Empire
 	player.provinces["Nagpur"] = provinces["Nagpur"]
 
 	if type(player) == "AI":
-		player.personality["Navy"] = 0.6
+		player.personality["Navy"] = 0.35
 
 
 def bengal(player, provinces):
@@ -666,8 +674,8 @@ def china(player, provinces):
 
 	player.provinces["Liaoning"] = provinces["Liaoning"]
 
-	if type(player) == "AI":
-		player.personality["Navy"] = 0.5
+	if type(player) == AI:
+		player.personality["Navy"] = 0.35
 
 
 def korea(player, provinces):
@@ -702,10 +710,10 @@ def japan(player, provinces):
 
 	player.provinces["Kyushu"] = provinces["Kyushu"]
 
-	if type(player) == "AI":
-		player.build_factory_priority["cannons"] += 0.25
+	if type(player) == AI:
+		player.build_factory_priority["cannons"] += 0.15
 		player.personality["Army"] = 1.3
-		player.personality["Navy"] = 1.3
+		player.personality["Navy"] = 1.0
 
 
 
