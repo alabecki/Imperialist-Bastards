@@ -31,12 +31,12 @@ manufacture = {
 	"clothing": {"cotton": 0.95, "dyes": 0.25},
 	"furniture": {"wood": 0.67, "cotton": 0.33},
 	"chemicals": {"coal": 1},
-	"gear": {"rubber": 0.5, "iron": 0.3, "coal": 0.2},
+	"gear": {"rubber": 0.6, "iron": 0.2, "coal": 0.2},
 	"radio": {"gear": 0.85, "wood": 0.15},
 	"telephone": {"gear": 0.85, "wood": 0.15},
 	"fighter": {"wood": 1, "gear": 1, "parts": 1, "cannons": 1.0},   # 2.5 
 	"auto": {"rubber": 0.5, "gear": 1.0, "parts": 1.0, "iron": 0.5},		#2
-	"tank": {"auto": 1.0, "iron": 1.0, "cannons": 1.5},  #4 
+	"tank": {"iron": 1.5, "cannons": 1.5, "rubber": 0.5, "gear": 1, "parts": 1},  #4 
 	#"frigates": {"cannons": 1.0, "wood": 1.0, "cotton": 1.0},
 	#"iron_clad": {"cannons": 1.0, "iron": 1.0, "parts": 1.0},
 	#"battle_ship": {"cannons": 3.0, "iron": 3.0, "parts": 1.0, "gear": 1.0 }  #8 

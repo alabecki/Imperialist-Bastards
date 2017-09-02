@@ -251,7 +251,7 @@ while True:
 									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 								print("Population Overview: ######################################################################################### \n")
 								for k, v in nation.midPOP.items():
-									print("%.2f: %s, priority: %.2f \n"  % (k, v["number"], v["priority"]))
+									print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
 								print("Military Overview: ################################################################################################ \n")
 								for k, v in nation.military.items():
 									print(" %s: %.2f " % (k, v) )
@@ -853,17 +853,17 @@ while True:
 							if chem == "3":
 								if "synthetic_rubber" not in player.technologies:
 									print ("You need the synthetic rubber technology to do this")
-								elif players.resources["oil"] < 3:
+								elif player.resources["oil"] < 3:
 									print("You do not have enough oil \n")
 								else:
 									player.resources["oil"] -= 3
 									player.resources["rubber"] += 1
-									rint("You now have %s rubber and %s oil" % (player.resources["rubber"], \
+									print("You now have %s rubber and %s oil" % (player.resources["rubber"], \
 										player.resources["oil"]))
 							if chem == "4":
 								if "synthetic_oil" not in player.technologies:
 									print ("You need the synthetic oil technology to do this")
-								elif players.goods["chemicals"] < 3:
+								elif player.goods["chemicals"] < 3:
 									print("You do not have enough chemicals \n")
 								else:
 									player.goods["chemicals"] -= 3
@@ -1078,7 +1078,7 @@ while True:
 
 						if action == "5":
 							a_options = set()
-							print("On which Major Power do you intend wage a colonial war?\n")
+							print("On which Major Power do you intend wage a minor war?\n")
 							for k, v in players.items():
 								if v.type == "major":
 									non_national = False
@@ -1093,12 +1093,15 @@ while True:
 								other = " "
 								while other not in a_options:
 									print("On which Modern nation do you intend wage a minor war?\n")
+									for ao in a_options:
+										print(ao)
 									other = input()
 								p_options = set()
+								other = players[other]
 								if player.check_for_border(other):
 									for prov in other.provinces.values():
-										if prov.culure != other.culture and player.check_for_ground_invasion(prov, provinces):
-											print(prov.name, prov.resources, prov.quality)
+										if prov.culture != other.culture and player.check_for_ground_invasion(prov, provinces):
+											print(prov.name, prov.resource, prov.quality)
 											p_options.add(prov.name)
 								annex = " "
 								while annex not in p_options:
@@ -1107,9 +1110,9 @@ while True:
 										print(p)
 									annex = input()
 								annex = other.provinces[annex]
-								if check_for_border(player, other) and player.check_for_ground_invasion(annex, provinces):
+								if player.check_for_border(other) and player.check_for_ground_invasion(annex, provinces):
 									print("You may seek to capture neighboring %s from %s by land!" % (annex.name, other.name))
-									combat(player, other, annex)
+									combat(player, other, annex, players)
 									player.reputation -= 0.3
 
 						if action == "6":
@@ -1119,17 +1122,24 @@ while True:
 								options = set()
 								for k, v in players.items():
 									if v.type == "major" and v in player.CB:
-										options.add(v)
+										options.add(v.name)
 								if len(options) == 0:
 									print("You cannot currently wage war on a Major Power")
 								else:
 									other = " "
-									while o not in options:
+									while other not in options:
 										print("On which Major Power would you like wage a Great War?")
 										for o in options:
 											print(o)
 										other = input()
-									land = check_for_border(player, other)
+									other = players[other]
+									land = player.check_for_border(other)
+
+									annex = ""
+									for p, prov in other.provinces.items():
+										if prov.name == other.capital:
+											annex = prov
+
 									if land == False:
 										print("Since you do not border %s, you must send your army by navy\n" % (other.name))
 										transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
@@ -1140,7 +1150,7 @@ while True:
 											player.reputation -= 0.1
 									else:
 										print("Since we border %s, we may attack by land!" % (other.name))
-										combat(player, other, annex)
+										combat(player, other, annex, players)
 										player.reputation -= 0.1
 
 				
@@ -1185,7 +1195,6 @@ while True:
 								relations[relata].relationship -= min(1, 10/(other.POP + 0.001))
 								player.reputation -= 0.02
 								print("Your relation with %s is now %s " % (other.name, relations[relata].relationship))
-								player.diplo_action -=1
 
 							elif dip == "3":
 								print("Please choose a Nation:\n" )
@@ -1214,7 +1223,7 @@ while True:
 										relata = frozenset([player.name, v.name])
 										if len(relata) == 1:
 											continue
-										if relations[relata].relationship <= -2.5:
+										if relations[relata].relationship <= -2.5 and v not in player.CB:
 											options.append(v.name)
 								if len(options) < 1:
 									print("Your relations are not currently bad enough with any nation to gain a CB \n")
@@ -1230,6 +1239,7 @@ while True:
 									player.CB.add(other)
 									print("You are now able to declare war on %s \n" % (other.name))
 									player.reputation -= 0.025
+
 
 
 							elif dip == "5":
@@ -1373,18 +1383,18 @@ while True:
 
 
 					if command == "12":
-						print("Saving....\n")
-						save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
+						#print("Saving....\n")
+						#save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
 						_continue = False
 						break
 		gc.collect()
 		
 		if AUTO_SAVE == True:
 	
-			if market.turn % 2 == 1:
+			#if market.turn % 2 == 1:
 
-				print("Saving....\n")
-				save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
+			print("Saving....\n")
+			save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
 
 	
 		#globe.world_update(players)

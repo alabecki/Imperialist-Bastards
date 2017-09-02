@@ -199,7 +199,7 @@ def gain_cb(player, players, relations):
 		return
 	target = player.rival_target[0]
 	relata = frozenset([player.name, target.name])
-	if relations[relata].relationship > -2.5:
+	if relations[relata].relationship > -2.5 and target in player.CB:
 		return
 	else:
 		player.diplo_action -= 1

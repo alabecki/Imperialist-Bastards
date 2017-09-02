@@ -653,6 +653,6 @@ class Player(object):
 		count = 0
 		
 		count += self.military["frigates"] * self.frigates["attack"]
-		count +=  self.military["iron_clad"] * self.iron_clad["attack"]
-		count +=  self.military["battle_ship"] * self.battle_ship["attack"]
+		count +=  self.military["iron_clad"] * self.iron_clad["attack"] * 2
+		count +=  self.military["battle_ship"] * self.battle_ship["attack"] * 4
 		return count
