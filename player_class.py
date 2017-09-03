@@ -110,9 +110,9 @@ class Player(object):
 			"gear": 0.0,
 			"radio": 0.0,
 			"telephone": 0.0,
+			"tank": 0.0,
 			"auto": 0.0,
 			"fighter": 0.0,
-			"tank": 0.0,
 		}
 
 
@@ -291,6 +291,8 @@ class Player(object):
 		}
 
 		self.doctrines = set()
+
+		self.just_attacked = -1
 
 		self.colonization = 0.0
 		self.num_colonies = 0
@@ -522,6 +524,7 @@ class Player(object):
 		#globe.colonization.append([self.name, col_gain])
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0
+		self.just_attacked -= 1
 		
 
 
@@ -606,7 +609,10 @@ class Player(object):
 		strength += self.military["tank"] * self.tank["defend"]
 		strength += self.military["fighter"] * self.fighter["defend"]
 		#strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
-		strength = strength * self.fortification
+		if self.sprawl == True:
+			strength = strength * (self.fortification + 1)
+		else:
+			strength = strength * self.fortification
 		return strength
 
 
@@ -656,3 +662,42 @@ class Player(object):
 		count +=  self.military["iron_clad"] * self.iron_clad["attack"] * 2
 		count +=  self.military["battle_ship"] * self.battle_ship["attack"] * 4
 		return count
+
+
+	def war_after_math(self, target, players, relations):
+		relata = frozenset([self.name, target.name])
+		self.rival_target = []
+		relations[relata].relationship += 1
+		if target in self.CB:
+			self.CB.remove(target)
+		self.diplo_action -= 1.0
+		if target.type == "old_minor":
+			self.reputation -= 0.1
+			self.stability += 0.1
+		if target.type == "old_empire":
+			self.reputation -= 0.15
+			self.stability += 0.1
+		if (target.type == "minor" or target.type == "major") and self.military["tank"] == 0:
+			self.reputation -= 0.33
+			self.stability -= 0.25
+			for pl, play in players.items():
+				if play.type == "major" and self.name != pl:
+					relations[frozenset([self.name, pl])].relationship -= 0.2
+
+		for p, pl in players.items():
+			if len(set([self.name, p])) == 1 or len(set([target.name, p])) == 1:
+				continue
+			if relations[frozenset([self.name, p])].relationship < -1.5:
+				relations[frozenset([self.name, p])].relationship -= 0.1
+			if relations[frozenset([target.name, p])].relationship >= 0 and relations[frozenset([self.name, p])].relationship < 1.5:
+				relations[frozenset([self.name, p])].relationship -= 0.1
+			if relations[frozenset([target.name, p])].relationship >= 1:
+				relations[frozenset([self.name, p])].relationship -= 0.15 
+			if relations[frozenset([target.name, p])].relationship >= 2:
+				relations[frozenset([self.name, p])].relationship -= 0.15 
+			if pl.type == "AI":
+				if pl.rival_target != []:
+					if target == pl.rival_target[0]: 
+						relations[frozenset([self.name, p])].relationship -= 0.15
+				if target in pl.allied_target:
+					relations[frozenset([self.name, p])].relationship -= 0.2

@@ -28,6 +28,7 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 	player.update_priorities(market)
 
 
+
 	player.calculate_resource_production()
 	player.calculate_resource_need()
 	player.calculate_resource_forecast()
@@ -39,6 +40,7 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 
 	player.AI_reset_POP()
 	player.AI_assign_POP()
+
 
 	player.early_game(market, relations, players)
 	player.ai_increase_middle_class(market, relations, players)
@@ -78,7 +80,7 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 		if i == 1:
 			worsen_relations(player, players, relations)
 		if i ==	2:
-			attack_target(player, players, relations, provinces)
+			attack_target(player, players, relations, provinces, market)
 		#if i == 3:
 			#ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 		if i == 3:

@@ -16,19 +16,18 @@ import math
 
 
 craft = {
-	"parts" : "iron",
-	"cannons" : "iron",
-	"paper" : "wood",
-	"clothing" : "cotton",
-	"furniture" : "wood",
-	"chemicals" : "coal"
+	"parts": {"iron": 0.67, "coal": 0.33},
+	"cannons": {"iron": 0.67, "coal": 0.33},
+	"paper": {"wood": 1.0},
+	"clothing": {"cotton": 0.9, "dyes": 0.3},
+	"furniture": {"wood": 0.67, "cotton": 0.33},
 			}
 	
 manufacture = {
 	"parts": {"iron": 0.67, "coal": 0.33},
 	"cannons": {"iron": 0.67, "coal": 0.33},
 	"paper": {"wood": 1.0},
-	"clothing": {"cotton": 0.95, "dyes": 0.25},
+	"clothing": {"cotton": 0.9, "dyes": 0.3},
 	"furniture": {"wood": 0.67, "cotton": 0.33},
 	"chemicals": {"coal": 1},
 	"gear": {"rubber": 0.6, "iron": 0.2, "coal": 0.2},
@@ -91,16 +90,16 @@ class AI(Player):
 		}
 		#cannon
 		self.improve_province_priority = {
-			"food": 1.2,
+			"food": 1.1,
 			"iron": 1.0,
 			"coal": 0.4,
 			"wood": 0.8,
-			"cotton": 0.4,
+			"cotton": 0.65,
 			"gold": 1.5,
 			"spice": 2,
-			"dyes": 0.2,
-			"rubber": 1.8,
-			"oil": 1.7,
+			"dyes": 0.65,
+			"rubber": 0.2,
+			"oil": 0.2,
 			"shipyard": 2,
 			"fortification": 1.0
 		}
@@ -144,14 +143,14 @@ class AI(Player):
 			"dynamite": 3,
 			"compound_steam_engine": 4,
 			"telegraph": 3.25,
-			"radio": 3.5,
+			"radio": 3.85,
 			"mechanical_reaper": 2,
 			"oil_drilling": 5,
 			"combustion": 4,
 			"steel_plate_armor": 2.5,
 			"flight": 4.5,
 			"automobile":3.75,
-			"telephone": 4,
+			"telephone": 3.5,
 			"mobile_warfare": 5.5,
 			"bombers": 3.5,
 			"oil_powered_ships": 5.0,
@@ -165,14 +164,15 @@ class AI(Player):
 			"food":	1.0,
 			"iron": 1.1,
 			"coal": 0.4,
-			"cotton": 0.75,
+			"cotton": 0.8,
 			"wood": 1.0,
-			"spice": 2,
-			"dyes": 0.75,
-			"gold": 1.9,
+			"spice": 1.75,
+			"dyes": 0.8,
+			"gold": 1.5,
 			"rubber": 0.1,
 			"oil": 0.1
 		}
+		
 
 		self.resourse_to_keep = {
 			"food":	3,
@@ -184,7 +184,7 @@ class AI(Player):
 			"dyes": 2.0,
 			"gold": 2.0,
 			"rubber": 2,
-			"oil": 3
+			"oil": 2
 		}
 
 		self.resource_base = {
@@ -294,23 +294,35 @@ class AI(Player):
 		if self.freePOP < 0.2:
 			self.proPOP -= 1
 			self.freePOP +1
-		current = 100
-		tries = 0
 		allow = False
-		_type = sorted(self.mid_class_priority, key=self.mid_class_priority.get, reverse = True)
-		while tries < 4 and allow == False:
-			#print(type(_type))
-			index = _type[tries]
-			#print(index)
-			#print(type(self.midPOP))
-			#print(self.midPOP["researchers"]["number"])
-			if self.midPOP[index]["number"] >= 2:
-				tries += 1
-			else: 
-				allow = True
-		if allow == False:
-			print("Maximum # of Middle Class Achieved!!!")
-			return 
+		least_mid = 100
+		for m, mid in self.midPOP.items():
+			if self.midPOP[m]["number"] < least_mid:
+				least_mid = self.midPOP[m]["number"]
+		least_mid = max(0.2, least_mid)
+		m_options = []
+		for m, mid in self.midPOP.items():
+			if self.midPOP[m]["number"] >= 2:
+				continue
+			if self.midPOP[m]["number"] < least_mid * 2:
+				m_options.append(m)
+		for mo in m_options:
+			print(mo)
+		m_selection = ""
+		if self.stability < -1.0 and "artists" in m_options:
+			m_selection = "artists"
+		else:
+			m_preferences = sorted(self.mid_class_priority, key=self.mid_class_priority.get, reverse = True)
+			for mp in m_preferences:
+				if mp in m_options:
+					m_selection = mp
+					break 
+		if m_selection == "":
+			print("It seems that maximal mid class has been achieved by %s" % (self.name))
+			stop = input()
+			return
+
+
 		if self.numMidPOP < 4.5:
 			self.resources["spice"] -= 1.0
 		requirement = self.determine_middle_class_need()
@@ -318,13 +330,13 @@ class AI(Player):
 			self.goods[r] -= 1.0
 		self.numLowerPOP -= 0.2
 		self.numMidPOP += 0.2
-		self.midPOP[_type[tries]]["number"] += 0.2
+		self.midPOP[m_selection]["number"] += 0.2
 		self.freePOP -= 0.2
-		self.mid_class_priority[_type[tries]] -= 0.1
-		self.new_development += 1.0
-		if _type[tries] == "officers":
+		self.mid_class_priority[m_selection] -= 0.1
+		self.new_development += 0.5
+		if m_selection == "officers":
 			self.ai_choose_doctrine()
-		print("New middle class pop: %s ________________________" % (_type[tries]))
+		print("New middle class pop: %s ________________________" % (m_selection))
 
 
 	def ai_choose_doctrine(self):
@@ -546,7 +558,7 @@ class AI(Player):
 					self.try_development(market, relations, players)
 				else:
 					pick = uniform(0, 1)
-					if pick <=  0.40:
+					if pick <=  0.38:
 						#print("Wants to build factory")
 						self.try_factory(market, relations, players)
 					else:
@@ -592,9 +604,14 @@ class AI(Player):
 			self.ai_craftman_production(_type)
 		else:
 			if _type in craft.keys():
-				get = self.ai_buy(craft[_type], 1, market, relations, players)
-			if get == "sucess":
-				self.ai_craftman_production(_type)
+				check = True
+				for i in craft[_type]:
+					get = self.ai_buy(i, craft[_type][i], market, relations, players)
+					if get == "fail":
+						check = False
+				if check == True:
+					self.ai_craftman_production(_type)
+
 
 
 	def assign_priorities_to_provs(self):
@@ -799,7 +816,9 @@ class AI(Player):
 		#print("Price to buy %s" % (price_to_buy))
 		price_to_craft = 100
 		if _type in craft.keys():
-			price_to_craft = market.buy_price(craft[_type], self.supply[_type])
+			price_to_craft = 0
+			for i in craft[_type]:
+				price_to_craft += market.buy_price(i, self.supply[i]) * craft[_type][i]
 	#	print("price to craft %s " % (price_to_craft))
 		if self.supply[_type] > 3 and self.resources["gold"] >= market.buy_price(_type, self.supply[_type]):
 			return "buy"
@@ -834,13 +853,24 @@ class AI(Player):
 		elif _type in ["gear", "telephone", "radio", "auto", "fighter", "tank"]:
 			return "fail" 
 		elif _type in craft.keys():
-			if self.resources[craft[_type]] >= 1.0:
-				#print("Decide to craft good" + _type)
+			check = True
+			for i in craft[_type]:
+				if self.resources[i] < craft[_type][i]:
+					check = False
+			if check == True:
 				return "craft_ready"
-		elif self.supply[craft[_type]] >= 3 and self.resources["gold"] >= market.buy_price(craft[_type], self.supply[_type]) and \
-		_type in craft.keys():
-			#print("Buy materail then craft")
-			return "craft_prepare"
+			else:
+				check = True
+				if _type not in craft.keys():
+					check = False
+				for i in craft[_type]:
+					check = False
+					if self.supply[i] < 2:
+						check = False
+					elif self.resources["gold"] <= (market.buy_price(i, self.supply[i])) * 2:
+						check = False
+				if check == True:
+					return "craft_prepare"
 		else:
 			return "fail"
 
@@ -1129,7 +1159,8 @@ class AI(Player):
 	def ai_craftman_production(self, _type):
 		if _type not in craft.keys():
 			return False
-		self.resources[craft[_type]] -= 1.0
+		for i in craft[_type]:
+			self.resources[i] -= craft[_type][i]
 		self.goods_produced[_type] += 1.0
 		self.AP -= 1
 		print("Crafted %s" % (_type))
@@ -1233,7 +1264,7 @@ class AI(Player):
 				amount = ceil(4 - self.resources["iron"])
 				amount = min(amount, len(market.market["iron"]))
 				self.ai_buy("iron", amount, market, relations, players)
-			if self.resources["coal"] < 2.5:
+			if self.resources["coal"] < 2:
 				amount = ceil(4 - self.resources["coal"])
 				amount = min(amount, self.supply["coal"])
 				self.ai_buy("coal", amount, market, relations, players)
@@ -1300,11 +1331,11 @@ class AI(Player):
 				amount = ceil(5 - self.goods["parts"])
 				amount = min(amount, self.supply["parts"])
 				self.ai_buy("parts", amount, market, relations, players)
-			if self.resources["iron"] < 5:
+			if self.resources["iron"] < 5.5:
 				amount = ceil(6 - self.resources["iron"])
 				amount = min(amount, self.supply["iron"])
 				self.ai_buy("iron", amount, market, relations, players)
-			if self.goods["cannons"] < 7:
+			if self.goods["cannons"] < 7.5:
 				decision = self.ai_decide_on_good("cannons", market, relations, players)
 				self.ai_obtain_good("cannons", decision, market, relations, players)
 				amount = ceil(8 - self.goods["cannons"])
@@ -1314,88 +1345,87 @@ class AI(Player):
 
 	def ai_modify_priorities_from_province(self, resource):
 		if resource == "food":
-			self.technology_priority["steel_plows"] += 1
-			self.technology_priority["mechanical_reaper"] += 1
-			self.technology_priority["fertlizer"] += 1
-			self.improve_province_priority["food"] + 0.6
+			self.technology_priority["steel_plows"] += 0.5
+			self.technology_priority["mechanical_reaper"] += 0.5
+			self.technology_priority["fertlizer"] += 0.5
+			self.improve_province_priority["food"] + 0.25
 		if resource == "iron":
-			self.technology_priority["square_timbering"] += 1
-			self.technology_priority["dynamite"] += 1
-			self.technology_priority["bessemer_process"] += 1
-			self.technology_priority["iron_clad"] += 0.5
-			self.technology_priority["muzzle_loaded_arms"] += 1
-			self.technology_priority["breach_loaded_arms"] += 1
-			self.technology_priority["machine_guns"] += 1
-			self.technology_priority["indirect_fire"] += 1
-			self.improve_province_priority["iron"] += 0.75
-			self.build_factory_priority["parts"] += 0.8
-			self.improve_province_priority["coal"] += 0.5
-			self.build_factory_priority["cannons"] + 0.8
-			self.build_factory_priority["tank"] += 0.6
+			self.technology_priority["square_timbering"] += 0.5
+			self.technology_priority["dynamite"] += 0.5
+			self.technology_priority["bessemer_process"] += 0.5
+			self.technology_priority["iron_clad"] += 0.25
+			self.technology_priority["muzzle_loaded_arms"] += 0.25
+			self.technology_priority["breach_loaded_arms"] += 0.25
+			self.technology_priority["machine_guns"] += 0.25
+			self.technology_priority["indirect_fire"] += 0.5
+			self.improve_province_priority["iron"] += 0.4
+			self.build_factory_priority["parts"] += 0.2
+			self.improve_province_priority["coal"] += 0.2
+			self.build_factory_priority["cannons"] + 0.2
+			self.build_factory_priority["tank"] += 0.3
 			#self.military_priority["iron_clad"] += 1
 			#self.military_priority["frigates"] + 0.1
 		if resource == "coal":
-			self.technology_priority["square_timbering"] += 1
-			self.technology_priority["dynamite"] += 0.5
-			self.technology_priority["bessemer_process"] += 0.5
-			self.technology_priority["chemistry"] += 1
-			self.technology_priority["synthetic_dyes"] + 0.5
-			self.technology_priority["fertlizer"] + 1
-			self.technology_priority["medicine"] + 1
-			self.improve_province_priority["coal"] += 0.5
-			self.build_factory_priority["parts"] += 0.4
-			self.build_factory_priority["cannons"] += 0.4
-			self.build_factory_priority["chemicals"] += 0.75
+			self.technology_priority["square_timbering"] += 0.5
+			self.technology_priority["dynamite"] += 0.25
+			self.technology_priority["bessemer_process"] += 0.25
+			self.technology_priority["chemistry"] += 0.5
+			self.technology_priority["synthetic_dyes"] + 0.25
+			self.technology_priority["fertlizer"] + 0.5
+			self.technology_priority["medicine"] + 0.5
+			self.improve_province_priority["coal"] += 0.25
+			self.build_factory_priority["parts"] += 0.1
+			self.build_factory_priority["cannons"] += 0.1
+			self.build_factory_priority["chemicals"] += 0.3
 		if resource == "wood":
-			self.technology_priority["saw_mill"] += 1
-			self.technology_priority["pulping"] += 1
-			self.technology_priority["compound_steam_engine"] += 1
-			self.build_factory_priority["paper"] += 1
-			self.build_factory_priority["furniture"] += 0.8
-			self.improve_province_priority["wood"] += 0.75
+			self.technology_priority["saw_mill"] += 0.5
+			self.technology_priority["pulping"] += 0.5
+			self.technology_priority["compound_steam_engine"] += 0.5
+			self.build_factory_priority["paper"] += 0.25
+			self.build_factory_priority["furniture"] += 0.25
+			self.improve_province_priority["wood"] += 0.25
 			#self.military_priority["frigates"] + 0.4
 		if resource == "cotton":
-			self.technology_priority["cotton_gin"] += 1
-			self.technology_priority["power_loom"] += 1
-			self.technology_priority["compound_steam_engine"] += 1
-			self.technology_priority["synthetic_dyes"] + 2
-			self.technology_priority["chemistry"] += 1
-			self.build_factory_priority["clothing"] += 0.8
-			self.build_factory_priority["furniture"] += 0.4
-			self.build_factory_priority["chemicals"] += 0.3
-			self.improve_province_priority["cotton"] += 0.8
+			self.technology_priority["cotton_gin"] += 0.5
+			self.technology_priority["power_loom"] += 0.5
+			self.technology_priority["compound_steam_engine"] += 0.25
+			self.technology_priority["synthetic_dyes"] + 0.5
+			self.technology_priority["chemistry"] += 0.25
+			self.build_factory_priority["clothing"] += 0.25
+			self.build_factory_priority["furniture"] += 0.1
+			self.build_factory_priority["chemicals"] += 0.1
+			self.improve_province_priority["cotton"] += 0.25
 			#self.military_priority["frigates"] + 0.4
 		if resource == "dyes":
-			self.technology_priority["synthetic_dyes"] -= 1
-			self.build_factory_priority["chemicals"] -= 0.25
-			self.technology_priority["compound_steam_engine"] += 1
-			self.improve_province_priority["dyes"] += 1
-			self.build_factory_priority["clothing"] += 0.25
+			self.technology_priority["synthetic_dyes"] -= 0.5
+			self.build_factory_priority["chemicals"] -= 0.1
+			self.technology_priority["compound_steam_engine"] += 0.25
+			self.improve_province_priority["dyes"] += 0.25
+			self.build_factory_priority["clothing"] += 0.2
 		if resource == "spice":
-			self.technology_priority["steel_plows"] += 1
-			self.improve_province_priority["spice"] += 2.5
+			self.technology_priority["steel_plows"] += 0.5
+			self.improve_province_priority["spice"] += 0.5
 		if resource == "gold":
-			self.technology_priority["dynamite"] += 1
-			self.improve_province_priority["gold"] += 2.5
+			self.technology_priority["dynamite"] += 0.25
+			self.improve_province_priority["gold"] += 0.25
 
 		if resource == "rubber":
-			self.build_factory_priority["gear"] += 1
-			self.build_factory_priority["telephone"] += 0.7
-			self.build_factory_priority["radio"] += 0.7
-			self.build_factory_priority["auto"] += 0.5
-			self.build_factory_priority["tank"] += 0.5
-			self.build_factory_priority["auto"] += 0.5
-			self.build_factory_priority["fighter"] += 0.5
-			self.improve_province_priority["rubber"] += 0.8
-			self.technology_priority["radio"] += 0.5
-			self.technology_priority["telephone"] += 0.5
+			self.build_factory_priority["gear"] += 0.5
+			self.build_factory_priority["telephone"] += 0.3
+			self.build_factory_priority["radio"] += 0.3
+			self.build_factory_priority["auto"] += 0.4
+			self.build_factory_priority["tank"] += 0.4
+			self.build_factory_priority["fighter"] += 0.3
+			self.improve_province_priority["rubber"] += 0.35
+			self.technology_priority["radio"] += 0.25
+			self.technology_priority["telephone"] += 0.25
 
 
 		if resource == "oil":
-			self.improve_province_priority["oil"] + 0.2
-			self.build_factory_priority["tank"] + 0.3
-			self.build_factory_priority["fighter"] + 0.5
-			self.build_factory_priority["auto"] += 0.5
+			self.improve_province_priority["oil"] + 0.1
+			self.build_factory_priority["tank"] + 0.15
+			self.build_factory_priority["fighter"] + 0.15
+			self.build_factory_priority["auto"] += 0.25
 
 
 
@@ -1488,10 +1518,14 @@ class AI(Player):
 		#FOR AI ONLY
 		if choice == "electricity":
 			self.resource_priority["rubber"] += 1.25
+			self.improve_province_priority["rubber"] +=1
 		if choice == "oil_drilling":
 			self.resource_priority["oil"] += 1
+			self.improve_province_priority["oil"] +=1
 		if choice == "chemistry":
-			self.resource_priority["coal"] += 0.3
+			self.resource_priority["coal"] += 0.2
+			self.improve_province_priority["coal"] += 0.2
+
 
 	def ai_improve_province_options(self):
 		#print("Improve province options")
@@ -1728,7 +1762,7 @@ class AI(Player):
 			self.resourse_to_keep["iron"] += 2
 		if _type == "clothing":
 			self.resource_priority["cotton"] += 0.3
-			self.resource_priority["dyes"] += 0.1
+			self.resource_priority["dyes"] += 0.4
 			self.resourse_to_keep["cotton"] += 3
 			self.resourse_to_keep["dyes"] += 1
 		if _type == "paper":
@@ -2034,10 +2068,12 @@ class AI(Player):
 					self.goods["chemicals"] -= 1
 					count -= 1
 					print("Turn chemicals to food")
-		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] >= 6:
+		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] >= 5:
 			self.resources["rubber"] += 1
 			self.goods["chemicals"] -= 3
 			print("Turns chemicals to rubber")
+		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] <= 5 and self.supply["oil"] > 12 and self.resources["gold"] > 42:
+			self.ai_buy(self, "oil", 4, market, relations, players)
 		if "synthetic_oil" in self.technologies and self.resources["oil"] < 2 and self.goods["chemicals"] >= 5 and len(market.market["oil"]) < 13:
 			self.resources["oil"] += 1
 			self.goods["chemicals"] -= 3
@@ -2179,6 +2215,15 @@ class AI(Player):
 			self.freePOP += 0.2
 			self.number_units -= 1
 			self.military["iron_clad"] -= 1
+
+		if "iron_clad" in self.technologies and self.military["frigates"] >= 2:
+			self.resources["iron"] += 1
+			self.military["frigates"] -=1
+			self.milPOP -= 0.2
+			self.freePOP += 0.2
+			self.number_units -= 1
+
+
 
 		if self.military["irregulars"] > 0:
 			if self.military["infantry"] >= 3 or self.military["cavalry"] >= 3:

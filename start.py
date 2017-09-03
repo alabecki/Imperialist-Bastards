@@ -84,7 +84,7 @@ def initialize_modern_minor(player):
 	player.type = "minor"
 
 	player.goods["cannons"] = 1.0
-
+	
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
 

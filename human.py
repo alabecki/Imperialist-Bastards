@@ -66,10 +66,21 @@ class Human(Player):
 				print(r)
 			return
 		else:
+			for m, mid in self.midPOP.items():
+				if self.midPOP[m]["number"] < least_mid:
+					least_mid = self.midPOP[m]["number"]
+			least_mid = max(0.2, least_mid)
+			m_options = []
+			for m, mid in self.midPOP.items():
+				if self.midPOP[m]["number"] >= 2:
+					continue
+				if self.midPOP[m]["number"] < least_mid * 2:
+					m_options.append(m)
 			_type = ""
-			while _type not in self.midPOP.keys():
+			while _type not in m_options:
 				print("What kind of middle class POP would you like to create?")
-				print("researchers, officers, bureaucrats", "artists", "managers \n")
+				for mo in m_options:
+					print(mo, end = "  ")
 				_type = input()
 
 			self.resources["spice"] -= 1
@@ -749,12 +760,11 @@ class Human(Player):
 
 	def craftman_production(self):
 		craft = {
-			"parts" : "iron",
-			"cannons" : "iron",
-			"paper" : "wood",
-			"clothing" : "cotton",
-			"furniture" : "wood",
-			"chemicals" : "coal"
+		"parts": {"iron": 0.67, "coal": 0.33},
+		"cannons": {"iron": 0.67, "coal": 0.33},
+		"paper": {"wood": 1.0},
+		"clothing": {"cotton": 0.9, "dyes": 0.3},
+		"furniture": {"wood": 0.67, "cotton": 0.33},
 			}
 		if(self.AP < 1):
 			print("You do not have any Action Points left \n")
@@ -762,11 +772,15 @@ class Human(Player):
 		_type = " "
 		while _type not in self.goods.keys():
 			_type = input("What kind of good do you want to produce with craftsmen?: parts cannons clothing paper furniture \n")
-		if(self.resources[craft[_type]] < 1.2):
-			print("You do not have enough %s with which to make %s \n" % (craft[_type], _type))
-			return
+		
+		for i in craft[_type]:
+			if i in self.resources.keys():
+				if(craft[_type][i] > self.resources[i]):
+					print("You do not have sufficient %s to craft %s \n" % (i, amount, _type))
+					return
 		else:
-			self.resources[craft[_type]] -= 1.1
+			for i in craft[_type]:
+				self.resources[i] -= craft[_type][i]
 			self.goods_produced[_type] += 1.0
 			self.AP -= 1
 			#self.new_development -= 0.05
@@ -779,7 +793,7 @@ class Human(Player):
 			"parts": {"iron": 0.67, "coal": 0.33},
 			"cannons": {"iron": 0.67, "coal": 0.33},
 			"paper": {"wood": 1.0},
-			"clothing": {"cotton": 0.95, "dyes": 0.25},
+			"clothing": {"cotton": 0.9, "dyes": 0.3},
 			"furniture": {"wood": 0.67, "cotton": 0.33},
 			"chemicals": {"coal": 1},
 			"gear": {"rubber": 0.6, "iron": 0.2, "coal": 0.2},
@@ -787,7 +801,7 @@ class Human(Player):
 			"telephone": {"gear": 0.85, "wood": 0.15},
 			"fighter": {"wood": 1, "gear": 1, "parts": 1, "cannons": 1.0},   # 2.5 
 			"auto": {"rubber": 0.5, "gear": 1.0, "parts": 1.0, "iron": 0.5},		#2
-			"tank": {"auto": 1.0, "iron": 1.0, "cannons": 1.5},  #4 
+			"tank": {"iron": 1.5, "cannons": 1.5, "rubber": 0.5, "gear": 1, "parts": 1},  #4 
 			#"frigates": {"cannons": 1.0, "wood": 1.0, "cotton": 1.0},
 			#"iron_clad": {"cannons": 1.0, "iron": 1.0, "parts": 1.0},
 			#"battle_ship": {"cannons": 3.0, "iron": 3.0, "parts": 1.0, "gear": 1.0 }  #8 

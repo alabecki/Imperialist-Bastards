@@ -81,7 +81,8 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 							return
 
 def	decide_rival_target(player, players, market, provinces, relations):
-
+	if len(player.rival_target) > 0 and player.rival_target[0].name not in players.keys():
+		player.rival_target = []
 	if len(player.rival_target) > 0 and (len(player.rival_target[0].provinces.keys()) == 0 \
 		or player.rival_target[1].name not in player.rival_target[0].provinces.keys() ):
 		player.rival_target = []
@@ -122,34 +123,29 @@ def	decide_rival_target(player, players, market, provinces, relations):
 						player.rival_target = [other, prov]
 					return
 
-	need = set()
-	for r, res in player.resources.items():
-		if player.resource_base[r] < 1.0 and player.supply[r] < 2:
-			if r == "oil" and "oil_drilling" not in player.technologies:
-				continue
-			if r == "rubber" and "electricity" not in player.technologies:
-				continue
-			need.add(r)
-	if len(need) == 0:
-		return
+	
 	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 	#c_options = set()
 	#p_options = set()
-	for k, v in players.items():
-		if v.name == player.name:
-			continue
-		relata = frozenset([player.name, v.name])
-		#print(relata)
-		other_strength = v.calculate_base_defense_strength()
-		if v in player.borders and self_strength > (other_strength * 1.25)\
-		or (self_naval_projection_strength > other_strength * 1.5 and transport_limit >= 4):
+	res_priority = sorted(player.resource_priority, key= player.resource_priority.get)
+	for res in res_priority:
+		for k, v in players.items():
 			for p, pr in v.provinces.items():
-				if v.type == "major" and pr.culture == v.culture:
-					continue
-				if v.type == "major" and v.type != "colony" and player.check_for_ground_invasion(pr, provinces) == False:
-					continue
-				elif pr.resource in need and relations[relata].relationship < 1.5:
-					player.rival_target = [v,  pr]
+				if res ==  pr.resource:
+						other_strength = v.calculate_base_defense_strength()
+						relata = frozenset([player.name, v.name])
+						if len(relata) == 1:
+							continue
+						if v in player.borders and self_strength > (other_strength * 1.25)\
+						or (self_naval_projection_strength > other_strength * 1.5 and transport_limit >= 4):
+							if v.type == "major" and pr.culture == v.culture:
+								continue
+							if v.type == "major" and v.type != "colony" and player.check_for_ground_invasion(pr, provinces) == False:
+								continue
+							elif relations[relata].relationship < 1.5:
+								player.rival_target = [v,  pr]
+
+
 	if len(player.rival_target) < 1:
 		for o, other in players.items():
 			if other.name == player.name:
@@ -164,8 +160,9 @@ def	decide_rival_target(player, players, market, provinces, relations):
 					elif relations[relata].relationship < 1.5:
 						player.rival_target = [other,  pr]
 			else:
-				if transport_limit < 4:
+				if transport_limit < 4 or player.government == "despotism":
 					return
+
 				relata = frozenset([player.name, other.name])
 				p_navy_str = calculate_naval_strength(player)
 				o_navy_str = calculate_naval_strength(other)
@@ -208,10 +205,14 @@ def gain_cb(player, players, relations):
 
 
 
-def attack_target(player, players, relations, provinces):
+def attack_target(player, players, relations, provinces, market):
+	if player.reputation <= 0.25:
+		return
 	if len(player.rival_target) < 2 or player.diplo_action < 1.0:
 		return
 	target = player.rival_target[0]
+	if target.just_attacked > 0:
+		return
 	#print(player.rival_target[0])
 	prov = player.rival_target[1]
 	#print("Target nation: %s" % (target.name))
@@ -222,6 +223,9 @@ def attack_target(player, players, relations, provinces):
 	relata = frozenset([player.name, target.name])
 	if target not in player.CB and (target.type == "major" or target.type == "minor"):
 		return
+	if target.type == "major" or target.type == "minor":
+		if player.reputation < 0.5:
+			return
 	annex = player.rival_target[1]
 	self_strength = player.calculate_base_attack_strength()
 	other_strength = target.calculate_base_defense_strength()
@@ -230,16 +234,16 @@ def attack_target(player, players, relations, provinces):
 		if target not in player.borders:
 			print("Not border")
 			if self_naval_projection_strength > other_strength * 1.2:
-				amphib_prelude(player, target, annex, players)
-				war_after_math(player,  target, players, relations)
+				amphib_prelude(player, target, annex, players, market, relations)
+				#war_after_math(player,  target, players, relations)
 			else:
 				player.rival_target = []
 
 		else:
 			print("Border")
 			if self_strength > other_strength * 1.2:
-				combat(player, target, annex, players)
-				war_after_math(player,  target, players, relations)
+				combat(player, target, annex, players, market, relations)
+				#war_after_math(player, target, players, relations)
 			else:
 				player.rival_target = []
 
@@ -253,60 +257,36 @@ def attack_target(player, players, relations, provinces):
 			else:
 				player.diplo_action -= 1.0
 				if land < sea:
-					combat(player, target, prov, players)
-					war_after_math(player,  target, players, relations)
+					combat(player, target, prov, players, market, relations)
+				#	war_after_math(player,  target, players, relations)
 					return
 				elif self_naval_projection_strength > other_strength * 1.25:
-					victor = naval_battle(player, target, players, annex)
+					victor = naval_battle(player, target, market, relations, annex)
 					if victor == player.name:
 						gain_province(player, target, annex, players)
-						war_after_math(player,  target, players, relations)
+					#	war_after_math(player,  target, players, relations)
 					return
 		
 		elif annex.colony:
 			if sea > 1.2 and self_naval_projection_strength > other_strength * 1.25:
-				victor = naval_battle(player, target, players, annex)
+				victor = naval_battle(player, target, market, relations, annex)
 				if victor == player.name:
-					gain_province(player, target, annex, players)
-				war_after_math(player,  target, players, relations)
+					gain_province(player, target, annex, players, market, relations)
+				#war_after_math(player,  target, players, relations)
 				player.reputation -= 0.1
 
 
 
 		elif target in player.borders and self_strength > other_strength * 1.2:
-			combat(player, target, prov, players)
-			war_after_math(player, target, players, relations)
+			combat(player, target, prov, players, market, relations)
+			#war_after_math(player, target, players, relations)
 		else:
 			if calculate_naval_strength(player) > calculate_naval_strength(target) * 1.2 and self_naval_projection_strength > other_strength * 1.2:
-				amphib_prelude(player, target, annex, players)
-				war_after_math(player, target, players, relations)
+				amphib_prelude(player, target, annex, players, market, relations)
+				#war_after_math(player, target, players, relations)
 
 
-def war_after_math(player, target, players, relations):
-	relata = frozenset([player.name, target.name])
-	player.rival_target = []
-	relations[relata].relationship += 1
-	if target in player.CB:
-		player.CB.remove(target)
-	player.diplo_action -= 1.0
-	player.reputation -= 0.1
-	for p, pl in players.items():
-		if len(set([player.name, p])) == 1 or len(set([target.name, p])) == 1:
-			continue
-		if relations[frozenset([player.name, p])].relationship < -1.5:
-			relations[frozenset([player.name, p])].relationship -= 0.2
-		if relations[frozenset([target.name, p])].relationship >= 0 and relations[frozenset([player.name, p])].relationship < 2:
-			relations[frozenset([player.name, p])].relationship -= 0.1
-		if relations[frozenset([target.name, p])].relationship >= 1:
-			relations[frozenset([player.name, p])].relationship -= 0.2 
-		if relations[frozenset([target.name, p])].relationship >= 2:
-			relations[frozenset([player.name, p])].relationship -= 0.2 
-		if pl.type == "AI":
-			if pl.rival_target != []:
-				if target == pl.rival_target[0]: 
-					relations[frozenset([player.name, p])].relationship -= 0.2
-			if target in pl.allied_target:
-				relations[frozenset([player.name, p])].relationship -= 0.2
+
 
 
 	#for r in relations:
