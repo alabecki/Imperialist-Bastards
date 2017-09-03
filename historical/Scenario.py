@@ -36,6 +36,8 @@ def get_name_from_minor_choice(choice):
 		name = "Portugal"
 	if choice == "4":
 		name = "Norway"
+	if choice == "5":
+		name = "Poland"
 
 def historical():
 
@@ -46,7 +48,7 @@ def historical():
 	i = 1
 
 	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Spain", "Netherlands"]
-	modern_minors = ["Denmark", "Sweden", "Portugal", "Norway"]
+	modern_minors = ["Denmark", "Sweden", "Portugal", "Norway", "Poland"]
 	old_empires = ["China", "India", "Japan", "Persia", "Ottoman"]
 	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dia Dam", "Siam", "Malaysia", \
 	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
@@ -100,7 +102,7 @@ def historical():
 				count += 1
 			choice = input()
 			name = get_name_from_minor_choice(choice)
-			new = Human(choice, "modern_minor", i)
+			new = Human(choice, "minor", i)
 			players[name] = new
 			player = players[name]
 			initialize_modern_minor(player)
@@ -112,7 +114,10 @@ def historical():
 				portugal(player, provinces)
 			if choice == "4":
 				norway(player)
+			if choice == "5":
+				poland(player)
 			human_choices.append(name)
+
 
 		if kind == "3":
 			print("This feature is not yet implemented")
@@ -125,6 +130,7 @@ def historical():
 			new = AI(m, "major", i)
 			players[m] = new
 			player = players[m]
+			print("Initialize %s" % (m))
 			initialize_major_power(player)
 			if player.name == "England":
 				england(player, provinces)
@@ -147,7 +153,7 @@ def historical():
 			i += 1
 	for m in modern_minors:
 		if m not in human_choices:
-			new = AI(m, "civ_minor", i)
+			new = AI(m, "minor", i)
 			players[m] = new
 			player = players[m]
 			initialize_modern_minor(player)
@@ -159,6 +165,8 @@ def historical():
 				portugal(player, provinces)
 			if player.name == "Norway":
 				norway(player, provinces)
+			if player.name == "Poland":
+				poland(player, provinces)
 			i +=1
 
 	for e in old_empires:
@@ -333,15 +341,18 @@ def historical():
 	#for r, rel in relations.items():
 	#	print(r, rel.relata)
 
-	relations[frozenset({"England", "India"})].relationship = -1
-	relations[frozenset({"England", "France"})].relationship = -1.25
+	relations[frozenset({"England", "India"})].relationship = -2.6
+	relations[frozenset({"England", "France"})].relationship = -1.2
 	relations[frozenset({"England", "Italy"})].relationship = 1
 	relations[frozenset({"England", "Ottoman"})].relationship = 1
 	relations[frozenset({"England", "Persia"})].relationship = 1.25
 	relations[frozenset({"England", "Spain"})].relationship = 0.75
-	relations[frozenset({"England", "Germany"})].relationship = -0.5
-	relations[frozenset({"England", "China"})].relationship = -1
-	relations[frozenset({"England", "Japan"})].relationship = 0.5
+	relations[frozenset({"England", "Germany"})].relationship = -0.75
+	relations[frozenset({"England", "China"})].relationship = -0.5
+	relations[frozenset({"England", "Japan"})].relationship = 0.65
+	relations[frozenset({"England", "Netherlands"})].relationship = 0.5
+	relations[frozenset({"England", "Poland"})].relationship = 0.75
+
 	relations[frozenset({"France", "Germany"})].relationship = -1.75
 	relations[frozenset({"France", "Russia"})].relationship = 1.5
 	relations[frozenset({"France", "Spain"})].relationship = 1
@@ -349,17 +360,25 @@ def historical():
 	relations[frozenset({"France", "Ottoman"})].relationship = 0.5
 	relations[frozenset({"France", "China"})].relationship = 0.5
 	relations[frozenset({"France", "Austria"})].relationship = -0.75
+	relations[frozenset({"France", "Netherlands"})].relationship = -0.5
+	relations[frozenset({"France", "Poland"})].relationship = 1.25
+
 	relations[frozenset({"Germany", "Austria"})].relationship = 2
 	relations[frozenset({"Germany", "Italy"})].relationship = 0.5
 	relations[frozenset({"Germany", "Russia"})].relationship = -0.75
 	relations[frozenset({"Germany", "Ottoman"})].relationship = 1
+	relations[frozenset({"Germany", "Netherlands"})].relationship = 0.75
+	relations[frozenset({"Germany", "Denmark"})].relationship = 1.5
+	relations[frozenset({"Germany", "Poland"})].relationship = -0.5
+	relations[frozenset({"Russia", "Poland"})].relationship = -2
 	relations[frozenset({"Austria", "Russia"})].relationship = -0.5
 	relations[frozenset({"Austria", "Italy"})].relationship = -1
 	relations[frozenset({"Russia", "Ottoman"})].relationship = -1
 	relations[frozenset({"Italy", "Russia"})].relationship = 0.65
+	relations[frozenset({"Italy", "Netherlands"})].relationship = 0.25
 	relations[frozenset({"Ottoman", "Italy"})].relationship = -0.75
 	relations[frozenset({"Spain", "Italy"})].relationship = 0.75
-	relations[frozenset({"Sweden", "Russia"})].relationship = -1.25
+	relations[frozenset({"Sweden", "Russia"})].relationship = -0.5
 	relations[frozenset({"Sweden", "Germany"})].relationship = 1.0
 	relations[frozenset({"Sweden", "Norway"})].relationship = -1.0
 	relations[frozenset({"Sweden", "Denmark"})].relationship = 1

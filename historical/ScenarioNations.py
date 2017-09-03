@@ -20,7 +20,6 @@ def england(player, provinces):
 	player.research = 20
 
 
-
 	player.provinces["SouthEastEngland"] = provinces["SouthEastEngland"]
 	player.provinces["SouthWestEngland"] = provinces["SouthWestEngland"]
 	player.provinces["Midlands"] = provinces["Midlands"]
@@ -37,11 +36,16 @@ def england(player, provinces):
 	if type(player) == AI:
 		player.personality["Army"] = 1.15
 		player.personality["Navy"] = 0.9
-		player.improve_province_priority["shipyard"] = 2.3
+		player.improve_province_priority["shipyard"] = 2.4
 		player.personality["Offensive"] = 0.55
-		player.build_factory_priority["parts"] += 0.35
-		player.build_factory_priority["clothing"] += 0.25
-		player.resource_priority["cotton"] += 0.25
+		player.build_factory_priority["parts"] = 1.5
+		player.build_factory_priority["clothing"] = 1.4
+		player.resource_priority["cotton"] = 2.2
+		player.resource_priority["dyes"] = 2.8
+		player.improve_province_priority["cotton"] = 1.1
+		player.improve_province_priority["dyes"] = 1
+
+
 		player.reputation = 1.1
 
 
@@ -67,10 +71,10 @@ def france(player, provinces):
 
 	if type(player) == AI:
 		player.personality["Army"] = 1.2
-		player.personality["Navy"] = 0.75
+		player.personality["Navy"] = 0.78
 		player.improve_province_priority["shipyard"] = 1.8
 		player.personality["Offensive"] = 0.38
-
+		player.improve_province_priority["shipyard"] = 2.2
 
 
 
@@ -93,7 +97,7 @@ def germany(player, provinces):
 	player.provinces["EastPrussia"] = provinces["EastPrussia"]
 	player.provinces["Brandenburg"] = provinces["Brandenburg"]
 	player.provinces["Rhineland"] = provinces["Rhineland"]
-	player.provinces["WestPoland"] = provinces["WestPoland"]
+	#player.provinces["WestPoland"] = provinces["WestPoland"]
 	player.provinces["Saxony"] = provinces["Saxony"]
 	player.provinces["NorthGermany"] = provinces["NorthGermany"]
 	player.provinces["Bavaria"] = provinces["Bavaria"]
@@ -105,7 +109,7 @@ def germany(player, provinces):
 	if type(player) == AI:
 		player.personality["Army"] = 1.3
 		player.personality["Navy"] = 0.65
-		player.build_factory_priority["paper"] += 0.25
+		player.build_factory_priority["paper"] = 1.3
 		player.personality["Offensive"] = 0.68
 
 
@@ -122,7 +126,7 @@ def austria(player, provinces):
 	player.resources["food"] = 2
 
 	player.military["frigates"] = 0
-	player.military["cavalry"] = 2
+	player.military["infantry"] = 3
 	player.colonization = 0
 
 	player.shipyard = 0
@@ -137,14 +141,14 @@ def austria(player, provinces):
 	player.provinces["Hungary"] = provinces["Hungary"]
 	player.provinces["Romania"] = provinces["Romania"]
 	player.provinces["Croatia"] = provinces["Croatia"]
-	player.provinces["WestUkraine"] = provinces["WestUkraine"]
+	#player.provinces["WestUkraine"] = provinces["WestUkraine"]
 
 
 	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.5
 		player.improve_province_priority["shipyard"] = 1.3
-		player.build_factory_priority["paper"] += 0.1
+		player.build_factory_priority["paper"] = 1.2
 
 
 
@@ -169,12 +173,14 @@ def russia(player, provinces):
 	player.midPOP["artists"]["number"] = 0
 	player.midPOP["researchers"]["number"] = 0.2
 
+	player.diplo_action = 2
+
 	player.POP = 10.2
 	player.numMidPOP = 0.2
 	player.numLowerPOP = 10
 	player.freePOP = 9
 
-	player.provinces["Poland"] = provinces["Poland"]
+	#player.provinces["_Poland"] = provinces["_Poland"]
 	player.provinces["Ukraine"] = provinces["Ukraine"]
 	player.provinces["Baltic"] = provinces["Baltic"]
 	player.provinces["Crimea "] = provinces["Crimea"] 
@@ -197,10 +203,10 @@ def russia(player, provinces):
 		player.personality["Army"] = 1.25
 		player.personality["Navy"] = 0.45
 		player.personality["Offensive"] = 0.40
-		player.build_factory_priority["paper"] += 0.2
-		player.build_factory_priority["furniture"] += 0.15
-		player.resource_priority["wood"] += 0.15
-
+		player.build_factory_priority["paper"] = 1.15
+		player.build_factory_priority["furniture"] = 1.3
+		player.resource_priority["wood"] = 1.1
+		player.improve_province_priority["wood"] = 1.2
 
 
 def italy(player, provinces): #major
@@ -222,8 +228,8 @@ def italy(player, provinces): #major
 	if type(player) == AI:
 		player.personality["Army"] = 1.15
 		player.personality["Navy"] = 0.8
-		player.build_factory_priority["furniture"] += 0.2
-		player.build_factory_priority["clothing"] += 0.25
+		player.build_factory_priority["furniture"] = 1.12
+		player.build_factory_priority["clothing"] = 1.12
 
 
 
@@ -234,8 +240,8 @@ def ottoman(player, provinces):
 	player.capital = "WestTurky"
 	player.resources["gold"] = 3
 
-	player.military["irregulars"] = 3
-	player.military["infantry"] = 1.0
+	player.military["irregulars"] = 2
+	player.military["infantry"] = 2.0
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 	player.military["artillery"] = 0.0
@@ -352,9 +358,9 @@ def netherlands(player, provinces): # major power
 	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.9
-		player.improve_province_priority["shipyard"] = 2.3
+		player.improve_province_priority["shipyard"] = 2.6
 		player.personality["Offensive"] = 0.4
-		player.resource_priority["spice"] += 1.0
+		player.resource_priority["spice"] = 2.2
 
 
 
@@ -403,6 +409,20 @@ def portugal(player, provinces): # old_minor
 	player.diplo_action = 1
 
 
+def poland(player, provinces):
+	player.capital = "_Poland"
+	player.culture = "Polish"
+	player.technologies.add("pre_industry_2")
+	player.technologies.add("flintlock")
+
+
+	player.provinces["_Poland"] = provinces["_Poland"]
+	player.provinces["WestPoland"] = provinces["WestPoland"]
+	player.provinces["WestUkraine"] = provinces["WestUkraine"]
+
+
+	player.military["infantry"] = 3.0
+	player.milPOP = 0.6
 
 def sweden(player, provinces): # adv minor
 	#Sweden
@@ -412,10 +432,14 @@ def sweden(player, provinces): # adv minor
 	player.technologies.add("flintlock")
 
 
+	player.military["infantry"] = 3.0
+	player.milPOP = 0.6
+	player.number_units = 3
+
 
 	player.midPOP["researchers"]["number"] = 0.2
 	player.numMidPOP = 0.2
-	player.POP = 4.85
+	player.POP = 4.8
 	player.numLowerPOP = 4.6
 	player.freePOP = 4
 

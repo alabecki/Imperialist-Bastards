@@ -65,12 +65,12 @@ def create_provinces():
 	Aquitaine.y = 5
 	provinces["Aquitaine"] = Aquitaine
 	
-	Alps = Province("Alps", "food", 1.0, "civilized", "French")
+	Alps = Province("Alps", "cotton", 1.0, "civilized", "French")
 	Alps.x = 8
 	Alps.y = 6
 	provinces["Alps"] = Alps
 	
-	Normandy = Province("Normandy", "dyes", 0.7, "civilized", "French")
+	Normandy = Province("Normandy", "food", 1.0, "civilized", "French")
 	Normandy.x = 6
 	Normandy.y =5
 	provinces["Normandy"] = Normandy
@@ -98,7 +98,7 @@ def create_provinces():
 	Rhineland.ocean = False
 	provinces["Rhineland"] = Rhineland
 	
-	WestPoland = Province("WestPoland", "food", 0.9, "civilized", "Polish")
+	WestPoland = Province("WestPoland", "food", 0.95, "civilized", "Polish")
 	WestPoland.x = 6
 	WestPoland.y = 9
 	WestPoland.ocean = False
@@ -166,11 +166,11 @@ def create_provinces():
 	WestUkraine.ocean = False
 	provinces["WestUkraine"] = WestUkraine
 
-	Poland = Province("Poland", "food", 1.0, "civilized", "Polish")
+	Poland = Province("_Poland", "food", 1.0, "civilized", "Polish")
 	Poland.x = 6
 	Poland.y = 11
 	Poland.ocean = False
-	provinces["Poland"] = Poland
+	provinces["_Poland"] = Poland
 
 	Baltic = Province("Baltic", "food", 0.8, "civilized", "Baltic")
 	Baltic.x = 5
@@ -523,7 +523,7 @@ def create_provinces():
 	Rajputana.x = 10
 	Rajputana.y = 18
 	provinces["Rajputana"] = Rajputana
-	Central_India = Province("Central_India", "dyes", 0.85, "old", "Indian")
+	Central_India = Province("Central_India", "dyes", 1.0, "old", "Indian")
 	Central_India.x = 10
 	Central_India.y = 19
 	Central_India.ocean = False
@@ -541,7 +541,7 @@ def create_provinces():
 	Nagpur.y = 20
 	provinces["Nagpur"] = Nagpur
 
-	Bengal = Province("_Bengal", "dyes", 0.9, "old", "Indian")
+	Bengal = Province("_Bengal", "dyes", 1.0, "old", "Indian")
 	Bengal.x = 10
 	Bengal.y =21
 	provinces["_Bengal"] = Bengal
@@ -630,18 +630,18 @@ def create_provinces():
 	Guangxi.y = 23
 	provinces["Guangxi"] = Guangxi
 
-	Guangdong = Province("Guangdong", "food", 1.1, "old", "Chinese")
+	Guangdong = Province("Guangdong", "food", 1.2, "old", "Chinese")
 	Guangdong.x = 9
 	Guangdong.y = 24
 	provinces["Guangdong"] = Guangdong
 
-	Hunan = Province("Hunan", "cotton", 0.8, "old", "Chinese")
+	Hunan = Province("Hunan", "cotton", 0.85, "old", "Chinese")
 	Hunan.x = 8
 	Hunan.y = 23
 	Hunan.ocean = False
 	provinces["Hunan"] = Hunan
 
-	Mongolia = Province("Mongolia", "food", 0.5, "old", "Mongolian")
+	Mongolia = Province("Mongolia", "wood", 0.65, "old", "Mongolian")
 	Mongolia.x = 6
 	Mongolia.y = 23
 	Mongolia.ocean = False
