@@ -36,6 +36,10 @@ def get_name_from_minor_choice(choice):
 		name = "Portugal"
 	if choice == "4":
 		name = "Norway"
+	if choice == "5":
+		name = "Poland"
+	if choice == "6":
+		name = Switzerland 
 
 def historical():
 
@@ -45,15 +49,16 @@ def historical():
 	uncivilized_minors = dict()
 	i = 1
 
-	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Ottoman", "Italy", "Spain", "Netherlands"]
-	modern_minors = ["Denmark", "Sweden", "Portugal", "Norway"]
-	old_empires = ["China", "India", "Japan", "Persia"]
+	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Spain", "Netherlands"]
+	modern_minors = ["Denmark", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", \
+	"Bavaria", "NorthGermany", "Papal States"]
+	old_empires = ["China", "India", "Japan", "Persia", "Ottoman"]
 	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dia Dam", "Siam", "Malaysia", \
-	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi"]
-	unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
-	"South Australia", "New Zealand", "Zululand"]
-	unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
-	"Congo", "Madagascar"] 
+	"Brunei", "Tunisia", "Libya", "Nejd", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
+	#unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
+	#"South Australia", "New Zealand", "Zululand"]
+	#unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
+	#"Congo", "Madagascar"] 
 
 	print("How many nations are to be controlled by human players? \n")
 	num_humans = input()
@@ -86,13 +91,11 @@ def historical():
 			if choice == "5":
 				austria(player, provinces)
 			if choice == "6":
-				italy(player)
+				italy(player, provinces)
 			if choice == "7":
-				ottoman(player, provinces)
-			if choice == "8":
-				spain(player)
-			if choice == "9":
-				netherlands(player)
+				spain(player, provinces)
+			if choice == "7":
+				netherlands(player, provinces)
 			human_choices.append(name)
 		if kind == "2":
 			print("Which Minor Modern nation will player " + i + " control? \n")
@@ -102,7 +105,7 @@ def historical():
 				count += 1
 			choice = input()
 			name = get_name_from_minor_choice(choice)
-			new = Human(choice, "modern_minor", i)
+			new = Human(choice, "minor", i)
 			players[name] = new
 			player = players[name]
 			initialize_modern_minor(player)
@@ -112,9 +115,13 @@ def historical():
 				sweden(player)
 			if choice == "3":
 				portugal(player, provinces)
-			if choice == "4":
-				norway(player)
+			
+			if choice == "5":
+				two_sicilies(player)
+			if choice == "6":
+				switzerland(player) 
 			human_choices.append(name)
+
 
 		if kind == "3":
 			print("This feature is not yet implemented")
@@ -127,6 +134,7 @@ def historical():
 			new = AI(m, "major", i)
 			players[m] = new
 			player = players[m]
+			print("Initialize %s" % (m))
 			initialize_major_power(player)
 			if player.name == "England":
 				england(player, provinces)
@@ -149,7 +157,7 @@ def historical():
 			i += 1
 	for m in modern_minors:
 		if m not in human_choices:
-			new = AI(m, "civ_minor", i)
+			new = AI(m, "minor", i)
 			players[m] = new
 			player = players[m]
 			initialize_modern_minor(player)
@@ -159,8 +167,19 @@ def historical():
 				sweden(player, provinces)
 			if player.name == "Portugal":
 				portugal(player, provinces)
-			if player.name == "Norway":
-				norway(player, provinces)
+			
+			if player.name == "Two Sicilies":
+				two_sicilies(player, provinces)
+			if player.name == "Switzerland":
+				switzerland(player, provinces)
+			if player.name == "Saxony":
+				saxony(player, provinces)
+			if player.name == "Bavaria":
+				bavaria(player, provinces)
+			if player.name == "NorthGermany":
+				northgermany(player, provinces)
+			if player.name == "Papal States":
+				papal_state(player, provinces) 
 			i +=1
 
 	for e in old_empires:
@@ -178,6 +197,8 @@ def historical():
 				persia(player, provinces)
 			if player.name == "Japan":
 				japan(player, provinces)
+			if player.name == "Ottoman":
+				ottoman(player, provinces)
 			i += 1
 
 	for o in old_minors:
@@ -210,7 +231,7 @@ def historical():
 				tunisia(player, provinces)
 			if player.name == "Libya":
 				libya(player, provinces)
-			if player.name == "Nejid":
+			if player.name == "Nejd":
 				nejd(player, provinces)
 			if player.name == "Afghanistan":
 				afghanistan(player, provinces)
@@ -226,74 +247,77 @@ def historical():
 				brunei(player, provinces)
 			if player.name == "Sulawesi":
 				sulawesi(player, provinces)
+			if player.name == "Java":
+				java(player, provinces)
 
-	for u in unciv:
-		new = Uncivilized_minor(u)
-		uncivilized_minors[u] = new
-		nation = uncivilized_minors[u]
-		if u == "Zululand":
-			zululand(nation, provinces)
-		if u == "Mozambique":
-			mozambique(nation, provinces)
-		if u == "Tanzania":
-			tanzania(nation, provinces)
-		if u == "Kenya":
-			kenya(nation, provinces)
-		if u == "Ethiopia":
-			ethiopia(nation, provinces)
-		if u == "New South Wales":
-			new_south_wales(nation, provinces)
-		if u == "Queensland":
-			queensland(nation, provinces)
-		if u == "West Australia":
-			west_australia(nation, provinces)
-		if u == "South Australia":
-			south_australia(nation, provinces)
-		if u == "New Zealand":
-			new_zealand(nation, provinces)
-
-		i += 1
-
-	for u in unciv_rough:
-		new = Uncivilized_minor(u)
-		uncivilized_minors[u] = new
-		nation = uncivilized_minors[u]
-		if u == "Mauritania":
-			mauritania(nation, provinces)
-		if u == "Liberia":
-			liberia(nation, provinces)
-		if u == "Mali":
-			mali(nation, provinces)
-		if u == "Ghana":
-			ghana(nation, provinces)
-		if u == "Niger":
-			niger(nation, provinces)
-		if u == "Nigeria":
-			nigeria(nation, provinces)
-		if u == "Cameroon":
-			cameroon(nation, provinces)
-		if u == "Angola":
-			angola(nation, provinces)
-		if u == "Nambia":
-			nambia(nation, provinces)
-		if u == "Ethiopia":
-			ethiopia(nation, provinces)
-		if u == "Congo":
-			congo(nation, provinces)
-		if u == "Madagascar":
-			madagascar(nation, provinces)
-		i += 1
+	#for u in unciv:
+	#	new = Uncivilized_minor(u)
+	#	uncivilized_minors[u] = new
+	#	nation = uncivilized_minors[u]
+	#	if u == "Zululand":
+	#		zululand(nation, provinces)
+	#	if u == "Mozambique":
+	#		mozambique(nation, provinces)
+	#	if u == "Tanzania":
+	#		tanzania(nation, provinces)
+	#	if u == "Kenya":
+	#		kenya(nation, provinces)
+	#	if u == "Ethiopia":
+	#		ethiopia(nation, provinces)
+	#	if u == "New South Wales":
+	#		new_south_wales(nation, provinces)
+	#	if u == "Queensland":
+	#		queensland(nation, provinces)
+	#	if u == "West Australia":
+	#		west_australia(nation, provinces)
+	#	if u == "South Australia":
+	#		south_australia(nation, provinces)
+	#	if u == "New Zealand":
+	#		new_zealand(nation, provinces)
+#
+#		i += 1
+#
+#	for u in unciv_rough:
+#		new = Uncivilized_minor(u)
+#		uncivilized_minors[u] = new
+#		nation = uncivilized_minors[u]
+#		if u == "Mauritania":
+#			mauritania(nation, provinces)
+#		if u == "Liberia":
+#			liberia(nation, provinces)
+#		if u == "Mali":
+#			mali(nation, provinces)
+#		if u == "Ghana":
+#			ghana(nation, provinces)
+#		if u == "Niger":
+#			niger(nation, provinces)
+#		if u == "Nigeria":
+#			nigeria(nation, provinces)
+#		if u == "Cameroon":
+#			cameroon(nation, provinces)
+#		if u == "Angola":
+#			angola(nation, provinces)
+#		if u == "Nambia":
+#			nambia(nation, provinces)
+#		if u == "Ethiopia":
+#			ethiopia(nation, provinces)
+#		if u == "Congo":
+#			congo(nation, provinces)
+#		if u == "Madagascar":
+#			madagascar(nation, provinces)
+#		i += 1
 
 	print("Players")
 	for p, player in players.items():
 		print(player.name)
+	
 
 
-	print("Unvivilized Nations:")
-	for unciv in uncivilized_minors.values():
-		print(unciv.name)
-		for p, prov in unciv.provinces.items():
-			print(p, prov.name)
+	#print("Unvivilized Nations:")
+	#for unciv in uncivilized_minors.values():
+	#	print(unciv.name)
+	#	for p, prov in unciv.provinces.items():
+	#		print(p, prov.name)
 
 	for p, play in players.items():
 		if play.capital == "":
@@ -304,8 +328,7 @@ def historical():
 	for p, play in players.items():
 		for p, prov in play.provinces.items():
 			res = prov.resource
-			#print("What the fuck are you doing?---------------------------")
-			play.resources[res] += prov.quality * 1.5
+			play.resources[res] += prov.quality * 1
 			#play.capital = play.provinces[x].name
 	for p1 in players.values():
 		borders = set()
@@ -328,36 +351,94 @@ def historical():
 		relations[pair] = Relation(pair)
 
 
-	for r, rel in relations.items():
-		print(r, rel.relata)
+	#for r, rel in relations.items():
+	#	print(r, rel.relata)
 
-	relations[frozenset({"England", "India"})].relationship = -2.5
-	relations[frozenset({"England", "France"})].relationship = -1.25
+	relations[frozenset({"England", "India"})].relationship = -2.7
+	relations[frozenset({"England", "France"})].relationship = -1.2
 	relations[frozenset({"England", "Italy"})].relationship = 1
 	relations[frozenset({"England", "Ottoman"})].relationship = 1
-	relations[frozenset({"England", "Russia"})].relationship = -1
 	relations[frozenset({"England", "Persia"})].relationship = 1.25
-	relations[frozenset({"England", "Egypt"})].relationship = -1.25
 	relations[frozenset({"England", "Spain"})].relationship = 0.75
-	relations[frozenset({"England", "Germany"})].relationship = -0.5
-	relations[frozenset({"France", "Algeria"})].relationship = -1.5
+	relations[frozenset({"England", "Germany"})].relationship = -0.75
+	relations[frozenset({"England", "China"})].relationship = -0.5
+	relations[frozenset({"England", "Japan"})].relationship = 0.65
+	relations[frozenset({"England", "Netherlands"})].relationship = 0.5
+	relations[frozenset({"England", "Sweden"})].relationship = 0.5
+
+
+	#relations[frozenset({"England", "Poland"})].relationship = 0.75
+
 	relations[frozenset({"France", "Germany"})].relationship = -1.75
 	relations[frozenset({"France", "Russia"})].relationship = 1.5
 	relations[frozenset({"France", "Spain"})].relationship = 1
-	relations[frozenset({"France", "Dia Dam"})].relationship = -1
-	relations[frozenset({"France", "India"})].relationship = 0.5
-	relations[frozenset({"France", "Italy"})].relationship = -0.75
+	relations[frozenset({"France", "Italy"})].relationship = -0.5
 	relations[frozenset({"France", "Ottoman"})].relationship = 0.5
-	relations[frozenset({"Italy", "Libya"})].relationship = -1.0
-	relations[frozenset({"Germany", "Austria"})].relationship = 2
+	relations[frozenset({"France", "China"})].relationship = 0.5
+	relations[frozenset({"France", "Austria"})].relationship = -0.75
+	relations[frozenset({"France", "Netherlands"})].relationship = -0.5
+	#relations[frozenset({"France", "Poland"})].relationship = 1.25
+	relations[frozenset({"France", "Bavaria"})].relationship = 2.5
+
+
+	relations[frozenset({"Germany", "Austria"})].relationship = -1.5
 	relations[frozenset({"Germany", "Italy"})].relationship = 1
-	relations[frozenset({"Germany", "Russia"})].relationship = -0.75
-	relations[frozenset({"Germany", "Ottoman"})].relationship = 1
+	relations[frozenset({"Germany", "Russia"})].relationship = 0.1
+	relations[frozenset({"Germany", "Ottoman"})].relationship = 1.1
+	relations[frozenset({"Germany", "Netherlands"})].relationship = 0.75
+	relations[frozenset({"Germany", "Denmark"})].relationship = 1.5
+	relations[frozenset({"Germany", "Saxony"})].relationship = -2
+	relations[frozenset({"Germany", "Bavaria"})].relationship = -2
+	relations[frozenset({"Germany", "NorthGermany"})].relationship = -2.75
+
+
+	#relations[frozenset({"Germany", "Poland"})].relationship = -0.5
+	#relations[frozenset({"Russia", "Poland"})].relationship = -2
 	relations[frozenset({"Austria", "Russia"})].relationship = -0.5
-	relations[frozenset({"Austria", "Italy"})].relationship = -1
+	relations[frozenset({"Austria", "Italy"})].relationship = -2
 	relations[frozenset({"Russia", "Ottoman"})].relationship = -1
-	relations[frozenset({"China", "Russia"})].relationship = -1
-	relations[frozenset({"Spain", "Philippines"})].relationship -1
+	relations[frozenset({"Austria", "Saxony"})].relationship = 3
+
+	relations[frozenset({"Italy", "Russia"})].relationship = 0.65
+	relations[frozenset({"Italy", "Netherlands"})].relationship = 0.25
+	relations[frozenset({"Italy", "Two Sicilies"})].relationship = -2.7
+	relations[frozenset({"Italy", "Papal States"})].relationship = -2.7
+
+
+	relations[frozenset({"Ottoman", "Italy"})].relationship = -0.75
+	relations[frozenset({"Spain", "Italy"})].relationship = 0.75
+	relations[frozenset({"Sweden", "Russia"})].relationship = -0.75
+	relations[frozenset({"Sweden", "Germany"})].relationship = 1.0
+	#relations[frozenset({"Sweden", "Norway"})].relationship = -1.0
+	relations[frozenset({"Sweden", "Denmark"})].relationship = 1
+	relations[frozenset({"Sweden", "Austria"})].relationship = 0.5
+	relations[frozenset({"Japan", "Korea"})].relationship = -1
+	relations[frozenset({"Japan", "China"})].relationship = -1
+	relations[frozenset({"China", "Korea"})].relationship = 3
+	relations[frozenset({"Portugal", "Spain"})].relationship = 2
+	relations[frozenset({"Portugal", "France"})].relationship = 1
+
+
+	
+	new0 = CB("Germany", "Austria", "annex", "_Austria", 18)
+	players["Germany"].CB.add(new0)
+	new1 = CB("Germany", "Saxony", "annex", "_Saxony", 18)
+	players["Germany"].CB.add(new1)
+
+	#new2 = CB("Germany", "Bavaria", "annex", "_Bavaria", 18)
+	#players["Germany"].CB.add(new2)
+	new3 = CB("Germany", "NorthGermany", "annex", "_NorthGermany", 20)
+	players["Germany"].CB.add(new3)
+
+	new4 = CB("Italy", "Austria", "annex", "Venezia", 20)
+	new5 = CB("Italy", "Papal States", "annex", "Lazio", 20)
+	new6 = CB("Italy", "Two Sicilies", "annex", "Naples", 20)
+	new7 = CB("Italy", "Two Sicilies", "annex", "Sicily", 20)
+	players["Italy"].CB.add(new4)
+	players["Italy"].CB.add(new5)
+	players["Italy"].CB.add(new6)
+	players["Italy"].CB.add(new7)
+
 
 
 
@@ -367,15 +448,18 @@ def historical():
 
 	market = Market()
 
-	globe = Globe()
+	market_items = dict()
+		
+
+	#globe = Globe()
 
 	initial = {
 		"players" : players, 
 		"provinces": provinces, 
 		"relations": relations, 
-		"uncivilized_minors": uncivilized_minors,
+		#"uncivilized_minors": uncivilized_minors,
 		"market": market,
-		"globe": globe,
+		#"globe": globe,
 	 }
 
 	return initial
