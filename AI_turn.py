@@ -5,7 +5,7 @@ from AI_foreign_affairs import*
 from copy import deepcopy
 
 
-def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
+def AI_turn(players, player, market, relations, provinces):
 	
 	if len(player.provinces.keys()) < 1:
 		return
@@ -16,6 +16,9 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 	print("It is now %s's turn \n" % (player.name))
 
 	print("___________________________________________________________________")
+
+	if player.reputation < 0.65:
+		player.reputation += player.midPOP["artists"]["number"] * 0.1
 
 
 	player.AP += 1
@@ -61,13 +64,13 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 	player.build_army(market, relations, players)
 
 
-	player.use_chemicals(market)
+	player.use_chemicals(market, relations, players)
 
 
-	diplomacy = [0, 1, 2, 3, 4]
+	diplomacy = [0, 1, 2, 3]
 	shuffle(diplomacy)
 	ai_decide_ally_target(player, players, provinces)
-	decide_rival_target(player, players, market, provinces, relations)
+	decide_target(player, players, market, provinces, relations)
 	ai_destablize(player, players, relations)
 	gain_cb(player, players, relations)
 	ai_embargo(player, players, relations)
@@ -84,8 +87,6 @@ def AI_turn(players, player, market, uncivilized_minors, relations, provinces):
 		#if i == 3:
 			#ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 		if i == 3:
-			ai_improve_relations(player, players, relations)
-		if i == 4:
 			ai_bribe(player, players, relations)
 
 

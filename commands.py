@@ -86,12 +86,8 @@ build_factory = {
 }
 
 military_action = {
-	"1": "Go to war with an Uncivilized Nation",
-	"2": "Go to war with an Old World Minor Power",
-	"3": "Go to war with an Old World Old Empire",
-	"4": "Colonial war with a Major Power",
-	"5": "Minor war with a Major Power",
-	"6": "Great War with a Major Power"
+	"1": "Minor War",
+	"2": "Total War"
 }
 
 build_unit = {

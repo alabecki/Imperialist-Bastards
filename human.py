@@ -742,7 +742,7 @@ class Human(Player):
 					max_dev = 1
 			elif(self.provinces[prov].resource == "rubber"):
 				max_dev = 0
-				if("electricity" in self.technologies):
+				if("chemistry" in self.technologies):
 					max_dev = 1
 			if self.provinces[prov].development_level == max_dev:
 				print("You cannot further develop this province at this time")

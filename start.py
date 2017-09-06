@@ -51,11 +51,11 @@ def initialize_major_power(player):
 	#player.technologies.add("flintlock")
 	#player.technologies.add("high_pressure_steam_engine")
 
-	player.midPOP["researchers"]["number"] = 0.20
-	player.midPOP["officers"]["number"] = 0.20
+	player.midPOP["researchers"]["number"] = 0.2
+	player.midPOP["officers"]["number"] = 0.2
 	player.midPOP["managers"]["number"] = 0.0
-	player.midPOP["bureaucrats"]["number"] = 0.20
-	player.midPOP["artists"]["number"] = 0.20
+	player.midPOP["bureaucrats"]["number"] = 0.2
+	player.midPOP["artists"]["number"] = 0.2
 
 	player.numMidPOP = 0.8
 

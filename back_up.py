@@ -427,3 +427,258 @@ def attempt_objective(self, market):
       requirement = ["auto", "telephone", "paper", "spice", "clothing"]
     if self.numMidPOP > 23:
       requirement = ["auto", "radio", "telephone", "spice", "paper", "clothing", "chemicals", "furniture"]
+
+
+
+        if action == "1":
+              if player.diplo_action < 1:
+                print("You do not have any diplomatic points")
+              elif player.colonization < 1 + (player.num_colonies * 1.5):
+                print("You do not have enough colonization points")
+              else:
+                options = set()
+                print("On what uncivilized nation would you like to declare war? \n")
+                for uc, unciv in uncivilized_minors.items():
+                  if unciv.harsh == True and ("medicine" in player.technologies or "breach_loaded_arms" in player.technologies):
+                    continue
+                  if len(unciv.provinces) < 1:
+                    continue
+                  print(unciv.name)
+                  options.add(unciv.name)
+                  other = " "
+                  while other not in options:
+                    other = input()
+                  other = uncivilized_minors[other]
+                  print("Which province would you like to take (there is likely only 1 option:")
+                  for p in other.provinces.values():
+                    print(p)
+                  annex = " "
+                  while annex not in other.provinces.keys():
+                    annex = input()
+                  annex = other.provinces[annex]
+                  land = check_for_border(player, other)
+                  if land == False:
+                    print("Since you do not border %s, you must send your army by navy\n" % (other.name))
+                    transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+                    if transport_limit < 4:
+                      print("Your navy is not sufficient for carrying out an amphibious invasion!")
+                    else:
+                      amphib_prelude(player, other, market, relations, annex)
+                      player.reputation -= 0.1
+                  else:
+                    print("Since we border %s, we may attack by land!" % (other.name))
+                    combat(player, other, annex, market, relations)
+                    player.reputation -= 0.1
+
+            #War on old_minor or old_empire
+            if action == "2":
+              if player.colonization < 1 + (player.num_colonies * 1.5):
+                print("You do not have enough colonization points")
+              else:
+                options = set()
+                for cb in player.CB:
+                  opponent = cb.opponent
+                  opponent = players[opponent]
+                  if opponent.type == "old_minor":
+                    if len(opponent.provinces.keys()) != 0 and opponent.just_attacked <= 0:
+                      options.add(cb)
+                if len(options) == 0:
+                  print("You do not currently have a CB on any old world minors")
+                  return
+                else:
+                  other = " "
+                  while other not in options:
+                    print("For which province would you like to declare war? \n")
+                    for o in options:
+                      print(o.opponent + ": " o.province)
+                  annex = input()
+                  other = annex.owner
+                  other = players[other]
+                  annex = " "                 
+                  land = player.check_for_border(other)
+                  if land == False:
+                    print("Since you do not border %s, you must send your army by navy\n" % (other.name))
+                    transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+                    if transport_limit < 4:
+                      print("Your navy is not sufficient for carrying out an amphibious invasion!")
+                    else:
+                      amphib_prelude(player, other, annex, relations, players)
+                      player.reputation -= 0.1
+                  else:
+                    print("Since we border %s, we may attack by land!" % (other.name))
+                    combat(player, other, annex, market, relations)
+                    player.reputation -= 0.1
+            
+            if action == "3":
+              if player.diplo_action < 1:
+                print("You do not have any diplomatic points")
+              elif player.colonization < 1 + (player.num_colonies * 1.5):
+                print("You do not have enough colonization points")
+              else:
+                cb_keys = []
+                for cb in player.CB:
+                  cb_keys.append(cb.opponent)
+                options = set()
+                for p, pl in players.items():
+                  if pl.type == "old_empire" and pl in cb_keys and pl.just_attacked <= 0:
+                    options.add(pl.name)
+                if len(options) == 0:
+                  print("You do not have a CB on an Old World Empire at this time")
+                else:
+                  other = " "
+                  while other not in options:
+                    print("On what old world empire would you like to declare war? \n")
+                    for o in options:
+                      print(o)
+                    other = input()
+                  other = players[other]
+                  annex = " "
+                  while annex not in other.provinces.keys():
+                    print("Which province do you seek to annex?\n")
+                    for p, prov in other.provinces.items():
+                      print(prov.name, prov.resource, prov.quality)
+                    annex = input()
+                  annex = other.provinces[annex]
+                  land = player.check_for_border(other)
+                  if land == False:
+                    print("Since you do not border %s, you must send your army by navy\n" % (other.name))
+                    amphib_prelude(player, other, annex, market, relationsplayers)
+                    player.reputation -= 0.1
+                  else:
+                    print("Since we border %s, we may attack by land!" % (other.name))
+                    combat(player, other, annex, market, relations)
+                    player.reputation -= 0.1
+
+            #War on Modern Nation
+            if action == "4":
+              c_options = set()
+              cb_keys = []
+              for cb in player.CB:
+                cb_keys.append(cb.opponent)
+              print("One which Major Power do you intend wage a colonial war?\n")
+              for k, v in players.items():
+                if v.type == "major":
+                  if v.num_colonies > 0 and v in cb_keys and pl.just_attacked <= 0:
+                    c_options.add(v.name)
+
+              if len(c_options) == 0:
+                print("There are currently no major powers on whom you may wage a colonial war \n")
+              else:
+                other = " "
+                while other not in c_options:
+                  print("On which Modern nation do you intend wage a colonial war?\n")
+                  for co in c_options:
+                    print(co)
+                  other = input()
+                p_options = set()
+                other = players[other]
+                for prov in other.provinces.values():
+                  #print(prov.name, prov.colony)
+                  #if prov.colony == True:
+                    #print(prov.name, prov.resources, prov.quality)
+                  p_options.add(prov.name)
+                annex = " "
+                while annex not in p_options:
+                  print("The following provinces are colonies belonging to %s" % (other.name))
+                  for po in p_options:
+                    print(po)
+                  annex = input()
+                annex = provinces[annex]
+                if player.check_for_border(other):
+                  print("You may to capture %s by establishing naval domination or by invading %s and taking it as a prize for victory" % (annex.name, other.name))
+                  landOrSea = " "
+                  while landOrSea != "l" and landOrSea != "s":
+                    landOrSea = input("Do you choose land (l) or sea (s)?")
+                  if landOrSea == "s":
+                    naval_battle(player, other, market, relations, annex)
+                    player.reputation -= 0.2
+                  else:
+                    combat(player, other, annex, players, market , relations)
+                else:
+                  print("You do not neighbor %s and so you must capture %s by establishing naval \
+                  dominance" % (other.name, annex.name))
+                  naval_battle(player, other, market, relations, annex)
+                  player.reputation -= 0.2
+
+            if action == "5":
+              a_options = set()
+              cb_keys = []
+              for cb in player.CB:
+                cb_keys.append(cb.opponent)
+              print("On which Major Power do you intend wage a minor war?\n")
+              for k, v in players.items():
+                if v.type == "major":
+                  non_national = False
+                  for p, prov in v.provinces.items():
+                    if prov.culture != v.culture:
+                      non_national = True
+                  if non_national == True and v in cb_keys and pl.just_attacked <= 0:
+                    a_options.add(v.name)
+              if len(a_options) == 0:
+                print("There are currently no major powers on whom you may wage a minor war \n")
+              else:
+                other = " "
+                while other not in a_options:
+                  print("On which Modern nation do you intend to wage a minor war?\n")
+                  for ao in a_options:
+                    print(ao)
+                  other = input()
+                p_options = set()
+                other = players[other]
+                if player.check_for_border(other):
+                  for prov in other.provinces.values():
+                    if prov.culture != other.culture and player.check_for_ground_invasion(prov, provinces):
+                      print(prov.name, prov.resource, prov.quality)
+                      p_options.add(prov.name)
+                annex = " "
+                while annex not in p_options:
+                  print("The following are neighboring provinces that you may annex: \n")
+                  for p in p_options:
+                    print(p)
+                  annex = input()
+                annex = other.provinces[annex]
+                if player.check_for_border(other) and player.check_for_ground_invasion(annex, provinces):
+                  print("You may seek to capture neighboring %s from %s by land!" % (annex.name, other.name))
+                  combat(player, other, annex, players, market, relations)
+                  player.reputation -= 0.3
+
+            if action == "6":
+              cb_keys = []
+              for cb in player.CB:
+                cb_keys.append(cb.opponent)
+              if player.military["tank"] < 1:
+                print("Great Wars can only be waged once you have Tanks in your military")
+              else:
+                options = set()
+                for k, v in players.items():
+                  if v.type == "major" and v in cb_keys:
+                    options.add(v.name)
+                if len(options) == 0:
+                  print("You cannot currently wage war on a Major Power")
+                else:
+                  other = " "
+                  while other not in options:
+                    print("On which Major Power would you like wage a Great War?")
+                    for o in options:
+                      print(o)
+                    other = input()
+                  other = players[other]
+                  land = player.check_for_border(other)
+
+                  annex = ""
+                  for p, prov in other.provinces.items():
+                    if prov.name == other.capital:
+                      annex = prov
+
+                  if land == False:
+                    print("Since you do not border %s, you must send your army by navy\n" % (other.name))
+                    transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+                    if transport_limit < 4:
+                      print("Your navy is not sufficient for carrying out an amphibious invasion!")
+                    else:
+                      amphib_prelude(player, other, market, relations, annex)
+                      player.reputation -= 0.1
+                  else:
+                    print("Since we border %s, we may attack by land!" % (other.name))
+                    combat(player, other, annex, players, market, relations)
+                    player.reputation -= 0.1

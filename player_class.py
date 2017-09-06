@@ -1,10 +1,11 @@
 
 
 from random import*
-import minor_classes
+from minor_classes import*
 from technologies import technology_dict
 from globe import*
 from queue import*
+from copy import deepcopy
 
 
 stability_map = {
@@ -292,6 +293,10 @@ class Player(object):
 
 		self.doctrines = set()
 
+		self.claims = set()
+
+		self.objectives = set()
+
 		self.just_attacked = -1
 
 		self.colonization = 0.0
@@ -369,7 +374,7 @@ class Player(object):
 						c_mod = 0.85
 					else:
 						c_mod = 0.70
-				if p.resource == "rubber" and "electricity" not in self.technologies:
+				if p.resource == "rubber" and "chemistry" not in self.technologies:
 					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.75
 					res_dict["food"] += gain
 					#self.resources["wood"] += gain
@@ -491,7 +496,7 @@ class Player(object):
 		self.payMaintenance()
 		if market.turn >= 20:
 			for p in self.provinces.values():
-				if p.culture != self.culture:
+				if p.culture != self.culture and p.type == "civilized":
 					if p.culture not in self.accepted_cultures:
 						self.stability -= 0.05
 					else:
@@ -499,7 +504,7 @@ class Player(object):
 
 		if self.stability < -3.0:
 			self.stability = -3.0
-		culture_gain = 0.2 + self.midPOP["artists"]["number"] * 2
+		culture_gain = 0.2 + self.midPOP["artists"]["number"]
 		self.culture_points+= culture_gain
 		##for g in globe.culture:
 			#print(g)
@@ -507,8 +512,6 @@ class Player(object):
 		print("Culture points gained: %s " % (culture_gain))
 		self.can_train = 1 + self.midPOP["officers"]["number"] * 5
 		self.AP = int(self.proPOP) * self.production_modifier
-
-		#self.reputation += self.midPOP["artists"]["number"] * 0.1
 		research_gain = (0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
 		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.33)) * government_map[self.government]
 		print("Research points gained: %s " % (research_gain))
@@ -578,7 +581,10 @@ class Player(object):
 					
 				if thing not in core:
 					core.add(thing)
-			return core
+		#print("%s cores:" % (self.name))
+		#for c in core:
+		#	print(c.name)
+		return core
 
 	def check_for_ground_invasion(self, prov, provinces):
 		core = self.core_provinces()
@@ -664,13 +670,15 @@ class Player(object):
 		return count
 
 
-	def war_after_math(self, target, players, relations):
-		relata = frozenset([self.name, target.name])
-		self.rival_target = []
-		relations[relata].relationship += 1
-		if target in self.CB:
-			self.CB.remove(target)
-		self.diplo_action -= 1.0
+	def war_after_math(self, target, players, relations, prov):
+
+
+		if self.culture == prov.culture:
+			self.reputation += 0.15
+			self.stability += 0.2
+	
+		#if target in self.CB:
+		#	self.CB.remove(target)
 		if target.type == "old_minor":
 			self.reputation -= 0.1
 			self.stability += 0.1
@@ -678,8 +686,7 @@ class Player(object):
 			self.reputation -= 0.15
 			self.stability += 0.1
 		if (target.type == "minor" or target.type == "major") and self.military["tank"] == 0:
-			self.reputation -= 0.33
-			self.stability -= 0.25
+			self.reputation -= 0.3
 			for pl, play in players.items():
 				if play.type == "major" and self.name != pl:
 					relations[frozenset([self.name, pl])].relationship -= 0.2
@@ -694,10 +701,51 @@ class Player(object):
 			if relations[frozenset([target.name, p])].relationship >= 1:
 				relations[frozenset([self.name, p])].relationship -= 0.15 
 			if relations[frozenset([target.name, p])].relationship >= 2:
-				relations[frozenset([self.name, p])].relationship -= 0.15 
+				relations[frozenset([self.name, p])].relationship -= 0.15
+			if relations[frozenset([target.name, p])].relationship >= 2.7:
+				if pl.type == "major" or pl.type == "minor":
+					new = CB(p, self.name, "annex", prov.name, 5)
+					pl.CB.add(new)
+
 			if pl.type == "AI":
 				if pl.rival_target != []:
 					if target == pl.rival_target[0]: 
 						relations[frozenset([self.name, p])].relationship -= 0.15
 				if target in pl.allied_target:
 					relations[frozenset([self.name, p])].relationship -= 0.2
+
+
+
+	def check_for_sea_invasion(self):
+		res = False
+		for prov in self.provinces.values():
+			if prov.ocean == True:
+				res = True
+		return res
+
+
+	def calculate_number_of_units(player):
+		count = 0
+		count += self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + \
+		 self.military["irregulars"] + self.military["tank"] + self.military["fighter"]
+		return count
+
+
+
+	def calculate_army_ammo_needed(self):
+		ammo_needed = 0.0
+		ammo_needed += self.military["infantry"] * self.infantry["ammo_use"]
+		ammo_needed += self.military["cavalry"] * self.cavalry["ammo_use"]
+		ammo_needed += self.military["artillery"] * self.artillery["ammo_use"]
+		ammo_needed += self.military["tank"] * self.cavalry["ammo_use"]
+		ammo_needed += self.military["fighter"] * self.artillery["ammo_use"]
+		print("Ammo Needed for %s: %s" % (self.name, ammo_needed))
+
+		return ammo_needed
+
+	def calculate_army_oil_needed(self):
+		oil_needed = 0.0
+		oil_needed += self.military["tank"] * self.tank["oil_use"]
+		oil_needed += self.military["fighter"] * self.fighter["oil_use"]
+		print("Oil Needed for %s: %s" % (self.name, oil_needed))
+		return oil_needed

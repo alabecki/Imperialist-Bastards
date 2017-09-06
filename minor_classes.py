@@ -4,7 +4,7 @@ from random import*
 
 
 class Province(object):
-	def __init__ (self, name, _resource, _quality, _type, _culture):
+	def __init__ (self, name, _owner, _resource, _quality, _type, _culture):
 		self.name = name
 		self.ocean = True
 		self.resource = _resource
@@ -25,7 +25,7 @@ class Province(object):
 		#self.factories = set()
 		#self.desirability =_desirability
 		#self.abb = ""
-		#self.ruler =  ""
+		self.owner = _owner
 		#self.occupier = ""
 		#self.friendly_units_present = []
 		#self.occupying_units_present = []
@@ -64,3 +64,13 @@ class MarketItem(object):
 # When buying, AI will try first to buy from minors (probably just resources)
 # It will decide who do buy from based on their relations with that player.
 # For each player there is a list of players with whom he does not wish to trad
+
+class CB(object):
+	def __init__ (self, owner, opponent, action, province, time):
+		self.owner = owner
+		self.opponent = opponent
+		self.action = action
+		self.province = province
+		self.time = time
+
+# actions : annex (province), free (province)

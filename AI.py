@@ -634,7 +634,7 @@ class AI(Player):
 				continue
 			if k == "oil" and "oil_drilling" not in self.technologies:
 				continue
-			if k == "rubber" and "electricity" not in self.technologies:
+			if k == "rubber" and "chemistry" not in self.technologies:
 				continue
 			if self.supply[k] < 1:
 				self.resource_priority[k] += 0.1
@@ -674,9 +674,17 @@ class AI(Player):
 		if self.POP > 11:
 			self.freePOP -= 1
 			self.proPOP += 1
-		if self.POP > 16:
+		if self.POP > 17:
 			self.proPOP += 1
 			self.freePOP -= 1
+		if self.POP > 23:
+			self.proPOP += 1
+			self.freePOP -= 1
+		if self.POP > 30:
+			self.proPOP += 1
+			self.freePOP -= 1
+
+
 		count = 0
 		for p in priorities:
 			if self.freePOP > 1 and count <= 16:
@@ -1514,9 +1522,12 @@ class AI(Player):
 		if choice == "electricity":
 			self.factory_throughput += 1
 			self.production_modifier += 0.15
+		if choice == "radio":
+			self.reputation += 0.2
+			self.stability += 0.2
 
 		#FOR AI ONLY
-		if choice == "electricity":
+		if choice == "chemistry":
 			self.resource_priority["rubber"] += 1.25
 			self.improve_province_priority["rubber"] +=1
 		if choice == "oil_drilling":
@@ -1599,7 +1610,7 @@ class AI(Player):
 						options.append("dyes")
 				elif prov.resource == "rubber":
 					max_dev = 0
-					if "electricity" in self.technologies:
+					if "chemistry" in self.technologies:
 						max_dev = 1
 					if prov.development_level < max_dev:
 						options.append("rubber")
@@ -2045,14 +2056,14 @@ class AI(Player):
 				max_dev = 1
 		elif(self.provinces[prov].resource == "rubber"):
 			max_dev = 0
-			if("electricity" in self.technologies):
+			if("chemistry" in self.technologies):
 				max_dev = 1
 		if self.provinces[prov].development_level >= max_dev:
 			return False
 		else:
 			return True
 
-	def use_chemicals(self, market):
+	def use_chemicals(self, market, relations, players):
 		if self.goods["chemicals"] > 4:
 			if self.resources["dyes"] < 3:
 				self.goods["chemicals"] -= 1
@@ -2068,12 +2079,13 @@ class AI(Player):
 					self.goods["chemicals"] -= 1
 					count -= 1
 					print("Turn chemicals to food")
-		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] >= 5:
+		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] >= 4:
 			self.resources["rubber"] += 1
-			self.goods["chemicals"] -= 3
-			print("Turns chemicals to rubber")
+			self.goods["chemicals"] -= 1
+			self.resources["oil"] -= 1
+			print("Turns oil and chemicals to rubber")
 		if "synthetic_rubber" in self.technologies and self.resources["rubber"] < 2 and self.resources["oil"] <= 5 and self.supply["oil"] > 12 and self.resources["gold"] > 42:
-			self.ai_buy(self, "oil", 4, market, relations, players)
+			self.ai_buy("oil", 4, market, relations, players)
 		if "synthetic_oil" in self.technologies and self.resources["oil"] < 2 and self.goods["chemicals"] >= 5 and len(market.market["oil"]) < 13:
 			self.resources["oil"] += 1
 			self.goods["chemicals"] -= 3
@@ -2081,96 +2093,107 @@ class AI(Player):
 
 
 	def use_culture(self, players):
-		if self.culture_points >= 1:
-			if self.diplo_action >= 1 and self.reputation < 0.1:
+		count = 0
+		while self.culture_points >= 2 and count <= 8:
+			if self.culture_points >= 1:
+				if self.diplo_action >= 1 and self.reputation < 0.1:
+					self.culture_points -= 1
+					self.diplo_action -= 1
+					self.reputation += 0.1
+					print ("Improve Reputation______________________________________________") 
+					continue
+			if self.culture_points >= 1:
+				if self.stability <= 0.0:
+					self.culture_points -= 1
+					self.stability += 0.5
+					print("Increased Stability_______________________________________________")
+					continue
+			if self.culture_points >= 1:
+
+				if self.diplo_action >= 1 and self.reputation < 0.3:
+					self.culture_points -= 1
+					self.diplo_action -= 1
+					self.reputation += 0.1
+					print ("Improve Reputation______________________________________________") 
+					continue
+			other = 0
+			for p in self.provinces.values():
+				if p.culture != self.culture:
+					other += 1
+			if other >= 1 and self.culture_points > 1:
+				for p in self.provinces.values():
+					if p.culture != self.culture and self.culture_points > 1 and p.culture not in self.accepted_cultures:
+						self.culture_points -= 1
+						chance = uniform(0, 1)
+						if p.type == "uncivilized":
+							if chance < 0.66:
+								self.accepted_cultures.add(p.culture)
+								print("Ingegrated Culture")
+								continue
+						if p.type == "old":
+							if chance < 0.33:
+								self.accepted_cultures.add(p.culture)
+								print("Integrated Culture") 
+								continue
+						if p.type == "civilized":
+							if chance < 0.25:
+								self.accepted_cultures.add(p.culture)
+								print("Integrated Culture__________________________________________")
+								continue
+
+			if self.diplo_action >= 1 and self.reputation < 0.6 and self.culture_points >= 1:
 				self.culture_points -= 1
 				self.diplo_action -= 1
-				self.reputation += 0.1
-				print ("Improve Reputation______________________________________________") 
-		if self.culture_points >= 1:
-			if self.stability <= 0.0:
+				self.reputation += 0.2
+				print ("Improve Reputation____________________________________________________________") 
+				continue				
+
+			if self.stability < 1.0 and self.culture_points >= 1:
 				self.culture_points -= 1
 				self.stability += 0.5
-				print("Increased Stability_______________________________________________")
-		if self.culture_points >= 1:
+				print("Increased Stability______________________________________________________________")
+				continue
+		#	if self.culture >= 3:
+		#		for p in players.values():
+		#			if p.midPOP["artists"]["number"] < self.midPOP["artists"]["number"] and p.type == "major":
+		#				if p.numMidPOP >= 0.75:
+		#					for m in p.midPOP:
+		#						if p.midPOP[m]["number"] >= 0.25:
+		#							p.midPOP[m]["number"] -= 0.25
+		#							p.numMidPOP -= 0.25
+		#							p.POP -= 0.25
+		#							p.resources["gold"] -= 5
+		#							self.midPOP[m]["number"] += 0.25
+		#							self.numMidPOP += 0.25
+		#							self.POP += 0.25
+		#							self.resources["gold"] += 5
+		#							self.culture -= 3
+		#							print("%s has stolen a %s POP from %s !" % (self.name, m, p.name))
+		#							return
+			if self.resources["gold"] < 40 and self.culture_points >= 1:
+				for p in players.values():
+					if p.type == "major":
+						p.resources["gold"] -= 1
+						self.resources["gold"] += 1
+						self.culture_points -= 1
 
-			if self.diplo_action >= 1 and self.reputation < 0.3:
+				print("Cultural Exports ____________________________________________")
+				continue
+			if self.stability < 2.25 and self.culture_points >= 1:
+				self.culture_points -= 1
+				self.stability += 0.5
+				if self.stability > 3.0:
+					self.stability = 3.0
+				print("Increased Stability_________________________________________________")
+				continue
+			if self.diplo_action >= 1 and self.reputation < 0.75 and self.culture_points >= 1:
 				self.culture_points -= 1
 				self.diplo_action -= 1
-				self.reputation += 0.1
-				print ("Improve Reputation______________________________________________") 
-		other = 0
-		for p in self.provinces.values():
-			if p.culture != self.culture:
-				other += 1
-		if other >= 1 and self.culture_points > 1:
-			for p in self.provinces.values():
-				if p.culture != self.culture and self.culture_points > 1:
-					self.culture_points -= 1
-					chance = uniform(0, 1)
-					if p.type == "uncivilized":
-						if chance < 0.66:
-							self.accepted_cultures.add(p.culture)
-							print("Ingegrated Culture")
-					if p.type == "old":
-						if chance < 0.33:
-							self.accepted_cultures.add(p.culture)
-							print("Integrated Culture") 
-					if p.type == "civilized":
-						if chance < 0.25:
-							self.accepted_cultures.add(p.culture)
-							print("Integrated Culture__________________________________________")
+				self.reputation += 0.2
+				print ("Improve Reputation________________________________________________") 
+				continue
+			count += 1	
 
-		if self.diplo_action >= 1 and self.reputation < 0.6 and self.culture_points >= 1:
-			self.culture_points -= 1
-			self.diplo_action -= 1
-			self.reputation += 0.2
-			print ("Improve Reputation____________________________________________________________") 
-			
-
-		if self.stability < 1.0 and self.culture_points >= 1:
-			self.culture_points -= 1
-			self.stability += 0.5
-			print("Increased Stability______________________________________________________________")
-			
-	#	if self.culture >= 3:
-	#		for p in players.values():
-	#			if p.midPOP["artists"]["number"] < self.midPOP["artists"]["number"] and p.type == "major":
-	#				if p.numMidPOP >= 0.75:
-	#					for m in p.midPOP:
-	#						if p.midPOP[m]["number"] >= 0.25:
-	#							p.midPOP[m]["number"] -= 0.25
-	#							p.numMidPOP -= 0.25
-	#							p.POP -= 0.25
-	#							p.resources["gold"] -= 5
-	#							self.midPOP[m]["number"] += 0.25
-	#							self.numMidPOP += 0.25
-	#							self.POP += 0.25
-	#							self.resources["gold"] += 5
-	#							self.culture -= 3
-	#							print("%s has stolen a %s POP from %s !" % (self.name, m, p.name))
-	#							return
-		if self.resources["gold"] < 40 and self.culture_points >= 1:
-			for p in players.values():
-				if p.type == "major":
-					p.resources["gold"] -= 1
-					self.resources["gold"] += 1
-			print("Cultural Exports ____________________________________________")
-			
-		if self.stability < 2.25 and self.culture_points >= 1:
-			self.culture_points -= 1
-			self.stability += 0.5
-			if self.stability > 3.0:
-				self.stability = 3.0
-			print("Increased Stability_________________________________________________")
-
-		if self.diplo_action >= 1 and self.reputation < 0.75 and self.culture_points >= 1:
-			self.culture_points -= 1
-			self.diplo_action -= 1
-			self.reputation += 0.2
-			print ("Improve Reputation________________________________________________") 
-				
-		return
 
 	def check_obsolete(self):
 		if self.military["iron_clad"] >= 2 or self.military["battle_ship"] > 0:
