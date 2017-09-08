@@ -8,6 +8,8 @@ from copy import deepcopy
 def AI_turn(players, player, market, relations, provinces):
 	
 	if len(player.provinces.keys()) < 1:
+		print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		print("%s has only one province!!!" % (player.name))
 		return
 
 	if type(player) == Human:
@@ -65,29 +67,26 @@ def AI_turn(players, player, market, relations, provinces):
 
 
 	player.use_chemicals(market, relations, players)
-
-
-	diplomacy = [0, 1, 2, 3]
-	shuffle(diplomacy)
+	#attack_target(player, players, relations, provinces, market)
 	ai_decide_ally_target(player, players, provinces)
 	decide_target(player, players, market, provinces, relations)
-	ai_destablize(player, players, relations)
+	worsen_relations(player, players, relations, provinces)
 	gain_cb(player, players, relations)
+	attack_target(player, players, relations, provinces, market)
+	#ai_bribe(player, players, relations)
+
+
+	count = 0
+	while player.diplo_action >= 2 and count < 4:
+		if player.rival_target == [] or len(player.CB) < 2:
+			worsen_relations(player, players, relations, provinces)
+			decide_target(player, players, market, provinces, relations)
+		damage_relations(player, players, relations)
+		ai_improve_relations(player, players, relations)
+		ai_destablize(player, players, relations)
+		count += 1
 	ai_embargo(player, players, relations)
 	ai_lift_embargo(player, players, relations)
-
-
-	for i in diplomacy:
-		if i == 0:
-			ai_improve_relations(player, players, relations)
-		if i == 1:
-			worsen_relations(player, players, relations)
-		if i ==	2:
-			attack_target(player, players, relations, provinces, market)
-		#if i == 3:
-			#ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
-		if i == 3:
-			ai_bribe(player, players, relations)
 
 
 	player.use_culture(players)

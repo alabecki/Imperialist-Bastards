@@ -169,18 +169,18 @@ class Player(object):
 		self.number_developments = 0.0
 
 		self.factories = {
-			"tank": 0,
-			"fighter": 0,
-			"auto": 0,
-			"parts": 0,
-			"clothing": 0,
-			"cannons": 0,
-			"paper": 0,
-			"furniture": 0,
-			"chemicals": 0,
-			"gear": 0,
-			"telephone": 0,
-			"radio": 0,
+			"tank": {"number":0, "used": False},
+			"fighter": {"number":0, "used": False},
+			"auto": {"number":0, "used": False},
+			"parts": {"number":0, "used": False},
+			"clothing": {"number":0, "used": False},
+			"cannons": {"number":0, "used": False},
+			"paper": {"number":0, "used": False},
+			"furniture": {"number":0, "used": False},
+			"chemicals": {"number":0, "used": False},
+			"gear": {"number":0, "used": False},
+			"telephone": {"number":0, "used": False},
+			"radio": {"number":0, "used": False},
 		}
 
 
@@ -309,6 +309,8 @@ class Player(object):
 
 		self.sprawl = False
 
+		self.ideas = set()
+
 
 	def determine_middle_class_need(self):
 		requirement = ["paper"]
@@ -321,9 +323,9 @@ class Player(object):
 		if self.numMidPOP >= 3 and self.numMidPOP < 3.5:
 			requirement = ["paper", "clothing", "furniture", "chemicals"]
 		if self.numMidPOP >= 3.5 and self.numMidPOP < 4:
-			requirement = ["paper", "clothing", "furniture", "radio", "radio"]
+			requirement = ["paper", "clothing", "furniture", "telephone", "telephone"]
 		if self.numMidPOP >= 4 and self.numMidPOP < 4.5:
-			requirement = ["paper", "clothing", "furniture", "telephone", "radio", "telephone"]
+			requirement = ["paper", "clothing", "furniture", "telephone", "radio", "radio"]
 		if self.numMidPOP > 4.5:
 			requirement = ["paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
 		#print("Mid class requirments:")
@@ -528,6 +530,20 @@ class Player(object):
 		print("Colonization point gain: %s" % (col_gain))
 		self.POP_increased = 0
 		self.just_attacked -= 1
+
+		for v in self.factories.values():
+			v["used"] = False
+
+		cb_keys = []
+		for cb in self.CB:
+			cb_keys.append(cb)
+
+		for cb in cb_keys:
+			cb.time -= 1
+			if cb.time < 0:
+				self.CB.discard(cb)
+				del cb
+
 		
 
 
@@ -588,7 +604,9 @@ class Player(object):
 
 	def check_for_ground_invasion(self, prov, provinces):
 		core = self.core_provinces()
-		for c in core: 
+		prov = provinces[prov]
+		for c in core:
+			#c = provinces[c] 
 			if abs(c.x - prov.x) <= 1 and abs(c.y - prov.y) <= 1:
 				return True
 		return False
@@ -704,8 +722,12 @@ class Player(object):
 				relations[frozenset([self.name, p])].relationship -= 0.15
 			if relations[frozenset([target.name, p])].relationship >= 2.7:
 				if pl.type == "major" or pl.type == "minor":
-					new = CB(p, self.name, "annex", prov.name, 5)
-					pl.CB.add(new)
+					if relations[frozenset([self.name, p])].relationship < 2:
+						new = CB(p, self.name, "annex", prov.name, 5)
+						pl.CB.add(new)
+					else:
+						relations[frozenset([self.name, p])].relationship -= 1
+
 
 			if pl.type == "AI":
 				if pl.rival_target != []:

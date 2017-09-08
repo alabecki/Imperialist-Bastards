@@ -120,8 +120,7 @@ while True:
 		print("Please choose a name for the auto save file ...")
 		auto_name = input()
 		print("Saving game as %s ....." % (auto_name))
-		save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
-
+		save_game(auto_name, players, relations, market, provinces)
 
 						
 	_continue = True
@@ -217,10 +216,18 @@ while True:
 							print("Artillery, Attack: %s, Defend: %s, Manouver: %s" % (player.artillery["attack"], player.artillery["defend"], player.artillery["manouver"]))
 							print("Fighter, Attack: %s, Defend: %s, Manouver: %s" % (player.fighter["attack"], player.fighter["defend"], player.fighter["manouver"]))
 							print("Tank, Attack: %s, Defend: %s, Manouver: %s" % (player.tank["attack"], player.tank["defend"], player.tank["manouver"]))
-							print("Frigate, Attack: %s, Defend: %s, Manouver: %s" % (player.frigates["attack"], player.frigates["defend"]))
-							print("Ironclad, Attack: %s, Defend: %s, Manouver: %s" % (player.iron_clad["attack"], player.iron_clad["defend"]))
-							print("Battleship, Attack: %s, Defend: %s, Manouver: %s" % (player.battle_ship["attack"], player.battle_ship["defend"]))
-
+							print("Frigate, Attack: %s" % (player.frigates["attack"]))
+							print("Ironclad, Attack: %s" % (player.iron_clad["attack"]))
+							print("Battleship, Attack: %s" % (player.battle_ship["attack"]))
+							print("\n")
+							ammo_needed = calculate_ammo_needed(player)
+							oil_needed = calculate_oil_needed(player)
+							print("Ammo (number of cannons) needed for land combat: %s" % (ammo_needed))
+							print("Oil Needed for land combat: %s" % (oil_needed))
+							ammo_navy_needed = calculate_ammo_needed_navy(player)
+							oil_navy_needed = calculate_oil_needed_navy(player)
+							print("Ammo (number of cannons) needed for naval combat: %s" % (ammo_navy_needed))
+							print("Oil Needed for naval combat %s" % (oil_navy_needed))
 
 
 						if info_command == "5":
@@ -268,6 +275,21 @@ while True:
 								print("Military Overview: ################################################################################################ \n")
 								for k, v in nation.military.items():
 									print(" %s: %.2f " % (k, v) )
+								
+								print("\n")
+								print("Infantry: Attack: %s, Defense: %s, Manouver: %s" % (nation.infantry["attack"], nation.infantry["defend"], nation.infantry["manouver"]))
+								print("Artillery: Attack: %s, Defense: %s, Manouver: %s" % (nation.artillery["attack"], nation.artillery["defend"], nation.artillery["manouver"]))
+								print("Cavalry: Attack: %s, Defense: %s, Manouver: %s" % (nation.cavalry["attack"], nation.cavalry["defend"], nation.cavalry["manouver"]))
+								print("Fighter: Attack: %s, Defense: %s, Manouver: %s" % (nation.fighter["attack"], nation.fighter["defend"], nation.fighter["manouver"]))
+								print("Tank: Attack: %s, Defense: %s, Manouver: %s" % (nation.tank["attack"], nation.tank["defend"], nation.tank["manouver"]))
+								print("Frigate: Attack: %s" % (nation.frigate["attack"]))
+								print("Ironclad: Attack: %s" % (nation.iron_clad["attack"]))
+								print("Battleship: Attack: %s" % (nation.battle_ship["attack"]))
+								print("\n")
+								print("CBs:")
+								for cb in nation.CB:
+									print("Opponent: %s, Province: %s, Action: %s, Time: %s" % (cb.opponent, cb.province, cb.action, cb.time))
+
 								print("Inventory: ##########################################################################################################\n")
 								for v, k in nation.resources.items():
 									print(v, k)
@@ -277,6 +299,8 @@ while True:
 								print("Technologies: ################################################################################################### \n")
 								for tech in nation.technologies:
 									print(tech, end=" ")
+
+
 							if which == "2":
 								know = " "
 								for k, v in national_comparisons.items():
@@ -924,13 +948,13 @@ while True:
 							if cb.opponent != prov.owner or cb.opponent not in players.keys():
 								player.CB.discard(cb)
 								del cb
-						if len(cb) < 1:
+						if len(player.CB) < 1:
 							print("You do not currently have a CB against any other player")
 
 						else:
 							cb_keys = []
 							for cb in player.CB:
-								cb.key.append(province)
+								cb_keys.append(cb.province)
 						
 							action = " "
 							while action not in military_action.keys():
@@ -974,19 +998,22 @@ while True:
 										
 								
 								else:
-									land = player.check_for_border(other)
+									land = player.check_for_border(owner)
 									if land == False:
 										print("Since you do not border %s, you must send your army by navy\n" % (other.name))
 										transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 										if transport_limit < 4:
 											print("Your navy is not sufficient for carrying out an amphibious invasion!")
 										else:
-											amphib_prelude(player, other, annex, relations, players)
+											amphib_prelude(player, owner, annex, relations, players)
 											player.reputation -= 0.1
 									else:
-										print("Since we border %s, we may attack by land!" % (other.name))
-										combat(player, other, annex, market, relations)
-								
+										print("Since we border %s, we may attack by land!" % (owner.name))
+										#combat(player, owner, annex, players, market, relations)
+										forces = select_ground_forces(player, target)
+										amph_combat(player, target, forces, prov, players, market, relations)
+
+	
 							if action == "2":
 								print("This feature is not yet implemented")
 			
@@ -1087,7 +1114,7 @@ while True:
 									for prov in other.provinces.values():
 										if prov.name in player.objectives:
 											p_options.append(prov)
-									new = CB(player, other.name, "annex", prov.name, 3)
+									new = CB(player, other.name, "annex", prov.name, 5)
 
 									player.CB.add(other)
 									print("You are now able to declare war on %s \n" % (other.name))
@@ -1247,7 +1274,7 @@ while True:
 			#if market.turn % 2 == 1:
 
 			print("Saving....\n")
-			save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
+			save_game(auto_name, players, relations, market, provinces)
 
 	
 		#globe.world_update(players)

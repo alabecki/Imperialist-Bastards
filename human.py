@@ -571,41 +571,41 @@ class Human(Player):
 			#	options.append["ship_yard"]
 			#if self.factories["ship_yard"] == 2 and "oil_powered_ships" in self.technologies:
 			#	options.append["ship_yard"]
-			if self.factories["parts"] == 0:
+			if self.factories["parts"]["number"] == 0:
 				options.append("parts")
-			if self.factories["parts"] == 1 and "bessemer_process" in self.technologies: 
+			if self.factories["parts"]["number"] == 1 and "bessemer_process" in self.technologies: 
 				options.append("parts")
-			if self.factories["clothing"] == 0:
+			if self.factories["clothing"]["number"] == 0:
 				options.append("clothing")
-			if self.factories["clothing"] == 1 and "power_loom" in self.technologies:
+			if self.factories["clothing"]["number"] == 1 and "power_loom" in self.technologies:
 				options.append("clothing")
-			if self.factories["furniture"] == 0:
+			if self.factories["furniture"]["number"] == 0:
 				options.append("furniture")
-			if self.factories["furniture"] == 1 and "electricity" in self.technologies:
+			if self.factories["furniture"]["number"] == 1 and "electricity" in self.technologies:
 				options.append("furniture")
-			if self.factories["paper"] == 0:
+			if self.factories["paper"]["number"] == 0:
 				options.append("paper")
-			if self.factories["paper"] == 1 and "pulping" in self.technologies:
+			if self.factories["paper"]["number"] == 1 and "pulping" in self.technologies:
 				options.append("paper")
-			if self.factories["cannons"] == 0:
+			if self.factories["cannons"]["number"] == 0:
 				options.append("cannons")
-			if self.factories["cannons"] == 1 and "bessemer_process" in self.technologies:
+			if self.factories["cannons"]["number"] == 1 and "bessemer_process" in self.technologies:
 				options.append("cannons")
-			if self.factories["chemicals"] == 0 and "chemistry" in self.technologies:
+			if self.factories["chemicals"]["number"] == 0 and "chemistry" in self.technologies:
 				options.append("chemicals")
-			if self.factories["chemicals"] == 1 and "dyes" in self.technologies:
+			if self.factories["chemicals"]["number"] == 1 and "dyes" in self.technologies:
 				options.append("chemicals")
-			if self.factories["gear"] < 2 and "electricity" in self.technologies:
+			if self.factories["gear"]["number"] < 2 and "electricity" in self.technologies:
 				options.append("gear")
-			if self.factories["radio"] < 2 and "radio" in self.technologies:
+			if self.factories["radio"]["number"] < 2 and "radio" in self.technologies:
 				options.append("radio")
-			if self.factories["telephone"] < 2 and "telephone" in self.technologies:
+			if self.factories["telephone"]["number"] < 2 and "telephone" in self.technologies:
 				options.append("telephone")
-			if self.factories["fighter"] < 2 and "flight" in self.technologies:
+			if self.factories["fighter"]["number"] < 2 and "flight" in self.technologies:
 				options.append("fighter")
-			if self.factories["auto"] < 2 and "automobile" in self.technologies:
+			if self.factories["auto"]["number"] < 2 and "automobile" in self.technologies:
 				options.append("auto")
-			if self.factories["tank"] < 2 and "mobile_warfare" in self.technologies:
+			if self.factories["tank"]["number"] < 2 and "mobile_warfare" in self.technologies:
 				options.append("tank")
 		if len(options) == 0:
 			print("You cannot build any factories at this time")
@@ -620,7 +620,7 @@ class Human(Player):
 		self.AP -= 1
 		self.resources["iron"] -= 1.0
 		self.goods["parts"] -= 1.0
-		self.factories[choice] += 1
+		self.factories[choice]["number"] += 1
 		market.global_factories[choice] += 1
 		self.stability -= 0.3
 		self.new_development -= 1
@@ -740,10 +740,15 @@ class Human(Player):
 				max_dev = 0
 				if("oil_drilling" in self.technologies):
 					max_dev = 1
+				if "rotary_drilling" in self.technologies:
+					max_dev = 2
+
 			elif(self.provinces[prov].resource == "rubber"):
 				max_dev = 0
 				if("chemistry" in self.technologies):
 					max_dev = 1
+				if "synthetic_dyes" in self.technologies:
+					max_dev = 2
 			if self.provinces[prov].development_level == max_dev:
 				print("You cannot further develop this province at this time")
 				return
@@ -815,13 +820,15 @@ class Human(Player):
 			for k in self.factories.keys():
 				print(k)
 			_type = input("What kind of good do you want to produce with factory? \n")
-		if self.factories[_type] == 0:
+		if self.factories[_type]["number"] == 0:
 			print("You do not have a %s factory \n" % (_type))
 			return
+		if self.factories[_type]["used"] == True:
+			print("You have already used your %s factory this round" % (_type))
 		else:
 			stab_rounds = round(self.stability* 2) / 2
 			stab_mod = stability_map[stab_rounds]
-			max_amount = self.factories[_type] * stab_mod * self.factory_throughput
+			max_amount = self.factories[_type]["number"] * stab_mod * self.factory_throughput
 			material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
 			max_amount = max_amount/(material_mod + 0.0001)
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
@@ -848,6 +855,7 @@ class Human(Player):
 								self.goods[i] -= manufacture[_type][i] * amount * material_mod
 						self.goods_produced[_type] += amount
 						self.AP -= 1
+						self.factories[_type]["used"] = True
 						print("Next turn you will receive %s %s" % (self.goods_produced[_type], _type))
 						return
 

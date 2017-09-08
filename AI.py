@@ -57,6 +57,8 @@ class AI(Player):
 
 		self.allied_target = []
 
+		self.sphere_targets = set()
+
 		self.mid_class_priority = {
 			"researchers": 1.0,
 			"officers": 0.9,
@@ -100,7 +102,7 @@ class AI(Player):
 			"dyes": 0.65,
 			"rubber": 0.2,
 			"oil": 0.2,
-			"shipyard": 2,
+			"shipyard": 3.5,
 			"fortification": 1.0
 		}
 
@@ -151,6 +153,7 @@ class AI(Player):
 			"flight": 4.5,
 			"automobile":3.75,
 			"telephone": 3.5,
+			"rotary_drilling": 4,
 			"mobile_warfare": 5.5,
 			"bombers": 3.5,
 			"oil_powered_ships": 5.0,
@@ -427,20 +430,20 @@ class AI(Player):
 			self.ai_buy("wood", 1, market, relations, players)
 		if self.resources["iron"] < 1 and market.buy_price("iron", self.supply["iron"]) < self.resources["gold"] * 1.5:
 			self.ai_buy("iron", 1, market, relations, players)
-		if self.factories["cannons"] == 0 and self.goods["cannons"] < 2.5:
+		if self.factories["cannons"]["number"] == 0 and self.goods["cannons"] < 2.5:
 			if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2:
 				self.ai_craftman_production("cannons")
 		#if self.goods["cannons"] >= 1 and self.resources["wood"] >= 1 and self.shipyard >= 1 and \
 		#	self.resources["cotton"] >= 1 and self.AP >= 1:
 		#		if self.military["frigates"] < 2:
 		#			self.ai_build_frigates()
-		if self.factories["clothing"] == 0 and self.goods["clothing"] < 2:
+		if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2:
 			if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3 :
 				self.ai_craftman_production("clothing")
-		if self.factories["paper"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
+		if self.factories["paper"]["number"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
 			if self.resources["wood"] >= 2 and self.supply["paper"] <= 3:
 				self.ai_craftman_production("paper")
-		if self.factories["furniture"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
+		if self.factories["furniture"]["number"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
 			if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3:
 				self.ai_craftman_production("furniture")
 
@@ -452,7 +455,7 @@ class AI(Player):
 	def num_factories(self):
 		count = 0
 		for k, v in self.factories.items():
-			count += self.factories[k]
+			count += self.factories[k]["number"]
 		return count
 
 
@@ -766,9 +769,16 @@ class AI(Player):
 		print("Fortifiction Level: %s " % (self.fortification))
 		print("Shipyard Level: %s" % (self.shipyard))
 		for k, v in self.factories.items():
-			print(k, v, end = " | ")
+			print(k, v["number"], end = " | ")
 		for k, v in self.military.items():
 			print(k, v)
+		if self.rival_target != []:
+			print("Rival Target:")
+			print(self.rival_target[0].name, self.rival_target[1].name)
+		print("CBs:")
+		for cb in self.CB:
+			print("Opponent: %s, Province: %s, Action: %s, Time: %s" % (cb.opponent, cb.province, cb.action, cb.time))
+
 
 		print("Embarged by:")
 		for e in self.embargo:
@@ -834,7 +844,7 @@ class AI(Player):
 		price_to_man = 0
 		for i in manufacture[_type]:
 			price_to_man += market.buy_price(i, self.supply[_type]) * int(manufacture[_type][i] * material_mod)
-		if self.factories[_type] >= 1:
+		if self.factories[_type]["number"] >= 1:
 			cap = self.calculate_how_much_can_produce(_type)
 			if cap >= 4:
 				#print("Make w factory")
@@ -961,6 +971,46 @@ class AI(Player):
 		price = market.buy_price(kind, self.supply[kind])
 		print("Price: %s" % (price))
 		p_relations = [r for r in relations.values() if self.name in r.relata]
+		p_relations = deepcopy(p_relations)
+		for pr in p_relations:
+				pair = list(pr.relata)
+				if pair[0] == self.name:
+					other = pair[1]
+				else:
+					other = pair[0]
+				other = players[other]
+				if other.midPOP["managers"]["number"] > 0:
+					pr.relationship += other.midPOP["managers"]["number"]/4
+
+
+				#if "quality control" in other.ideas:
+				#	pr.relata += 0.15
+
+		if kind == "clothing" or kind == "furniture":
+			for pr in p_relations:
+				pair = list(pr.relata)
+				if pair[0] == self.name:
+					other = pair[1]
+				else:
+					other = pair[0]
+				other = players[other]
+				if other.midPOP["artists"]["number"] > 0:
+					pr.relationship += other.midPOP["artists"]["number"]/2
+				#if "brand name clothing" in other.ideas:
+				#	pr.relata += 0.5
+
+		if kind == "radio" or kind == "telephone" or kind == "auto":
+			for pr in p_relations:
+				pair = list(pr.relata)
+				if pair[0] == self.name:
+					other = pair[1]
+				else:
+					other = pair[0]
+				other = players[other]
+				if other.midPOP["artists"]["number"] > 0:
+					pr.relationship += other.midPOP["artists"]["number"]/4
+
+
 		p_relations.sort(key=lambda x: x.relationship, reverse=True)
 		#print("P_relations:")
 		#for pr in p_relations:
@@ -1131,7 +1181,7 @@ class AI(Player):
 		material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
 		material_max = 1000
 
-		max_amount = (self.factories[_type] * stab_mod * self.factory_throughput)
+		max_amount = (self.factories[_type]["number"] * stab_mod * self.factory_throughput)
 		#print("MAX amount %s" % (max_amount))
 
 			
@@ -1160,6 +1210,7 @@ class AI(Player):
 			else:
 				self.goods[i] -= manufacture[_type][i] * amount * material_mod
 		self.goods_produced[_type] += amount
+		self.factories[_type]["used"] = True
 		print("Produced %s %s " % (amount, _type))
 		self.AP -= 1
 		return True
@@ -1176,12 +1227,14 @@ class AI(Player):
 		return
 
 	def ai_decide_factory_productions(self, market, relations, players):
+		if self.AP < 1:
+			#print("No action points left")
+			return
 		for k, v in self.factories.items():
 			#print(k, v)
-			if v >= 1:
+			if v["number"] >= 1:
 				print("Factory owned: %s" % (k))
-				if self.AP < 1:
-					#print("No action points left")
+				if v["used"] == True:
 					return
 
 				if self.AP >= 1 and (len(market.market[k]) < 20):
@@ -1434,6 +1487,8 @@ class AI(Player):
 			self.build_factory_priority["tank"] + 0.15
 			self.build_factory_priority["fighter"] + 0.15
 			self.build_factory_priority["auto"] += 0.25
+			self.technology_priority["rotary_drilling"] += 0.5
+			self.technology_priority["oil_drilling"] += 0.5
 
 
 
@@ -1528,11 +1583,11 @@ class AI(Player):
 
 		#FOR AI ONLY
 		if choice == "chemistry":
-			self.resource_priority["rubber"] += 1.25
-			self.improve_province_priority["rubber"] +=1
+			self.resource_priority["rubber"] += 1.3
+			self.improve_province_priority["rubber"] +=1.15
 		if choice == "oil_drilling":
-			self.resource_priority["oil"] += 1
-			self.improve_province_priority["oil"] +=1
+			self.resource_priority["oil"] += 1.3
+			self.improve_province_priority["oil"] +=1.15
 		if choice == "chemistry":
 			self.resource_priority["coal"] += 0.2
 			self.improve_province_priority["coal"] += 0.2
@@ -1612,12 +1667,16 @@ class AI(Player):
 					max_dev = 0
 					if "chemistry" in self.technologies:
 						max_dev = 1
+					if "synthetic_dyes" in self.technologies:
+						max_dev = 2
 					if prov.development_level < max_dev:
 						options.append("rubber")
 				elif prov.resource == "oil":
 					max_dev = 0
 					if "oil_drilling" in self.technologies:
 						max_dev = 1
+					if "rotary_drilling" in self.technologies:
+						max_dev = 2
 					if prov.development_level < max_dev:
 						options.append("oil") 
 
@@ -1637,45 +1696,45 @@ class AI(Player):
 		options = []
 		if "high_pressure_steam_engine" in self.technologies and self.new_development >= 1.0:
 		
-			if self.factories["parts"] == 0 and self.resource_base["iron"] >= 1:
+			if self.factories["parts"]["number"] == 0 and self.resource_base["iron"] >= 1:
 				options.append("parts")
-			if self.factories["parts"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.8 and self.resource_base["coal"] >= 1.0: 
+			if self.factories["parts"]["number"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.8 and self.resource_base["coal"] >= 1.0: 
 				options.append("parts")
-			if self.factories["clothing"] == 0 and self.resource_base["cotton"] >= 0.5:
+			if self.factories["clothing"]["number"] == 0 and self.resource_base["cotton"] >= 0.5:
 				options.append("clothing")
-			if self.factories["clothing"] == 0 and self.num_factories() >= 1:
+			if self.factories["clothing"]["number"] == 0 and self.num_factories() >= 1:
 				options.append("clothing")
-			if self.factories["clothing"] == 1 and "power_loom" in self.technologies and self.resource_base["cotton"] >= 1.8:
+			if self.factories["clothing"]["number"] == 1 and "power_loom" in self.technologies and self.resource_base["cotton"] >= 1.8:
 				options.append("clothing")
-			if self.factories["furniture"] == 0 and self.resource_base["wood"] >= 0.8:
+			if self.factories["furniture"]["number"] == 0 and self.resource_base["wood"] >= 0.8:
 				options.append("furniture")
-			if self.factories["furniture"] == 1 and "electricity" in self.technologies and self.resource_base["wood"] >= 1.4 and self.resource_base["cotton"] >= 0.9:
+			if self.factories["furniture"]["number"] == 1 and "electricity" in self.technologies and self.resource_base["wood"] >= 1.4 and self.resource_base["cotton"] >= 0.9:
 				options.append("furniture")
-			if self.factories["paper"] == 0 and self.resource_base["wood"] >= 1:
+			if self.factories["paper"]["number"] == 0 and self.resource_base["wood"] >= 1:
 				options.append("paper")
-			if self.factories["paper"] == 1 and "pulping" in self.technologies and self.resource_base["wood"] >= 1.8:
+			if self.factories["paper"]["number"] == 1 and "pulping" in self.technologies and self.resource_base["wood"] >= 1.8:
 				options.append("paper")
-			if self.factories["cannons"] == 0:
+			if self.factories["cannons"]["number"] == 0:
 				options.append("cannons")
-			if self.factories["cannons"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.6:
+			if self.factories["cannons"]["number"] == 1 and "bessemer_process" in self.technologies and self.resource_base["iron"] >= 1.6:
 				options.append("cannons")
-			if self.factories["chemicals"] == 0 and "chemistry" in self.technologies and self.resource_base["coal"] > 1.2:
+			if self.factories["chemicals"]["number"] == 0 and "chemistry" in self.technologies and self.resource_base["coal"] > 1.2:
 				options.append("chemicals")
-			if self.factories["chemicals"] == 1 and "dyes" in self.technologies and self.resource_base["coal"] > 2:
+			if self.factories["chemicals"]["number"] == 1 and "dyes" in self.technologies and self.resource_base["coal"] > 2:
 				options.append("chemicals") 
-			if self.factories["gear"] == 0 and "electricity" in self.technologies:
+			if self.factories["gear"]["number"] == 0 and "electricity" in self.technologies:
 				options.append("gear")
-			if self.factories["gear"] == 1 and self.resource_base["rubber"] >= 1.1:
+			if self.factories["gear"]["number"] == 1 and self.resource_base["rubber"] >= 1.1:
 			 	options.append("gear")
-			if self.factories["radio"] == 0 and "radio" in self.technologies:
+			if self.factories["radio"]["number"] == 0 and "radio" in self.technologies:
 				options.append("radio")
-			if self.factories["telephone"] == 0 and "telephone" in self.technologies:
+			if self.factories["telephone"]["number"] == 0 and "telephone" in self.technologies:
 				options.append("telephone")
-			if self.factories["fighter"] == 0 and "flight" in self.technologies:
+			if self.factories["fighter"]["number"] == 0 and "flight" in self.technologies:
 				options.append("fighter")
-			if self.factories["auto"] == 0 and "automobile" in self.technologies:
+			if self.factories["auto"]["number"] == 0 and "automobile" in self.technologies:
 				options.append("auto")
-			if self.factories["tank"] == 0 and "mobile_warfare" in self.technologies:
+			if self.factories["tank"]["number"] == 0 and "mobile_warfare" in self.technologies:
 				options.append("tank") 
 		return options
 
@@ -1798,7 +1857,7 @@ class AI(Player):
 		if _type == "auto":
 			self.resourse_to_keep["rubber"] += 1
 			self.resourse_to_keep["iron"] += 1
-			self.resource_priority["oil"] += 0.1
+			self.resource_priority["oil"] += 0.2
 			self.resource_priority["rubber"] += 0.2
 			self.resource_priority["iron"] += 0.05
 			self.goods["gear"] -= 1
@@ -1807,7 +1866,7 @@ class AI(Player):
 		self.AP -= 1
 		self.resources["iron"] -= 1.0
 		self.goods["parts"] -= 1.0
-		self.factories[_type] += 1
+		self.factories[_type]["number"] += 1
 		#globe.factories[_type] += 1
 		for p in players.values():
 			if type(p) == AI:

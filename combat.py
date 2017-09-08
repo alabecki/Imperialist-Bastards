@@ -372,12 +372,12 @@ def combat_outcome(winner, p1, p2, prov, players, market, relations):
 				selection.development_level -= 1
 				print("As a result of the war, the development level of %s has been reduced to %s" % (selection.name, selection.development_level))
 
-		#print(prov.name)
+		print(prov.name)
 		#if p2.type == "major" or p2.type == "old_empire":
 		#	resolve_major_conflict()
 
-		#for p, pr in p2.provinces.items():
-		#	print(p, pr.name)
+		for p, pr in p2.provinces.items():
+			print(p, pr.name)
 		if prov.name in p2.provinces.keys():
 			gain_province(p1, p2, prov, players, market, relations)
 		else:
@@ -420,6 +420,8 @@ def gain_province(p1, p2, prov, players, market, relations):
 				p2.numMidPOP -= 0.2
 				p2.POP -= 0.2
 				print("%s has lost a %s to %s" % (p2.name, switch, p1.name))
+
+
 	pause = input()
 	prov.owner = p1.name
 	#new = deepcopy(p2.provinces[prov.name])
@@ -442,6 +444,7 @@ def gain_province(p1, p2, prov, players, market, relations):
 		p2.capital = ch
 	if prov.colony == True:
 		p2.num_colonies -= 1
+		p2.colonization += 1 + p1.num_colonies
 	if p2.type == "old_empire" or p2.type == "old_minor" or prov.colony == True:
 		p1.colonization -= (1 + p1.num_colonies)
 		p1.provinces[prov.name].colony = True
@@ -478,6 +481,11 @@ def gain_province(p1, p2, prov, players, market, relations):
 		for r in relkeys:
 			if p2.name in relations[r].relata:
 				del relations[r]
+		for pl in players.values():
+			sphere_target_copy = deepcopy(pl.sphere_targets)
+			for st in sphere_target_copy:
+				if st == p2.name:
+					pl.sphere_targets.remove(st)
 	
 		del players[p2.name]
 	else:
@@ -574,7 +582,32 @@ def oil_amph_unit_man(player, current_makeup):
 			amount = current_makeup[k] * player.tank["manouver"]
 		if k == "fighter":
 			amount = current_makeup[k] * player.fighter["manouver"]
-	return amount  
+	return amount 
+
+
+def select_ground_forces(player, target):
+
+	forces = {
+		"infantry": 0,
+		"cavalry": 0,
+		"artillery": 0,
+		"tank": 0,
+		"fighter": 0
+	}
+	for k, v in forces.items():
+		correct = False
+		while correct == False:
+			print("How many %s would you like to send? (you have %s)" % (k, player.military[k]))
+			print("%s has %s %s" % (target.name, target.military[k], k))
+			amount = input()
+			amount = int(amount)
+			if amount > player.military[k]:
+				print("You only have %s %s" %(v, k))
+				continue
+			else:
+				forces[k] = amount
+				number += amount
+				correct = True
 
 
 
@@ -809,8 +842,8 @@ def amph_combat(p1, p2, p1_forces, prov, players, market, relations):
 		loss_mod = att_str/temp
 
 
-		att_losses = def_str/loss_mod
-		def_losses = att_str/loss_mod
+		att_losses = def_str/(loss_mod + 0.001)
+		def_losses = att_str/(loss_mod + 0.001)
 
 		if att_losses > att_number_units_army:
 			temp = att_losses = att_number_units_army
@@ -821,15 +854,16 @@ def amph_combat(p1, p2, p1_forces, prov, players, market, relations):
 		done = False
 		if att_losses < 0.50 and def_losses < 0.50:
 			done = True
+
 		print("%s losses: %s,  %s losses: %s \n" % (p1.name, att_losses, p2.name, def_losses))
 		att_current_makeup = distribute_losses_amph(p1, att_losses, att_number_units_army, att_current_makeup)
 		att_number_units_army = calculate_amphib_num_units(p1, att_current_makeup)
 		def_number_units_army = distribute_losses(p2, def_losses, def_number_units_army)
 		print("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_army, p2.name, def_number_units_army))
 
-		if(att_number_units_army < att_initial_army * 0.4):
+		if(att_number_units_army < att_initial_army * 0.45):
 			done = True
-		if(def_number_units_army < def_initial_army * 0.3):
+		if(def_number_units_army < def_initial_army * 0.38):
 			done = True
 		if att_number_units_army < 1 or def_number_units_army < 1:
 			done = True
@@ -853,7 +887,7 @@ def amph_combat(p1, p2, p1_forces, prov, players, market, relations):
 					return
 
 
-def naval_transport(player):
+def naval_transport(player, target):
 	forces = {
 		"infantry": 0,
 		"cavalry": 0,
@@ -861,6 +895,9 @@ def naval_transport(player):
 		"tank": 0,
 		"fighter": 0
 	}
+	if player.military["infantry"] < 1:
+		return forces
+	forces["infantry"] += 1
 	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 	if type(player) == Human:
 		number = 0
@@ -881,15 +918,48 @@ def naval_transport(player):
 					number += amount
 					correct = True
 	if type(player) == AI:
-		for v in range(int(transport_limit)):
-			tries = 0
-			while tries < 40:
-				_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
-				if (player.military[_type] - forces[_type]) >= 1:
-					print("Load %s " % (_type))
-					forces[_type] += 1
-					break
+		target_strength = target.calculate_base_defense_strength()
+		print("Target strength: %s" % (target_strength))
+		self_strength = 0
+		number_units = player.num_army_units()
+		tries = 0
+		number = 0
+		while (self_strength < (target_strength * 2) and number_units > 0.99 and tries < 128 and number <= transport_limit):
+			pick = choice(["infantry", "artillery", "cavalry", "fighter", "tank"])
+			if (player.military[pick] - forces[pick]) >= 1:
+				print("Adds %s " % (pick))
+				forces[pick] += 1
+				if pick == "infantry":
+					self_strength += player.infantry["attack"]
+				elif pick == "cavalry":
+					self_strength += player.cavalry["attack"]
+				elif pick == "artillery":
+					self_strength += player.artillery["attack"]
+				elif pick == "tank":
+					self_strength += player.tank["attack"]
+				elif pick == "fighter":
+					self_strength += player.fighter["attack"]
 				tries += 1
+				number_units -= 1
+				print("Tries: %s" % (tries))
+				number += 1
+			else:
+				tries += 1
+
+	return forces
+
+
+
+
+		#for v in range(int(transport_limit)):
+		#	tries = 0
+		#	while tries < 52:
+		#		_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
+		#		if (player.military[_type] - forces[_type]) >= 1:
+		#			print("Load %s " % (_type))
+		#			forces[_type] += 1
+		#			break
+		#		tries += 1
 	print("forces:")
 	for j, k in forces.items():
 		print(j, k)
@@ -897,6 +967,10 @@ def naval_transport(player):
 
 
 def ai_transport_units(player):
+	target_strength = target.calculate_base_defense_strength()
+	print("Target strength: %s" % (target_strength))
+	self_strength = 0
+	number_units = player.num_army_units()
 	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
 	forces = {
 		"infantry": 0,
@@ -906,14 +980,29 @@ def ai_transport_units(player):
 		"fighter": 0
 	}
 	number = 0
-	for v in range(int(transport_limit)):
-		tries = 0
-		while tries < 32:
-			_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
-			if player.military[_type] - forces[_type] >= 1:
-				forces[_type] += 1
-				break
+
+	while (self_strength < (target_strength * 2) and number_units > 0.99 and tries < 128 and number <= transport_limit):
+		pick = choice(["infantry", "artillery", "cavalry", "fighter", "tank"])
+		if (player.military[pick] - forces[pick]) >= 1:
+			print("Adds %s " % (pick))
+			forces[pick] += 1
+			if pick == "infantry":
+				self_strength += player.infantry["attack"]
+			elif pick == "cavalry":
+				self_strength += player.cavalry["attack"]
+			elif pick == "artillery":
+				self_strength += player.artillery["attack"]
+			elif pick == "tank":
+				self_strength += player.tank["attack"]
+			elif pick == "fighter":
+				self_strength += player.fighter["attack"]
 			tries += 1
+			number_units -= 1
+			print("Tries: %s" % (tries))
+			number += 1
+		else:
+			tries += 1
+
 
 	return forces
 
@@ -1096,7 +1185,9 @@ def naval_battle(p1, p2, market, relations, prov = " "):
 					continue
 
 def amphib_prelude(player, other, annex, players, market, relations):
-	amount = naval_transport(player)
+	amount = naval_transport(player, other)
+	if amount["infantry"] == 0:
+		return
 	if type(other) == Human:
 		print("That dastardly %s is sending an armada filled with soldiers to your homeland! \n" % (player.name))
 		print("His navy has %s frigates and %s ironclads. Your navy has %s frigates and %s ironclads" \
