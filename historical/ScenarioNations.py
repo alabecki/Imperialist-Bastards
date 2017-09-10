@@ -34,7 +34,7 @@ def england(player, provinces):
 	player.objectives = {"SouthEastEngland", "SouthEastEngland", "Midlands", "Whales", "NorthEngland", \
 	"Scotland", "Ireland", "Bombay", "_Bengal", "_Hyderabad", "UpperEgypt", "MiddleEgypt", "Sudan", \
 	"United_Provinces", "Rajputana", "Madres", "Nagpur", "_Burma", "_Malaysia", "_Nejd", \
-	"Iraq", "Guangdong", "Punjab", "Central_India", "_NorthGermany", "Brittany"}
+	"Iraq", "Guangdong", "Punjab", "Central_India"}
 
 
 	if type(player) == AI:
@@ -83,7 +83,7 @@ def france(player, provinces):
 
 
 	player.objectives = {"Loire", "Champagne", "Brittany", "CentralFrance", "Aquitaine", "Alps", \
-	"Normandy", "Piedmont", "Wallonie", "Gelderland", "Aragon", "Algiers", "Constantine", "_Burma",\
+	"Normandy", "Piedmont", "Wallonie", "Gelderland", "Algiers", "Constantine", "_Burma",\
 	"Syria", "_Morocco", "South_Morocco", "Laos", "North_Dai_Nam", "South_Dai_Nam", "_Cambodia", "Bombay", \
 	"Khuzestan", "Tunis"} 
 
@@ -121,7 +121,7 @@ def germany(player, provinces):
 	player.tank["attack"] += 0.5
 
 	if type(player) == AI:
-		player.personality["Army"] = 1.7
+		player.personality["Army"] = 1.8
 		player.personality["Navy"] = 0.65
 		player.build_factory_priority["paper"] = 1.3
 		player.personality["Offensive"] = 0.68
@@ -135,13 +135,13 @@ def germany(player, provinces):
 		player.technologies.add("high_pressure_steam_engine")
 		player.resources["gold"] = 18
 		player.improve_province_priority["shipyard"] = 24
-		player.sphere_targets = {"Denmark", "Sweden", "Switzerland", "Sweden", "Japan", "Ottoman", "Persia", "India"}
-
-
+		player.sphere_targets = {"Denmark", "Switzerland", "Sweden", "Japan", "Ottoman", \
+		"Persia", "India", "Austria"}
+		
 
 	player.objectives = {"EastPrussia", "Brandenburg", "_NorthGermany", "_Bavaria", "Rhineland", \
-	"_Saxony", "WestPoland", "_Poland", "_Austria", "Bohemia", "Wallonie", "Gelderland", "Baltic", \
-	"_Malaysia", "Bangkok", "Khuzestan", "SouthEastEngland", "_Norway"}
+	"_Saxony", "WestPoland", "_Poland", "_Austria", "Bohemia", "Wallonie","Baltic", \
+	"_Malaysia", "Bangkok", "Khuzestan", "_Norway"}
 
 	
 
@@ -211,7 +211,8 @@ def austria(player, provinces):
 	player.provinces["Venezia"] = provinces["Venezia"]	
 
 
-	player.objectives = {"Romania", "Wallonie", "_Bavaria", "_Saxony", "Bosnia", "Venezia", "WestUkraine"}
+	player.objectives = {"Bohemia", "Slovakia", "_Austria", "Hungary", "Croatia", "Romania", "Wallonie", \
+	"_Bavaria", "_Saxony", "Bosnia", "Venezia", "WestUkraine"}
 	sphere = {"_Saxony"}
 
 	if type(player) == AI:
@@ -285,8 +286,9 @@ def russia(player, provinces):
 
 
 
-	player.objectives = {"_Poland", "WestPoland", "WestUkraine", "Finland", "EastKazakhstan", \
-	"WestKazakhstan", "EastPrussia", "Manchuria", "Romania", "Slovakia", "Brandenburg"}
+	player.objectives = {"Ukraine", "Baltic", "Okhotsk", "_Poland", "WestPoland", "WestUkraine", \
+	"Finland", "EastKazakhstan", "Yakutsk", "Ural", "Perm", "Moskva", "Novgorod", "Caucasia", "Crimea", \
+	"WestKazakhstan", "Manchuria", "Romania"}
 
 
 def italy(player, provinces): #major
@@ -357,6 +359,7 @@ def switzerland(player, provinces):
 	player.culture = "Swiss"
 	player.capital = "_Switzerland"
 	player.resources["gold"] = 12
+	player.resources["food"] = 2
 
 	player.military["infantry"] = 3
 	player.number_units = 3
@@ -485,7 +488,7 @@ def spain(player, provinces):
 
 
 	player.objectives = {"Andalusia", "Leon", "Aragon", "Galicia", "La_Mancha", "_Morocco", "South_Morocco", \
-	"NorthPhilippines", "SouthPhilippines", "_Portugal", "Sicily", "Naples", "Wallonie", "Aquitaine", "_Brunei"}
+	"NorthPhilippines", "SouthPhilippines", "_Portugal", "Sicily", "Naples", "Wallonie", "_Brunei"}
 
 
 
@@ -523,7 +526,7 @@ def netherlands(player, provinces): # major power
 		player.sphere_targets = {"Denmark", "Portugal", "Switzerland", "Ottoman", "Persia", "China"}
 
 
-	player.objectives = {"Holland", "Gelderland", "Wallonie", "_NorthGermany", "Sumatra", "_Brunei",  \
+	player.objectives = {"Holland", "Gelderland", "Wallonie", "Rhineland", "Sumatra", "_Brunei",  \
 	"_Sulawesi", "_Java", "Madres", "Bombay"}
 
 

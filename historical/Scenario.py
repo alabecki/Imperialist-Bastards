@@ -420,24 +420,24 @@ def historical():
 
 
 	
-	new0 = CB("Germany", "Austria", "annex", "_Austria", 18)
-	players["Germany"].CB.add(new0)
+	#new0 = CB("Germany", "Austria", "annex", "_Austria", 18)
+	#players["Germany"].CB.add(new0)
 	new1 = CB("Germany", "Saxony", "annex", "_Saxony", 18)
-	players["Germany"].CB.add(new1)
+	#players["Germany"].CB.add(new1)
 
 	#new2 = CB("Germany", "Bavaria", "annex", "_Bavaria", 18)
 	#players["Germany"].CB.add(new2)
 	new3 = CB("Germany", "NorthGermany", "annex", "_NorthGermany", 20)
-	players["Germany"].CB.add(new3)
+	#players["Germany"].CB.add(new3)
 
 	new4 = CB("Italy", "Austria", "annex", "Venezia", 20)
 	new5 = CB("Italy", "Papal States", "annex", "Lazio", 20)
-	new6 = CB("Italy", "Two Sicilies", "annex", "Naples", 20)
-	new7 = CB("Italy", "Two Sicilies", "annex", "Sicily", 20)
+	#new6 = CB("Italy", "Two Sicilies", "annex", "Naples", 20)
+	#new7 = CB("Italy", "Two Sicilies", "annex", "Sicily", 20)
 	players["Italy"].CB.add(new4)
 	players["Italy"].CB.add(new5)
-	players["Italy"].CB.add(new6)
-	players["Italy"].CB.add(new7)
+	#players["Italy"].CB.add(new6)
+	#players["Italy"].CB.add(new7)
 
 
 

@@ -5,7 +5,7 @@ def create_provinces():
 
 	provinces = {}
 	
-	SouthEastEngland = Province("SouthEastEngland", "England", "food", 1.2, "civilized", "English")
+	SouthEastEngland = Province("SouthEastEngland", "England", "food", 1.1, "civilized", "English")
 	SouthEastEngland.x = 3
 	SouthEastEngland.y = 4
 	provinces["SouthEastEngland"] = SouthEastEngland
@@ -15,28 +15,28 @@ def create_provinces():
 	SouthWestEngland.y = 5
 	provinces["SouthWestEngland"] = SouthWestEngland
 	
-	Midlands = Province("Midlands", "England", "iron", 1.1,  "civilized", "English")
+	Midlands = Province("Midlands", "England", "iron", 1.0,  "civilized", "English")
 	Midlands.x = 2
 	Midlands.y = 5
 	provinces["Midlands"] = Midlands
 
-	Whales = Province("Whales", "England", "iron", 1.1,  "civilized", "English" )
+	Whales = Province("Whales", "England", "iron", 1.0,  "civilized", "English" )
 	Whales.x = 2
 	Whales.y = 4
 	provinces["Whales"] = Whales
 	
-	NorthEngland = Province("NorthEngland", "England", "coal", 1.2, "civilized", "English")
+	NorthEngland = Province("NorthEngland", "England", "coal", 1.1, "civilized", "English")
 	NorthEngland.x = 1
 	NorthEngland.y = 5
 	provinces["NorthEngland"] = NorthEngland
 
 
-	Scotland = Province("Scotland", "England", "coal", 1.2, "civilized", "Scottish")
+	Scotland = Province("Scotland", "England", "coal", 1.0, "civilized", "Scottish")
 	Scotland.x = 1
 	Scotland.y = 4
 	provinces["Scotland"] = Scotland
 
-	Ireland = Province("Ireland", "England", "food", 1.1, "civilized", "Irish")
+	Ireland = Province("Ireland", "England", "food", 1.0, "civilized", "Irish")
 	Ireland.x = 2
 	Ireland.y = 2
 	provinces["Ireland"] = Ireland
