@@ -73,14 +73,13 @@ def AI_turn(players, player, market, relations, provinces):
 	worsen_relations(player, players, relations, provinces)
 	gain_cb(player, players, relations)
 	attack_target(player, players, relations, provinces, market)
-	#ai_bribe(player, players, relations)
+	ai_bribe(player, players, relations)
 
 
 	count = 0
 	while player.diplo_action >= 2 and count < 4:
 		if player.rival_target == [] or len(player.CB) < 2:
 			worsen_relations(player, players, relations, provinces)
-			decide_target(player, players, market, provinces, relations)
 		damage_relations(player, players, relations)
 		ai_improve_relations(player, players, relations)
 		ai_destablize(player, players, relations)

@@ -579,6 +579,9 @@ class Player(object):
 
 	
 	def core_provinces(self):
+		#print("Current Provinces")
+		#for k, v in self.provinces.items():
+		#	print(k, v)
 		core = set()
 		consider = Queue(100)
 		if self.capital == "":
@@ -588,6 +591,8 @@ class Player(object):
 			consider.put(first)
 			while consider.qsize() >= 1:
 				thing = consider.get()
+				if type(thing) != Province:
+					continue
 				for p in self.provinces.values():
 					if p != thing:
 						if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:

@@ -982,10 +982,8 @@ class AI(Player):
 				if other.midPOP["managers"]["number"] > 0:
 					pr.relationship += other.midPOP["managers"]["number"]/4
 
-
 				#if "quality control" in other.ideas:
 				#	pr.relata += 0.15
-
 		if kind == "clothing" or kind == "furniture":
 			for pr in p_relations:
 				pair = list(pr.relata)
@@ -1042,6 +1040,7 @@ class AI(Player):
 					other.resources["gold"] += price
 
 					market.market[kind].remove(s)
+					relations[frozenset({other.name, self.name})].relationship + 0.01
 					del s
 					if kind in market.resources:
 						self.resources[kind] += 1
@@ -1946,7 +1945,7 @@ class AI(Player):
 		num_units = self.num_army_units()
 		if num_units > self.POP * (self.personality["Army"]) * 0.8 and market.turn < 18:
 			return
-		if num_units > self.POP * self.personality["Army"]:
+		if num_units > self.POP * self.personality["Army"] and "mobile_warfare" not in self.technologies:
 			return
 		print("Wants to build army")
 		if self.can_train < 1:
@@ -1959,6 +1958,11 @@ class AI(Player):
 		if self.goods["cannons"] - ammo_needed < 1:
 			print("Not enough cannons")
 			return
+
+		if self.goods["tank"] >= 1 and self.military["tank"] < 4:
+			self.ai_build_tank()
+		if self.goods["fighter"] >= 1 and self.military["fighter"] < 4:
+			self.ai_build_fighter()
 
 		tries = 0
 		while ((self.goods["cannons"] - self.calculate_ammo_needed()) > 1.5 and self.freePOP > 0.2 and self.can_train >= 1):

@@ -194,12 +194,15 @@ class Market(object):
 					other.new_development +=  0.2
 					#self.market[_type].remove(s)
 					player.supply[_type] -= 1
+					relations[frozenset({other.name, player.name})].relationship + 0.01
 					if _type in self.resources:
 						player.resources[_type] += 1
 						print("You now have %s %s" % (player.resources[_type], _type))
 					else:
 						player.goods[_type] +=1
 						print("You now have %s %s" % (player.goods[_type], _type))
+						other.new_development +=  0.2
+
 					player.calculate_access_to_goods(market)
 
 
