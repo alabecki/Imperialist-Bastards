@@ -38,7 +38,8 @@ government_map = {
 }
 
 military_doctrines = ["Infantry_Offense", "Infantry_Defense", "Mobile_Offense", "Mobile_Defense", "Artillery_Offense",
-"Artillery_Defense", "Fighter_Offense", "Fighter_Defense", "Sea_Doctrine1", "Sea_Doctrine2", "Enhanced_Mobility"]
+"Artillery_Defense", "Fighter_Offense", "Fighter_Defense", "Sea_Doctrine1", "Sea_Doctrine2", "Enhanced_Mobility", 
+"Army_Discipline"]
 
 
 class Player(object):
@@ -232,15 +233,15 @@ class Player(object):
 
 		self.infantry = {
 			"attack": 1.0,
-			"defend": 1.1,
+			"defend": 1.2,
 			"manouver": 0.5,
 			"ammo_use": 0.1,
 			"oil_use": 0.0
 			}
 
 		self.artillery = {
-			"attack": 1.75,
-			"defend": 1.75,
+			"attack": 1.0,
+			"defend": 1.8,
 			"manouver": 0.0,
 			"ammo_use": 0.2,
 			"oil_use": 0.0
@@ -255,9 +256,9 @@ class Player(object):
 		}
 
 		self.fighter = {
-			"attack": 0.8,
-			"defend": 1.2,
-			"manouver": 6.0,
+			"attack": 1.0,
+			"defend": 1.5,
+			"manouver": 4.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.1
 		}
@@ -265,7 +266,7 @@ class Player(object):
 		self.tank = {
 			"attack": 3,
 			"defend": 2,
-			"manouver": 4.0,
+			"manouver": 3.0,
 			"ammo_use": 0.15,
 			"oil_use": 0.1
 		}
@@ -645,8 +646,8 @@ class Player(object):
 		return strength
 
 
-	def ai_naval_projection(self):
-		forces = self.ai_transport_units()
+	def ai_naval_projection(self, target):
+		forces = self.ai_transport_units(target)
 		strength = 0
 		for k, v in forces.items():
 			att = 0
@@ -663,8 +664,13 @@ class Player(object):
 		return strength
 
 
-	def ai_transport_units(self):
-		transport_limit = (self.military["frigates"] + self.military["iron_clad"] + self.military["battle_ship"]) * 2 
+	def ai_transport_units(self, target):
+		tries = 0
+		target_strength = target.calculate_base_defense_strength()
+		print("Target strength: %s" % (target_strength))
+		self_strength = 0
+		number_units = self.num_army_units()
+		transport_limit = ((self.military["frigates"] + self.military["iron_clad"]) * 2 + self.military["battle_ship"] * 3) 
 		forces = {
 			"infantry": 0,
 			"cavalry": 0,
@@ -673,14 +679,30 @@ class Player(object):
 			"fighter": 0
 		}
 		number = 0
-		for v in range(int(transport_limit)):
-			tries = 0
-			while tries < 32:
-				_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
-				if self.military[_type] - forces[_type] >= 1:
-					forces[_type] += 1
-					break
+
+		while (self_strength < (target_strength * 2) and number_units > 0.99 and tries < 128 and number <= transport_limit):
+			pick = choice(["infantry", "artillery", "cavalry", "fighter", "tank"])
+			if (self.military[pick] - forces[pick]) >= 1:
+			#	print("Adds %s " % (pick))
+				forces[pick] += 1
+				if pick == "infantry":
+					self_strength += self.infantry["attack"]
+				elif pick == "cavalry":
+					self_strength += self.cavalry["attack"]
+				elif pick == "artillery":
+					self_strength += self.artillery["attack"]
+				elif pick == "tank":
+					self_strength += self.tank["attack"]
+				elif pick == "fighter":
+					self_strength += self.fighter["attack"]
 				tries += 1
+				number_units -= 1
+				#print("Tries: %s" % (tries))
+				number += 1
+			else:
+				tries += 1
+
+
 		return forces
 
 

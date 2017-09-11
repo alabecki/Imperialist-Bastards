@@ -160,22 +160,22 @@ class Human(Player):
 				self.irregulars["attack"] += 0.15
 				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.3
-				self.infantry["defend"] += 0.10
-				self.cavalry["attack"] += 0.20
-				self.cavalry["defend"] += 0.08
+				self.infantry["defend"] += 0.1
+				self.cavalry["attack"] += 0.2
+				self.cavalry["defend"] += 0.1
 				self.artillery["attack"] += 0.3
-				self.artillery["defend"] += 0.10
+				self.artillery["defend"] += 0.1
 				self.frigates["attack"] += 0.25
 
 			if(choice == "muzzle_loaded_arms"):
 				self.irregulars["attack"] += 0.15
 				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.3
-				self.infantry["defend"] += 0.10
-				self.cavalry["attack"] += 0.20
-				self.cavalry["defend"] += 0.08
+				self.infantry["defend"] += 0.1
+				self.cavalry["attack"] += 0.2
+				self.cavalry["defend"] += 0.05
 				self.artillery["attack"] += 0.3
-				self.artillery["defend"] += 0.10
+				self.artillery["defend"] += 0.1
 				self.frigates["attack"] += 0.25
 			if(choice == "cement"):
 				self.max_fortification += 0.1
@@ -189,22 +189,20 @@ class Human(Player):
 				self.artillery["attack"] += 0.35
 				self.artillery["defend"] += 0.2
 				self.frigates["attack"] += 0.35
-				self.frigates["attack"] += 0.35
 			if(choice == "machine_guns" ):
 				self.irregulars["defend"] += 0.2
 				self.infantry["defend"] += 1.0
-				self.infantry["attack"] += 0.1
-				self.cavalry["defend"] + 0.15
+				self.cavalry["defend"] + 0.1
 			if(choice == "indirect_fire"):
-				self.artillery["attack"] += 0.1
-				self.artillery["defend"] += 0.4
+				self.artillery["attack"] += 0.15
+				self.artillery["defend"] += 0.5
 				self.artillery["ammo_use"] += 0.05
 				self.iron_clad["attack"] += 0.25
 			if(choice == "bombers"):
-				self.fighter["attack"] += 1
+				self.fighter["attack"] += 1.2
 				self.fighter["ammo"] += 0.1
 			if(choice == "radar"):
-				self.fighter["defend"] += 1
+				self.fighter["defend"] += 1.2
 				self.battle_ship["attack"] += 1
 			if(choice == "telegraph"):
 				self.factory_throughput += 1
@@ -212,7 +210,15 @@ class Human(Player):
 			if choice == "electricity":
 				self.factory_throughput += 1
 				self.production_modifier += 0.15
-
+			if choice == "radio":
+				self.reputation += 0.2
+				self.stability += 0.2
+			if choice == "early_computers":
+				self.battle_ship["attack"] += 1
+				self.production_modifier += 1.5
+			if choice == "atomic_bomb":
+				print("Holy Shit!")
+				pause = input()
 
 
 

@@ -122,7 +122,7 @@ class AI(Player):
 			"pre_industry_1": 5,
 			"pre_industry_2": 5,
 			"pre_industry_3": 5,
-			"professional_armies": 7,
+			#"professional_armies": 7,
 			"high_pressure_steam_engine": 7,
 			"square_timbering": 4,
 			"cotton_gin": 4,
@@ -159,7 +159,10 @@ class AI(Player):
 			"oil_powered_ships": 5.0,
 			"synthetic_oil": 4.0,
 			"synthetic_rubber": 4.0,
-			"radar": 3.0
+			"radar": 3.0,
+			"rockets": 1,
+			"early_computers": 2.3,
+			"atomic_bomb": 5
 
 		}
 
@@ -309,8 +312,8 @@ class AI(Player):
 				continue
 			if self.midPOP[m]["number"] < least_mid * 2:
 				m_options.append(m)
-		for mo in m_options:
-			print(mo)
+		#for mo in m_options:
+		#	print(mo)
 		m_selection = ""
 		if self.stability < -1.0 and "artists" in m_options:
 			m_selection = "artists"
@@ -338,6 +341,8 @@ class AI(Player):
 		self.mid_class_priority[m_selection] -= 0.1
 		self.new_development += 0.5
 		if m_selection == "officers":
+			self.milPOP -= 0.2
+			self.freePOP +=  0.2
 			self.ai_choose_doctrine()
 		print("New middle class pop: %s ________________________" % (m_selection))
 
@@ -448,8 +453,7 @@ class AI(Player):
 				self.ai_craftman_production("furniture")
 
 	def num_army_units(self):
-		res = 0
-		res += ((self.military["irregulars"]/2) + self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + self.military["tank"] + self.military["fighter"])
+		res = (self.military["irregulars"] + self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + self.military["tank"] + self.military["fighter"])
 		return res
 
 	def num_factories(self):
@@ -478,9 +482,9 @@ class AI(Player):
 		else:
 			#priorities = (sorted(self.build_factory_priority.keys(), key=lambda x:x[1], reverse=True ))
 			priorities = sorted(self.build_factory_priority, key=self.build_factory_priority.get, reverse = True)
-			print("Factory Priorities:")
-			for p in priorities:
-				print(p)
+			#print("Factory Priorities:")
+			#for p in priorities:
+			#	print(p)
 			options = self.ai_factory_options()
 			for p in priorities:
 				for o in options:
@@ -530,7 +534,7 @@ class AI(Player):
 	def develop_industry(self, market, relations, players):
 		print("Develop Industry:")
 		if self.AP < 1:
-			print("No AP left")
+		#	print("No AP left")
 			return
 		#print(self.type)
 		if self.type == "old_minor":
@@ -1232,7 +1236,7 @@ class AI(Player):
 		for k, v in self.factories.items():
 			#print(k, v)
 			if v["number"] >= 1:
-				print("Factory owned: %s" % (k))
+			#	print("Factory owned: %s" % (k))
 				if v["used"] == True:
 					return
 
@@ -1524,22 +1528,22 @@ class AI(Player):
 			self.irregulars["attack"] += 0.15
 			self.irregulars["defend"] += 0.1
 			self.infantry["attack"] += 0.3
-			self.infantry["defend"] += 0.10
-			self.cavalry["attack"] += 0.20
-			self.cavalry["defend"] += 0.08
+			self.infantry["defend"] += 0.1
+			self.cavalry["attack"] += 0.2
+			self.cavalry["defend"] += 0.1
 			self.artillery["attack"] += 0.3
-			self.artillery["defend"] += 0.10
+			self.artillery["defend"] += 0.1
 			self.frigates["attack"] += 0.25
 
 		if(choice == "muzzle_loaded_arms"):
 			self.irregulars["attack"] += 0.15
 			self.irregulars["defend"] += 0.1
 			self.infantry["attack"] += 0.3
-			self.infantry["defend"] += 0.10
-			self.cavalry["attack"] += 0.20
-			self.cavalry["defend"] += 0.08
+			self.infantry["defend"] += 0.1
+			self.cavalry["attack"] += 0.2
+			self.cavalry["defend"] += 0.05
 			self.artillery["attack"] += 0.3
-			self.artillery["defend"] += 0.10
+			self.artillery["defend"] += 0.1
 			self.frigates["attack"] += 0.25
 		if(choice == "cement"):
 			self.max_fortification += 0.1
@@ -1553,22 +1557,20 @@ class AI(Player):
 			self.artillery["attack"] += 0.35
 			self.artillery["defend"] += 0.2
 			self.frigates["attack"] += 0.35
-			self.frigates["attack"] += 0.35
 		if(choice == "machine_guns" ):
 			self.irregulars["defend"] += 0.2
 			self.infantry["defend"] += 1.0
-			self.infantry["attack"] += 0.1
-			self.cavalry["defend"] + 0.15
+			self.cavalry["defend"] + 0.1
 		if(choice == "indirect_fire"):
-			self.artillery["attack"] += 0.1
-			self.artillery["defend"] += 0.4
+			self.artillery["attack"] += 0.15
+			self.artillery["defend"] += 0.5
 			self.artillery["ammo_use"] += 0.05
 			self.iron_clad["attack"] += 0.25
 		if(choice == "bombers"):
-			self.fighter["attack"] += 1
+			self.fighter["attack"] += 1.2
 			self.fighter["ammo"] += 0.1
 		if(choice == "radar"):
-			self.fighter["defend"] += 1
+			self.fighter["defend"] += 1.2
 			self.battle_ship["attack"] += 1
 		if(choice == "telegraph"):
 			self.factory_throughput += 1
@@ -1579,6 +1581,12 @@ class AI(Player):
 		if choice == "radio":
 			self.reputation += 0.2
 			self.stability += 0.2
+		if choice == "early_computers":
+			self.battle_ship["attack"] += 1
+			self.production_modifier += 1.5
+		if choice == "atomic_bomb":
+			print("Holy Shit!")
+			pause = input()
 
 		#FOR AI ONLY
 		if choice == "chemistry":
@@ -1787,10 +1795,10 @@ class AI(Player):
 	#	print("Number of Army Units: %s" % (num_units))
 	#	print("Transport Limit %s" % (transport_limit))
 		#print("num units * per.navy %s" % (num_units*self.personality["Navy"]) )
-		print("Personality.navy: %s" % (self.personality["Navy"]))
-		print("Number of units: %s" % (num_units))
-		print("Num_units times pers.Navy: %s" %(num_units * self.personality["Navy"]))
-		print("Transpot Limit: %s" % (transport_limit))
+		#print("Personality.navy: %s" % (self.personality["Navy"]))
+		#print("Number of units: %s" % (num_units))
+		#print("Num_units times pers.Navy: %s" %(num_units * self.personality["Navy"]))
+		#print("Transpot Limit: %s" % (transport_limit))
 		if transport_limit > num_units * self.personality["Navy"]:
 			return
 		#	print("Wants to build navy ***********************************************")
@@ -1947,26 +1955,33 @@ class AI(Player):
 			return
 		if num_units > self.POP * self.personality["Army"] and "mobile_warfare" not in self.technologies:
 			return
-		print("Wants to build army")
+		#print("Wants to build army")
 		if self.can_train < 1:
-			print("Cannont further train")
+			#print("Cannont further train")
 			return
 		ammo_needed = self.calculate_ammo_needed()
 		cans = self.goods["cannons"] - ammo_needed
 		if cans < 1:
 			self.ai_buy("cannons", 3, market, relations, players)
 		if self.goods["cannons"] - ammo_needed < 1:
-			print("Not enough cannons")
+			#print("Not enough cannons")
 			return
-
-		if self.goods["tank"] >= 1 and self.military["tank"] < 4:
-			self.ai_build_tank()
-		if self.goods["fighter"] >= 1 and self.military["fighter"] < 4:
-			self.ai_build_fighter()
 
 		tries = 0
 		while ((self.goods["cannons"] - self.calculate_ammo_needed()) > 1.5 and self.freePOP > 0.2 and self.can_train >= 1):
 			priorities = sorted(self.military_priority, key=self.military_priority.get, reverse = True)
+			
+			if self.goods["tank"] >= 1 and self.military["tank"] < 4:
+				self.ai_build_tank()
+			else:
+				self.ai_buy("tank", 1, market, relations, players)
+			if self.goods["fighter"] >= 1 and self.military["fighter"] < 4:
+				self.ai_build_fighter()
+			else:
+				self.ai_buy("fighter", 1, market, relations, players)
+
+
+
 			for p in priorities:
 				if p == "infantry" and self.military["infantry"] < self.POP/3.4:
 					self.ai_build_infantry()

@@ -10,7 +10,7 @@
 technology_dict = {
 	"basic_civ": {"requirement": {}, "cost": 1, "min_mid": 0},
 	"pre_modern": {"requirement": {"basic_civ"}, "cost": 1, "min_mid": 0},
-	"professional_armies": {"requirement": {"pre_industry_1"}, "cost": 1, "min_mid": 0},
+	#"professional_armies": {"requirement": {"pre_industry_1"}, "cost": 1, "min_mid": 0},
 	"flint_lock": {"requirement": {"pre_industry_2", "professional_armies"}, "cost": 1, "min_mid": 0},
 	"pre_industry_1": { "requirement": {"pre_modern"}, "cost": 1, "min_mid": 0},
 	"pre_industry_2": {"requirement": {"pre_industry_1"}, "cost": 1, "min_mid": 0},
@@ -53,5 +53,6 @@ technology_dict = {
 	"synthetic_rubber": {"requirement": {"oil_powered_ships", "mobile_warfare"}, "cost": 10, "min_mid": 4},  # Use chemicals for rubber (3 for 1)
 	"radar": {"requirement": {"radio", "flight"}, "cost": 10, "min_mid": 4.5},
 	"rockets": {"requirement": {"synthetic_oil"}, "cost": 10, "min_mid": 4.5},
-	"atomic_bomb": {"requirement": {"synthetic_oil", "synthetic_rubber"}, "cost": 14, "min_mid": 5}
+	"early_computers": {"requirement": {"radar"}, "cost": 12, "min_mid": 5}
+	"atomic_bomb": {"requirement": {"synthetic_oil", "synthetic_rubber", "early_computers"}, "cost": 20, "min_mid": 6}
 }

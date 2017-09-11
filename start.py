@@ -37,10 +37,10 @@ def initialize_major_power(player):
 	player.stability = 1.0
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 8.4
+	player.POP = 8.2
 	player.freePOP = 6.6
-	player.milPOP = 1.0
-	player.numLowerPOP = 7.6
+	player.milPOP = 0.8
+	player.numLowerPOP = 7.4
 	player.type = "major"
 
 	player.shipyard = 1

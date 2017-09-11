@@ -367,6 +367,8 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 		num_resist = int(num_resist)
 		for i in range(num_resist):
 			p1.stability -= 0.2
+			if p1.stability < -3:
+				p1.stability = -3
 			unit_types = ["infantry", "cavalry", "artillery", "tank", "fighter"]
 			kind = choice(unit_types)
 			if p1.military[kind] > 2:
@@ -439,10 +441,10 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 		for p, pl in players.items():
 			if len(set([p1.name, p])) == 1 or len(set([p2.name, p])) == 1:
 				continue
-			if relations[frozenset([p1.name, p])].relationship < 1.5:
-				relations[frozenset([p1.name, p])].relationship -= 0.2
+			if relations[frozenset([p1.name, p])].relationship < 2.5:
+				relations[frozenset([p1.name, p])].relationship -= 1
 			if relations[frozenset([p2.name, p])].relationship > 1.5:
-				relations[frozenset([p1.name, p])].relationship -= 0.2
+				relations[frozenset([p1.name, p])].relationship -= 0.5
 
 		p2_borders = set()
 		if len(p2.provinces.keys()) >= 1:
@@ -1068,7 +1070,7 @@ def naval_transport(player, target):
 	if player.military["infantry"] < 1:
 		return forces
 	forces["infantry"] += 1
-	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	if type(player) == Human:
 		number = 0
 		print("Your transport capacity is %s" % (transport_limit))
@@ -1136,12 +1138,13 @@ def naval_transport(player, target):
 	return forces
 
 
-def ai_transport_units(player):
+def ai_transport_units(player, target):
 	target_strength = target.calculate_base_defense_strength()
 	print("Target strength: %s" % (target_strength))
 	self_strength = 0
+	tries = 0
 	number_units = player.num_army_units()
-	transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	forces = {
 		"infantry": 0,
 		"cavalry": 0,
@@ -1307,9 +1310,9 @@ def naval_battle(p1, p2, market, relations, prov = " "):
 		print("Defense str: %s " % (def_str))
 
 		temp = max(1, att_number_units_navy * 0.25) 
-		loss_mod = att_str/temp
-		att_losses = def_str/loss_mod
-		def_losses = att_str/loss_mod
+		loss_mod = att_str/(temp + 0.001)
+		att_losses = def_str/(loss_mod + 0.001)
+		def_losses = att_str/(loss_mod + 0.001)
 
 	
 
