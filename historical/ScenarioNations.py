@@ -108,6 +108,9 @@ def germany(player, provinces):
 
 	player.colonization = 0
 
+	player.midPOP["officers"] = 0.4
+	player.milPOP = 0.6
+
 	player.provinces["EastPrussia"] = provinces["EastPrussia"]
 	player.provinces["Brandenburg"] = provinces["Brandenburg"]
 	player.provinces["Rhineland"] = provinces["Rhineland"]
@@ -116,10 +119,14 @@ def germany(player, provinces):
 	#player.provinces["NorthGermany"] = provinces["NorthGermany"]
 	#player.provinces["Bavaria"] = provinces["Bavaria"]
 
-	player.doctrines = {"Mobile_Offense"}
+	player.doctrines = {"Mobile_Offense", "Army_Discipline"}
 	player.cavalry["attack"] += 0.3
 	player.tank["attack"] += 0.5
-
+	player.infantry["attack"] += 0.1
+	player.infantry["defend"] += 0.1
+	player.calvary["attack"] += 0.1
+	player.calvary["defent"] += 0.1
+ 
 	if type(player) == AI:
 		player.personality["Army"] = 1.8
 		player.personality["Navy"] = 0.65
@@ -285,7 +292,6 @@ def russia(player, provinces):
 		player.sphere_targets = {"Ottoman", "Denmark", "Japan", "Korea", "India"}
 
 
-
 	player.objectives = {"Ukraine", "Baltic", "Okhotsk", "_Poland", "WestPoland", "WestUkraine", \
 	"Finland", "EastKazakhstan", "Yakutsk", "Ural", "Perm", "Moskva", "Novgorod", "Caucasia", "Crimea", \
 	"WestKazakhstan", "Manchuria", "Romania"}
@@ -315,6 +321,8 @@ def italy(player, provinces): #major
 
 	player.numMidPOP = 0.4
 
+	player.doctrines = {"Infantry_Offense"}
+	player.infantry["attack"] += 0.25
 
 
 	#player.provinces["Naples"] = provinces["Naples"]
