@@ -78,7 +78,7 @@ def AI_turn(players, player, market, relations, provinces):
 
 
 	count = 0
-	while player.diplo_action >= 2 and count < 4:
+	while player.diplo_action >= 2 and count < 12:
 		if player.rival_target == [] or len(player.CB) < 2:
 			worsen_relations(player, players, relations, provinces)
 		if len(player.embargo) > 0:

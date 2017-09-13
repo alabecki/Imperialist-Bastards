@@ -452,9 +452,7 @@ class AI(Player):
 			if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3:
 				self.ai_craftman_production("furniture")
 
-	def num_army_units(self):
-		res = (self.military["irregulars"] + self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + self.military["tank"] + self.military["fighter"])
-		return res
+	
 
 	def num_factories(self):
 		count = 0
@@ -782,8 +780,6 @@ class AI(Player):
 		print("CBs:")
 		for cb in self.CB:
 			print("Opponent: %s, Province: %s, Action: %s, Time: %s" % (cb.opponent, cb.province, cb.action, cb.time))
-
-
 		print("Embarged by:")
 		for e in self.embargo:
 			print(e.name, end = " ")
@@ -1495,7 +1491,7 @@ class AI(Player):
 
 
 		if resource == "oil":
-			self.improve_province_priority["oil"] + 0.1
+			self.improve_province_priority["oil"] + 0.5
 			self.build_factory_priority["tank"] + 0.15
 			self.build_factory_priority["fighter"] + 0.15
 			self.build_factory_priority["auto"] += 0.25
@@ -1612,10 +1608,10 @@ class AI(Player):
 
 		#FOR AI ONLY
 		if choice == "chemistry":
-			self.resource_priority["rubber"] += 1.3
-			self.improve_province_priority["rubber"] +=1.15
+			self.resource_priority["rubber"] += 1.8
+			self.improve_province_priority["rubber"] += 1.15
 		if choice == "oil_drilling":
-			self.resource_priority["oil"] += 1.3
+			self.resource_priority["oil"] += 1.8
 			self.improve_province_priority["oil"] +=1.15
 		if choice == "chemistry":
 			self.resource_priority["coal"] += 0.2

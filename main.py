@@ -201,9 +201,20 @@ while True:
 							print("Development Points: %.2f  _____ Development Level: %.2f \n" % (player.new_development, player.number_developments))
 							print("Free POPs: %.2f  _______________ Culture Points: %.2f" % (player.freePOP, player.culture_points))
 							print("Factories:")
-
 							for k, v in player.factories.items():
 								print(k,v)
+							print("Objectives:")
+							for o in player.objectives:
+								if o not in player.provinces.keys():
+									print(o, end = ", ")
+							print("\n")
+							print("CBs:")
+							for cb in player.CB:
+								print(cb.province, cb.owner)
+							print("You are currently embargoed by:")
+							for e in player.embargo:
+								print(e.name, end = ", ")
+
 						if info_command == "2":
 							print("Province Overview: ######################################################################################## \n")
 							for k, province in player.provinces.items():
@@ -821,7 +832,7 @@ while True:
 							for k, v in relations.items():
 								if player.name in v.relata:
 									#pprint(vars(v))
-									print(v, v.relata, v.relationship)
+									print(v.relata, v.relationship)
 					if command == "2":
 						print("How would you like to manage your population? ################################################\n")
 						_choices = list(range(1, 4))
@@ -980,7 +991,7 @@ while True:
 								while annex not in cb_keys:
 									print("Please type in the name of the province associated with the CB:")
 									for cb in player.CB:
-										print(cb.opponent, cb.action, cb.province, cb.time)
+										print(cb.opponent, cb.province)
 									annex = input()
 								annex = provinces[annex]
 								owner = players[annex.owner]
@@ -993,7 +1004,7 @@ while True:
 											if landOrSea == "s":
 												victor = naval_battle(player, owner, market, relations, owner)
 												if victor == player.name:
-													gain_province(player, target, prov, players, market, relations)
+													gain_province(player, owner, prov, players, market, relations)
 												else:
 													player.war_after_math(owner, players, relations, annex)
 
@@ -1004,7 +1015,7 @@ while True:
 										dominance" % (owner.name, annex.name))
 										victor = naval_battle(player, owner, market, relations, owner)
 										if victor == player.name:
-											gain_province(player, target, prov, players, market, relations)
+											gain_province(player, owner, prov, players, market, relations)
 										else:
 											player.war_after_math(owner, players, relations, annex)
 										
@@ -1022,21 +1033,36 @@ while True:
 									else:
 										print("Since we border %s, we may attack by land!" % (owner.name))
 										#combat(player, owner, annex, players, market, relations)
-										forces = select_ground_forces(player, target)
-										amph_combat(player, target, forces, prov, players, market, relations)
+										forces = select_ground_forces(player, owner)
+										amph_combat(player, owner, forces, prov, players, market, relations)
 
 	
 							if action == "2":
-								print("This feature is not yet implemented")
-			
-				
-				
-					
-			
-						
-
-
-				
+								if player.military["fighter"] < 4 or player.military["tank"] < 4:
+									print("You must have at least 4 Fighters and 4 Tanks to wage a total war")
+								else:
+									target = ""
+									major_keys = []
+									for k, v in players.items():
+										if v.type == "major" and v.defeated == False:
+											major_keys.append(k)
+									if len(major_keys) == 0:
+										print("It appears that all other Major Powers have already been defeated")
+									elif players[target] not in player.borders:
+										print("You do not share a land border with %s, so you will need to send your military by sea" % (target)) 
+										target = players[target]
+										amphib_prelude(player, target, "total", players, market, relations)
+										
+									else:
+										print("Since you share a land border with %s, you are free to invade by land" % (target))
+										target = players[target]
+										forces = ai_select_ground_forces(player, target)
+										if forces["infantry"] == 0:
+											print("What are you thinking, attacking with no infantry?")
+										else:
+											forces = ai_select_ground_forces(player, target)
+											amph_combat(player, target, forces, "total", players, market, relations)	
+										
 
 					if command == "6":
 						if player.diplo_action < 1:
@@ -1101,35 +1127,39 @@ while True:
 
 							elif dip == "4":
 								options = []
-								cb_key = []
-								for cb in player.CB:
-									cb_key.append(cb.opponent)
-								for k, v in players.items():
-									if v.type == "major" or v.type == "old_empire":
-										relata = frozenset([player.name, v.name])
-										if len(relata) == 1:
-											continue
-										if relations[relata].relationship <= -2.5 and v not in cb_key:
-											options.append(v.name)
+								key = []
+								for o in player.objectives:
+									if o in player.provinces.keys():
+										continue
+									key.append(o)
+								for k in key:
+									annex = provinces[k]
+									other = annex.owner
+									other = players[other]
+									relata = frozenset({player.name, other.name})
+									if len(relata) == 1:
+										continue
+									if relations[relata].relationship <= -2.5:
+										options.append(k)			
+
 								if len(options) < 1:
 									print("Your relations are not currently bad enough with any nation to gain a CB \n")
 								else:	
-									other = " "
-									while other not in options:
-										print("Please choose a nation: \n")
+									annex = " "
+									while annex not in options:
+										print("Please choose a province: \n")
 										for o in options:
-											print(o)
-										other = input()
-									other = players[other]
+											op = provinces[o]
+											print("Name: %s, Owner: %s, Resource: %s, Quality: %s, Culture %s" % \
+												(op.name, op.owner, op.resource, op.quality, op.culture))
+										annex = input()
+									annex = provinces[annex]
 									player.diplo_action -= 1
-									p_options = []
-									for prov in other.provinces.values():
-										if prov.name in player.objectives:
-											p_options.append(prov)
-									new = CB(player, other.name, "annex", prov.name, 5)
+									
+									new = CB(player, annex.owner, "annex", annex.name, 5)
 
-									player.CB.add(other)
-									print("You are now able to declare war on %s \n" % (other.name))
+									player.CB.add(new)
+									print("You are now able to declare war on %s for the province of %s \n" % (new.opponent, new.province))
 									player.reputation -= 0.025
 
 

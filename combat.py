@@ -372,7 +372,9 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			unit_types = ["infantry", "cavalry", "artillery", "tank", "fighter"]
 			kind = choice(unit_types)
 			if p1.military[kind] > 2:
-				p1.military[kind] -= 0.20
+				p1.military[kind] -= 0.04
+				p1.milPOP -= 0.04
+				p1.POP -= 0.04
 			print("A %s unit belogning to %s has been damaged by %s resistance fighters!" % (kind, p1.name, p2.name))
 
 		for r, res in p2.resources.items():
@@ -486,14 +488,14 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 					del relations[r]
 			for pl in players.values():
 				if type(pl) == AI:
-					if p2.name in pl.sphere_target:
+					if p2.name in pl.sphere_targets:
 						pl.sphere_targets.remove(p2.name)
 					if p2 in pl.allied_target:
 						pl.allied_target.remove(p2)
-					if p2.name in pl.objectives:
-						pl.objectives.remove(p2.name)
-					if p2 in pl.embargo:
-						pl.embargo.remove(p2)	
+				if p2.name in pl.objectives:
+					pl.objectives.remove(p2.name)
+				if p2 in pl.embargo:
+					pl.embargo.remove(p2)	
 				#sphere_target_copy = deepcopy(pl.sphere_targets)
 				#for st in sphere_target_copy:
 					#if st == p2.name:
@@ -775,6 +777,7 @@ def select_ground_forces(player, target):
 		"tank": 0,
 		"fighter": 0
 	}
+	number = 0
 	for k, v in forces.items():
 		correct = False
 		while correct == False:
@@ -789,6 +792,7 @@ def select_ground_forces(player, target):
 				forces[k] = amount
 				number += amount
 				correct = True
+	return forces
 
 
 

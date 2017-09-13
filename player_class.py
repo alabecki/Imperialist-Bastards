@@ -685,6 +685,10 @@ class Player(object):
 				strength += forces[k] * self.fighter["attack"]
 		return strength
 
+	def num_army_units(self):
+		res = (self.military["irregulars"] + self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + self.military["tank"] + self.military["fighter"])
+		return res
+
 
 	def ai_transport_units(self, target):
 		tries = 0
@@ -693,7 +697,7 @@ class Player(object):
 		self_strength = 0
 		number_units = self.num_army_units()
 		transport_limit = ((self.military["frigates"] + self.military["iron_clad"]) * 2 + self.military["battle_ship"] * 3) 
-		print("Transpot Limit: %s" % (transport_limit))
+		print("Transport Limit: %s" % (transport_limit))
 		forces = {
 			"infantry": 0,
 			"cavalry": 0,
