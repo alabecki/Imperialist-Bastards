@@ -226,8 +226,8 @@ class Player(object):
 		self.irregulars = {
 			"attack": 0.5,
 			"defend": 0.625,
-			"manouver": 0.0,
-			"ammo_use": 0.025,
+			"manouver": 0.2,
+			"ammo_use": 0.02,
 			"oil_use": 0.0
 			}
 
@@ -235,15 +235,15 @@ class Player(object):
 			"attack": 1.0,
 			"defend": 1.2,
 			"manouver": 0.5,
-			"ammo_use": 0.1,
+			"ammo_use": 0.05,
 			"oil_use": 0.0
 			}
 
 		self.artillery = {
 			"attack": 1.0,
 			"defend": 1.8,
-			"manouver": 0.0,
-			"ammo_use": 0.2,
+			"manouver": 0.2,
+			"ammo_use": 0.1,
 			"oil_use": 0.0
 			}
 
@@ -251,7 +251,7 @@ class Player(object):
 			"attack": 1.5,
 			"defend": 1.0,
 			"manouver": 2.0,
-			"ammo_use": 0.1,
+			"ammo_use": 0.05,
 			"oil_use": 0.0
 		}
 
@@ -259,7 +259,7 @@ class Player(object):
 			"attack": 1.0,
 			"defend": 1.5,
 			"manouver": 4.0,
-			"ammo_use": 0.1,
+			"ammo_use": 0.75,
 			"oil_use": 0.1
 		}
 
@@ -267,30 +267,45 @@ class Player(object):
 			"attack": 3,
 			"defend": 2,
 			"manouver": 3.0,
-			"ammo_use": 0.15,
+			"ammo_use": 0.75,
 			"oil_use": 0.1
 		}
 		
 		self.frigates = {
 			"attack": 2.0,
 			"HP": 1.0,
-			"ammo_use": 0.2,
+			"ammo_use": 0.1,
 			"oil_use": 0.0
 		}
 
 		self.iron_clad = {
-			"attack": 2.8,
+			"attack": 3,
 			"HP": 2,
-			"ammo_use": 0.2,
+			"ammo_use": 0.1,
 			"oil_use": 0.0,
 			}
 
 		self.battle_ship = {
 			"attack": 7,
 			"HP": 4,
-			"ammo_use": 0.6,
+			"ammo_use": 0.3,
 			"oil_use": 0.2
 		}
+
+		self.military_produced = {
+			"irregulars": 0.0,
+			"infantry": 0.0,
+			"cavalry": 0.0,
+			"artillery": 0.0,
+			"frigates": 0.0,
+			"iron_clad": 0.0,
+			"fighter": 0.0,
+			"tank": 0.0,
+			"battle_ship": 0.0,
+		}
+
+
+		self.org_factor = 1
 
 		self.doctrines = set()
 
@@ -402,11 +417,11 @@ class Player(object):
 					if p.resource == "gold":
 						gain = gain * 5
 					#self.resources[p.resource] += gain
-					print(p.resource)
+					#print(p.resource)
 					res_dict[p.resource] += gain
 		for r, res in res_dict.items():
 			
-			print(r, res)
+			#print(r, res)
 			self.resources[r] += res
 			
 			if r == "food":
@@ -430,12 +445,18 @@ class Player(object):
 
 
 	def collect_goods(self):
-		print("%s collects: " % (self.name))
+		#print("%s collects: " % (self.name))
 		for k, p in self.goods_produced.items():
-			print("%s: %s " % (k, p))
+			#print("%s: %s " % (k, p))
 			self.goods[k] += p
 		for k in self.goods_produced.keys():
 			self.goods_produced[k] = 0
+
+		for k, v in self.military_produced.items():
+			self.military[k] += v
+
+		for k in self.military_produced.keys():
+			self.military_produced[k] = 0	
 		#self.goods_produced = dict.fromkeys(self.goods_produced, 0)
 
 
@@ -493,6 +514,10 @@ class Player(object):
 					self.supply[k] += 1
 
 	def turn(self, market):
+		if self.stability < -3: 
+			self.stability = - 3
+		if self.stability > 3:
+			self.stability = 3
 		stab_rounds = round(self.stability * 2) / 2
 		self.collect_resources(market)
 		self.collect_goods()
@@ -639,10 +664,7 @@ class Player(object):
 		strength += self.military["tank"] * self.tank["defend"]
 		strength += self.military["fighter"] * self.fighter["defend"]
 		#strength = strength * (1 + (self.midPOP["officers"]["number"]/2))
-		if self.sprawl == True:
-			strength = strength * (self.fortification + 1)
-		else:
-			strength = strength * self.fortification
+		strength = strength * self.fortification
 		return strength
 
 
@@ -667,10 +689,11 @@ class Player(object):
 	def ai_transport_units(self, target):
 		tries = 0
 		target_strength = target.calculate_base_defense_strength()
-		print("Target strength: %s" % (target_strength))
+		#print("Target strength: %s" % (target_strength))
 		self_strength = 0
 		number_units = self.num_army_units()
 		transport_limit = ((self.military["frigates"] + self.military["iron_clad"]) * 2 + self.military["battle_ship"] * 3) 
+		print("Transpot Limit: %s" % (transport_limit))
 		forces = {
 			"infantry": 0,
 			"cavalry": 0,
@@ -679,8 +702,10 @@ class Player(object):
 			"fighter": 0
 		}
 		number = 0
+		if transport_limit == 0:
+			return forces
 
-		while (self_strength < (target_strength * 2) and number_units > 0.99 and tries < 128 and number <= transport_limit):
+		while (self_strength < (target_strength * 2) and number_units >= 1 and tries < 160 and number <= transport_limit):
 			pick = choice(["infantry", "artillery", "cavalry", "fighter", "tank"])
 			if (self.military[pick] - forces[pick]) >= 1:
 			#	print("Adds %s " % (pick))

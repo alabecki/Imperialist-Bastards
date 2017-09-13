@@ -72,5 +72,11 @@ class CB(object):
 		self.action = action
 		self.province = province
 		self.time = time
-
 # actions : annex (province), free (province)
+
+class factory(object):
+	def __init__ (self, owner, kind):
+		self.owner = owner
+		self.kind = kind
+		self.size = 1
+		self.used = False

@@ -53,6 +53,6 @@ technology_dict = {
 	"synthetic_rubber": {"requirement": {"oil_powered_ships", "mobile_warfare"}, "cost": 10, "min_mid": 4},  # Use chemicals for rubber (3 for 1)
 	"radar": {"requirement": {"radio", "flight"}, "cost": 10, "min_mid": 4.5},
 	"rockets": {"requirement": {"synthetic_oil"}, "cost": 10, "min_mid": 4.5},
-	"early_computers": {"requirement": {"radar"}, "cost": 12, "min_mid": 5}
+	"early_computers": {"requirement": {"radar"}, "cost": 12, "min_mid": 5},
 	"atomic_bomb": {"requirement": {"synthetic_oil", "synthetic_rubber", "early_computers"}, "cost": 20, "min_mid": 6}
 }

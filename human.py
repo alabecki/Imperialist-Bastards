@@ -93,6 +93,8 @@ class Human(Player):
 			self.freePOP -= 0.20
 			self.new_development += 0.5
 			if _type == "officers":
+				self.milPOP -= 0.2
+				self.freePOP +=  0.2
 				self.choose_doctrine()
 			print("You now have %s %s" % (self.midPOP[_type]["number"], _type))
 
@@ -207,12 +209,15 @@ class Human(Player):
 			if(choice == "telegraph"):
 				self.factory_throughput += 1
 				self.production_modifier += 0.15
+				self.org_factor += 0.15
 			if choice == "electricity":
 				self.factory_throughput += 1
 				self.production_modifier += 0.15
 			if choice == "radio":
 				self.reputation += 0.2
 				self.stability += 0.2
+				self.org_factor += 0.15
+
 			if choice == "early_computers":
 				self.battle_ship["attack"] += 1
 				self.production_modifier += 1.5
@@ -391,10 +396,10 @@ class Human(Player):
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.goods["cannons"] -= 1.0
-		self.military["infantry"] += 1.0
+		self.military_produced["infantry"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("You now have %s Infantry \n" % (self.military["infantry"]))
+		print("Infantry will be ready at the start of next turn")
 
 	def build_cavalry(self):
 		if(self.resources["food"] < 1):
@@ -408,10 +413,10 @@ class Human(Player):
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
 			self.goods["cannons"] -= 1.0
-			self.military["cavalry"] += 1.0
+			self.military_produced["cavalry"] += 1.0
 			self.number_units += 1.0
 			self.can_train -= 1.0
-			print("You now have %s cavalry \n" % (self.military["cavalry"]))
+			print("Cavalry will be ready at the start of next turn")
 
 	def build_artillery(self):
 		if(self.goods["cannons"] < 2.0):
@@ -423,10 +428,10 @@ class Human(Player):
 		self.goods["cannons"] -= 2.0
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
-		self.military["artillery"] += 1.0
+		self.military_produced["artillery"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("You now have %s artillery \n" % (self.military["artillery"]))
+		print("Artillery will be ready at the start of next turn")
 
 	def build_tank(self):
 		if self.goods["tank"] < 1:
@@ -438,10 +443,10 @@ class Human(Player):
 		self.goods["tank"] -= 1
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
-		self.military["tank"] += 1.0
+		self.military_produced["tank"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("You now have %s tanks \n" % (self.military["tank"]))
+		print("Tank will be ready at the start of next turn")
 
 
 	def build_fighter(self):
@@ -454,10 +459,10 @@ class Human(Player):
 		self.goods["fighter"] -= 1
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
-		self.military["fighter"] += 1.0
+		self.military_produced["fighter"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("You now have %s fighters \n" % (self.military["fighter"]))
+		print("Fighter will be ready at the start of next turn")
 
 
 	def build_frigates(self):
@@ -480,11 +485,11 @@ class Human(Player):
 			self.goods["cannons"] -= 1.0
 			self.resources["cotton"] -= 1.0
 			self.resources["wood"] -= 1.0
-			self.military["frigates"] += 1.0
+			self.military_produced["frigates"] += 1.0
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
 			self.number_units +=1
-			print("You now have %s frigates \n" % (self.military["frigates"]))
+			print("Frigates will be ready at the start of next turn")
 			return
 
 	def build_ironclad(self):
@@ -510,11 +515,11 @@ class Human(Player):
 			self.goods["cannons"] -= 1.0
 			self.goods["parts"] -= 1.0
 			self.resources["iron"] -= 1.0
-			self.military["iron_clad"] += 1.0
+			self.military_produced["iron_clad"] += 1.0
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
 			self.number_units += 1
-			print("You now have %s iron clads \n" % (self.military["iron_clad"]))
+			print("Ironclad will be ready at the start of next turn")
 			return
 
 	def build_battleship(self):
@@ -545,11 +550,11 @@ class Human(Player):
 			self.resources["iron"] -= 3
 			self.goods["parts"] -= 1
 			self.goods["gear"] -= 1
-			self.military["battle_ship"] += 1.0
+			self.military_produced["battle_ship"] += 1.0
 			self.freePOP -= 0.2
 			self.milPOP += 0.2
 			self.number_units += 1
-			print("You now have %s battle ships \n" % (self.military["battle_ship"]))
+			print("Battleship will be ready at the start of next turn")
 			return
 
 

@@ -111,8 +111,8 @@ def initialize_oldempire(player):
 	player.goods["cannons"] = 1.0
 	player.goods["furniture"] = 0.0
 
-	player.military["irregulars"] = 3.0
-	player.military["cavalry"] = 2.0
+	player.military["irregulars"] = 4.0
+	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}

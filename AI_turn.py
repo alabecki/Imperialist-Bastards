@@ -68,18 +68,30 @@ def AI_turn(players, player, market, relations, provinces):
 
 	player.use_chemicals(market, relations, players)
 	#attack_target(player, players, relations, provinces, market)
-	ai_decide_ally_target(player, players, provinces)
 	decide_target(player, players, market, provinces, relations)
 	worsen_relations(player, players, relations, provinces)
 	gain_cb(player, players, relations)
 	attack_target(player, players, relations, provinces, market)
 	ai_bribe(player, players, relations)
+	ai_decide_ally_target(player, players, provinces)
+
 
 
 	count = 0
 	while player.diplo_action >= 2 and count < 4:
 		if player.rival_target == [] or len(player.CB) < 2:
 			worsen_relations(player, players, relations, provinces)
+		if len(player.embargo) > 0:
+			improve = sample(player.embargo, 1)
+			improve = improve[0]
+
+			relata = frozenset({player.name, improve.name})
+			player.diplo_action -=1
+			if relata in relations.keys():
+				relations[relata].relationship += min(1, 5/(improve.POP + 0.001))
+				player.reputation += 0.02
+			print("Improves relations with %s by %s" % (improve.name, min(1, 5/(improve.POP + 0.001))))
+
 		damage_relations(player, players, relations)
 		ai_improve_relations(player, players, relations)
 		ai_destablize(player, players, relations)

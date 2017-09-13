@@ -30,6 +30,7 @@ from AI_turn import*
 from globe import*
 
 from historical.Scenario import* 
+from BalanceScenario.Scenario import*
 #sys.path.insert(0, 'C:\Users\Labecki\Documents\Python\game\historical')
 #from Scenario import*
 
@@ -46,8 +47,8 @@ while True:
 	print(" _____________________________________ Main Menu ___________________________________________ \n")
 	print("\n")
 	print("______________________________Please select one of the following: ______________________________\n")
-	print("---------------------------------- Start a New Game ---(N) --------------------------------------	 \n")
-	print("----------------------------- Start Quasi-Historical Scenario (S)--------------------------------     \n")
+	print("---------------------------------- Start a Random Game ---(N) --------------------------------------	 \n")
+	print("----------------------------- Start a Scenario (S)--------------------------------     \n")
 	print("---------------------------------- Load a Saved Game --(L) --------------------------------------     \n")
 	print("------------------------------------- Options ---------(O) --------------------------------------     \n ")
 	print("--------------------------------------- Exit ----------(E) --------------------------------------     \n" )
@@ -61,7 +62,18 @@ while True:
 	if selection == "N":
 		initial = start_game()
 	elif selection == "S":
-		initial = historical()
+
+		print("Which Scenario would you like to play?")
+		print("(a) Quasi-Historical Scenario")
+		print("(b) Fictional Balance Scenario")
+		scen = ""
+		scen_options = ["a", "(a)", "b", "(b)"]
+		while scen not in scen_options:
+			scen = input()
+		if scen == "a" or scen == "(a)":
+			initial = historical()
+		if scen == "b" or scen == "(b)":
+			initial = balance()
 	elif selection == "L":
 		name = input("What is the name of the save that you want to load? \n")
 		print("Loading %s" % (name))
