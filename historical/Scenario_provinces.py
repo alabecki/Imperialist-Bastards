@@ -301,7 +301,7 @@ def create_provinces():
 	provinces["Sicily"] = Sicily
 
 
-	Switzerland = Province("_Switzerland", "Switzerland", "gold", 1.1, "civilized", "Swiss")
+	Switzerland = Province("_Switzerland", "Switzerland", "gold", 1.2, "civilized", "Swiss")
 	Switzerland.x = 7
 	Switzerland.y = 7
 	provinces["_Switzerland"] = Switzerland
@@ -454,7 +454,7 @@ def create_provinces():
 	Morocco.x = 13
 	Morocco.y = 8
 	provinces["_Morocco"] = Morocco
-	South_Morocco = Province("South_Morocco", "Morocco", "gold", 0.9, "old", "Arab")
+	South_Morocco = Province("South_Morocco", "Morocco", "gold", 1.0, "old", "Arab")
 	South_Morocco.x = 14
 	South_Morocco.y = 8
 	provinces["South_Morocco"] = South_Morocco

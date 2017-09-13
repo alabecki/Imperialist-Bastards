@@ -307,9 +307,9 @@ def historical():
 #			madagascar(nation, provinces)
 #		i += 1
 
-	print("Players")
-	for p, player in players.items():
-		print(player.name)
+	#print("Players")
+	#for p, player in players.items():
+	#	print(player.name)
 	
 
 
@@ -354,8 +354,8 @@ def historical():
 	#for r, rel in relations.items():
 	#	print(r, rel.relata)
 
-	relations[frozenset({"England", "India"})].relationship = -2.7
-	relations[frozenset({"England", "France"})].relationship = -1.2
+	relations[frozenset({"England", "India"})].relationship = -0.75
+	relations[frozenset({"England", "France"})].relationship = -1
 	relations[frozenset({"England", "Italy"})].relationship = 1
 	relations[frozenset({"England", "Ottoman"})].relationship = 1
 	relations[frozenset({"England", "Persia"})].relationship = 1.25
@@ -365,6 +365,8 @@ def historical():
 	relations[frozenset({"England", "Japan"})].relationship = 0.65
 	relations[frozenset({"England", "Netherlands"})].relationship = 0.5
 	relations[frozenset({"England", "Sweden"})].relationship = 0.5
+	relations[frozenset({"England", "Egypt"})].relationship = 1
+
 
 
 	#relations[frozenset({"England", "Poland"})].relationship = 0.75
@@ -373,7 +375,7 @@ def historical():
 	relations[frozenset({"France", "Russia"})].relationship = 1.5
 	relations[frozenset({"France", "Spain"})].relationship = 1
 	relations[frozenset({"France", "Italy"})].relationship = -0.5
-	relations[frozenset({"France", "Ottoman"})].relationship = 0.5
+	relations[frozenset({"France", "Ottoman"})].relationship = 1
 	relations[frozenset({"France", "China"})].relationship = 0.5
 	relations[frozenset({"France", "Austria"})].relationship = -0.75
 	relations[frozenset({"France", "Netherlands"})].relationship = -0.5
@@ -381,7 +383,7 @@ def historical():
 	relations[frozenset({"France", "Bavaria"})].relationship = 2.5
 
 
-	relations[frozenset({"Germany", "Austria"})].relationship = -1.5
+	relations[frozenset({"Germany", "Austria"})].relationship = 2.2
 	relations[frozenset({"Germany", "Italy"})].relationship = 1
 	relations[frozenset({"Germany", "Russia"})].relationship = 0.1
 	relations[frozenset({"Germany", "Ottoman"})].relationship = 1.1
@@ -439,7 +441,7 @@ def historical():
 	#players["Italy"].CB.add(new6)
 	#players["Italy"].CB.add(new7)
 
-
+	new6 = CB("England", "India", "annex", "Rajputana", 18)
 
 
 	#for r, rel in relations.items():
