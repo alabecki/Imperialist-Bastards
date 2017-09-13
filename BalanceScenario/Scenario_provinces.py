@@ -6,819 +6,431 @@ def create_provinces():
 
 	provinces = {}
 	
-	yellow1 = Province("yellow1", "cotton", 1.1, "civilized", "Yellow")
-	yellow1.x = 3
-	yellow1.y = 10
-	provinces["yellow1"] = yellow1
+	Fonie = Province("Fonie", "Bambaki", "food", 1.1, "civilized", "Bambaki")
+	Fonie.x = 4
+	Fonie.y = 9
+	provinces["Fonie"] = Fonie
 	
-	yellow2 = Province("yellow2", "food", 1.2, "civilized", "Yellow")
-	yellow2.x = 4
-	yellow2.y = 9
-	provinces["yellow2"] = yellow2
+	Fivne = Province("Fivne", "Bambaki", "cotton", 1.1, "civilized", "Bambaki")
+	Fivne.x = 5
+	Fivne.y = 9
+	provinces["Fivne"] = Fivne
 	
-	yellow3 = Province("yellow3", "iron", 1,  "civilized", "Yellow")
-	yellow3.x = 4
-	yellow3.y = 10
-	provinces["yellow3"] = yellow3
+	Fiten = Province("Fiten", "Bambaki", "food", 1,  "civilized", "Bambaki")
+	Fiten.x = 5
+	Fiten.y = 10
+	provinces["Fiten"] = Fiten
 
-	yellow4 = Province("yellow4", "food", 1.1,  "civilized", "Yellow" )
-	yellow4.x = 5
-	yellow4.y = 8
-	provinces["yellow4"] = yellow4
+	Sine = Province("Sine", "Bambaki", "cotton", 1.1,  "civilized", "Bambaki" )
+	Sine.x = 6
+	Sine.y = 9
+	provinces["Sine"] = Sine
 	
-	yellow5 = Province("yellow5", "food", 1, "civilized", "Yellow")
-	yellow5.x = 5
-	yellow5.y = 9
-	provinces["yellow5"] = yellow5
-
-
-	yellow6 = Province("yellow6", "coal", 0.9, "civilized", "Yellow")
-	yellow6.x = 1
-	yellow6.y = 4
-	provinces["yellow6"] = yellow6
+	Siten = Province("Siten", "Bambaki", "coal", 1.1, "civilized", "Bambaki")
+	Siten.x = 6
+	Siten.y = 10
+	provinces["Siten"] = Siten
 
 
+	Severen = Province("Severen", "Bambaki", "iron", 1.1, "civilized", "Bambaki")
+	Severen.x = 7
+	Severen.y = 9
+	provinces["Severen"] = Severen
 
-	green1 = Province("green1", "food", 1.1, "civilized", "Green")
-	green1.x = 2
-	green1.y = 11
-	provinces["green1"] = green1
 
-	
-	green2 = Province("green2", "wood", 1.2, "green2", "Green" )
-	green2.x = 2
-	green2.y = 12
-	green2.ocean = False
-	provinces["green2"] = green2
-	
-	green3 = Province("green3", "wood", 1.0, "civilized", "Green")
-	green3.x = 2
-	green3.y = 13
-	provinces["green3"] = green3
-	
 
-	green4 = Province("green4", "coal", 1.0, "civilized", "Green")
-	green4.x = 2
-	green4.y = 11
-	green4.ocean = False
-	provinces["green4"] = green4
-	
-	green5 = Province("green5", "iron", 1, "civilized", "Green")
-	green5.x = 2
-	green5.y = 12
-	provinces["green5"] = green5
-	
-	green6 = Province("green6", "food", 1.0, "civilized", "Green")
-	green6.x = 2
-	green6.y = 13
-	provinces["green6"] = green6
+	Foleven = Province("Foleven", "Hyle", "wood", 1.2, "civilized", "Hyle")
+	Foleven.x = 4
+	Foleven.y = 11
+	provinces["Foleven"] = Foleven
 
 	
+	Fotwee = Province("Fotwee", "Hyle", "wood", 1.2, "civilized", "Hyle" )
+	Fotwee.x = 4
+	Fotwee.y = 12
+	Fotwee.ocean = False
+	provinces["Fotwee"] = Fotwee
 	
-	purple1 = Province("purple1", "food", 1.0, "civilized", "purple")
-	purple1.x = 2
-	purple1.y =16
-	provinces["purple1"] = purple1
+	Threlve = Province("Threlve", "Hyle", "cotton", 1.0, "civilized", "Hyle")
+	Threlve.x = 3
+	Threlve.y = 12
+	provinces["Threlve"] = Threlve
+	
 
-	purple2 = Province("purple2", "iron", 1.0, "civilized", "purple")
-	purple2.x = 3
-	purple2.y = 15
-	provinces["purple2"] = purple2
-
-
-	purple3 = Province("purple3", "food", 1.0, "civilized", "purple")
-	purple3.x = 5
-	purple3.y =10
-	provinces["purple3"] = purple3
+	Fothra = Province("Fothra", "Hyle", "coal", 1.1, "civilized", "Hyle")
+	Fothra.x = 2
+	Fothra.y = 11
+	Fothra.ocean = False
+	provinces["Fothra"] = Fothra
 	
-	purple4 = Province("purple4", "coal", 1.1, "civilized", "purple")
-	purple4.x = 4
-	purple4.y = 14
-	purple4.ocean = False
-	provinces["purple4"] = purple4
+	Threthre = Province("Threthre", "Hyle", "food", 1.1, "civilized", "Hyle")
+	Threthre.x = 2
+	Threthre.y = 12
+	provinces["Threthre"] = Threthre
 	
-	purple5 = Province("purple5", "coal", 1.2, "civilized", "purple")
-	purple5.x = 4
-	purple5.y = 15
-	purple5.ocean = False
-	provinces["purple5"] = purple5
-	
-	purple6 = Province("purple6", "food", 0.9, "civilized", "purple")
-	purple6.x = 6
-	purple6.y = 9
-	purple6.ocean = False
-	provinces["purple6"] = purple6
-	
-	Saxony = Province("Saxony", "coal", 1.1, "civilized", "German")
-	Saxony.x = 6
-	Saxony.y = 8
-	Saxony.ocean = False
-	provinces["Saxony"] = Saxony
-	
-	NorthGermany = Province("NorthGermany", "food", 1.1, "civilized", "German")
-	NorthGermany.x = 5
-	NorthGermany.y = 8
-	provinces["NorthGermany"] = NorthGermany
-	
-	Bavaria = Province("Bavaria", "wood", 1.15, "civilized", "German")
-	Bavaria.x = 7
-	Bavaria.y = 9
-	Bavaria.ocean = False
-	provinces["Bavaria"] = Bavaria
-
-
-	Bohemia = Province("Bohemia", "iron", 1.25, "civilized", "Check")
-	Bohemia.x = 7
-	Bohemia.y = 10
-	Bohemia.ocean = False
-	provinces["Bohemia"] = Bohemia
-
-	Slovakia  = Province("Slovakia", "coal", 1.1, "civilized", "Slovakian")
-	Slovakia.x = 7
-	Slovakia.y = 11
-	Slovakia.ocean = False
-	provinces["Slovakia"] = Slovakia
+	Tothra = Province("Tothra", "Hyle", "food", 1.0, "civilized", "Hyle")
+	Tothra.x = 2
+	Tothra.y = 13
+	provinces["Tothra"] = Tothra
 
 	
-	Austria = Province("Austria", "food", 1.1, "civilized", "German")
-	Austria.x = 7
-	Austria.y = 9
-	Austria.ocean = False
-	provinces["Austria"] = Austria
+	
+	Niten = Province("Niten", "Trope", "food", 1.2, "civilized", "Trope")
+	Niten.x = 9
+	Niten.y =10
+	provinces["Niten"] = Niten
+
+	Teetee = Province("Teetee", "Trope", "food", 1.1, "civilized", "Trope")
+	Teetee.x = 10
+	Teetee.y = 10
+	provinces["Teetee"] = Teetee
+
+
+	Teaven = Province("Teaven", "Trope", "food", 1.2, "civilized", "Trope")
+	Teaven.x = 10
+	Teaven.y =11
+	provinces["Teaven"] = Teaven
+	
+	Nineven = Province("Nineven", "Trope", "cotton", 0.9, "civilized", "Trope")
+	Nineven.x = 9
+	Nineven.y = 11
+	Nineven.ocean = False
+	provinces["Nineven"] = Nineven
+	
+	Eateven = Province("Eateven", "Trope", "coal", 1.1, "civilized", "Trope")
+	Eateven.x = 8
+	Eateven.y = 11
+	Eateven.ocean = False
+	provinces["Eateven"] = Eateven
+	
+	Seleven = Province("Seleven", "Trope", "iron", 1.0, "civilized", "Trope")
+	Seleven.x = 7
+	Seleven.y = 11
+	Seleven.ocean = False
+	provinces["Seleven"] = Seleven
 
 	
-	Hungary = Province("Hungary", "food", 1.1, "civilized", "Hungarian")
-	Hungary.x = 8
-	Hungary.y = 11
-	Hungary.ocean = False
-	provinces["Hungary"] = Hungary
+	Seele = Province("Seele", "Sidero", "iron", 1.1, "civilized", "Sidero")
+	Seele.x = 6
+	Seele.y = 11
+	Seele.ocean = False
+	provinces["Seele"] = Seele
 	
-	Romania = Province("Romania", "oil", 0.75, "civilized", "Romanian")
-	Romania.x = 8
-	Romania.y = 12
-	Romania.ocean = False
-	provinces["Romania"] = Romania
+	Sitwee = Province("Sitwee", "Sidero", "iron", 1.1, "civilized", "Sidero")
+	Sitwee.x = 6
+	Sitwee.y = 12
+	provinces["Sitwee"] = Sitwee
+	
+	Thesee = Province("Thesee", "Sidero", "food", 1.1, "civilized", "Sidero")
+	Thesee.x = 6
+	Thesee.y = 13
+	provinces["Thesee"] = Thesee
+
+
+	Fithee = Province("Fithee", "Sidero", "coal", 1.2, "civilized", "Sidero")
+	Fithee.x = 5
+	Fithee.y = 13
+	provinces["Fithee"] = Fithee
+
+	Sifoo  = Province("Sifoo", "Sidero", "food", 1, "civilized", "Sidero")
+	Sifoo.x = 6
+	Sifoo.y = 14
+	provinces["Sifoo"] = Sifoo
 
 	
-	Croatia = Province("Croatia", "wood", 1.0, "civilized", "Croatian")
-	Croatia.x = 8
-	Croatia.y = 10
-	provinces["Croatia"] = Croatia
+	Fivfoo = Province("Fivfoo", "Sidero", "wood", 1, "civilized", "Sidero")
+	Fivfoo.x = 5
+	Fivfoo.y = 14
+	provinces["Fivfoo"] = Fivfoo
 
-	WestUkraine = Province("WestUkraine", "food", 1.1, "civilized", "Ukrainian")
-	WestUkraine.x = 7
-	WestUkraine.y = 12
-	WestUkraine.ocean = False
-	provinces["WestUkraine"] = WestUkraine
-
-	Poland = Province("Poland", "food", 1.0, "civilized", "Polish")
-	Poland.x = 6
-	Poland.y = 11
-	Poland.ocean = False
-	provinces["Poland"] = Poland
-
-	Baltic = Province("Baltic", "food", 0.8, "civilized", "Baltic")
-	Baltic.x = 5
-	Baltic.y = 12
-	Baltic.ocean = True
-	provinces["Baltic"] = Baltic
-
-
-	Ukraine = Province("Ukraine", "food", 1.3, "civilized", "Ukraine")
-	Ukraine.x = 6
-	Ukraine.y = 12
-	Ukraine.ocean = False
-	provinces["Ukraine"] = Ukraine
-
-	Crimea  = Province("Crimea ", "coal", 1.0, "civilized", "Russian")
-	Crimea.x = 7
-	Crimea.y =12  
-	provinces["Crimea"] = Crimea 
 	
-	Novgorod = Province("Novgorod", "food", 0.75, "civilized", "Russian")
-	Novgorod.x = 4
-	Novgorod.y = 12
-	provinces["Novgorod"] = Novgorod
+	Nifeenee = Province("Nifeenee", "Isorropia", "cotton", 0.9, "civilized", "Isorropia")
+	Nifeenee.x = 9
+	Nifeenee.y = 15
+	provinces["Nifeenee"] = Nifeenee
 	
-	Moskva = Province("Moskva", "wood", 1.1, "civilized", "Russian")
-	Moskva.x = 6
-	Moskva.y = 13
-	Moskva.ocean = False
-	provinces["Moskva"] = Moskva
-	
-	Galich = Province("Galich", "wood", 0.75, "civilized", "Russian")
-	Galich.x = 6
-	Galich.y = 14
-	Galich.ocean = False
-	provinces["Galich"] = Galich
-	
-	Caucasia = Province("Caucasia", "oil", 1.25, "civilized", "Russian")
-	Caucasia.x = 6
-	Caucasia.y = 15
-	Caucasia.ocean = False
-	provinces["Caucasia"] = Caucasia
-	
-	Tartaria = Province("Tartaria", "food", 0.5, "civilized", "Russian")
-	Tartaria.x = 6
-	Tartaria.y = 16
-	Tartaria.ocean = False
-	provinces["Tartaria"] = Tartaria
-	
-	Kazen = Province("Kazen", "cotton", 0.7, "civilized", "Russian")
-	Kazen.x = 6
-	Kazen.y = 17
-	Kazen.ocean = False
-	provinces["Kazen"] = Kazen
+	Efetee = Province("Efetee", "Isorropia", "wood", 1, "civilized", "Isorropia")
+	Efetee.x = 8
+	Efetee.y = 15
+	provinces["Efetee"] = Efetee
 
-	Samara = Province("Samara", "iron", 0.7, "civilized", "Russian")
-	Samara.x = 6
-	Samara.y = 18
-	Samara.ocean = False
-	provinces["Samara"] = Samara
 	
-	Perm = Province("Perm", "wood", 0.7, "civilized", "Russian")
-	Perm.x = 6
-	Perm.y = 19
-	Perm.ocean = False
-	provinces["Perm"] = Perm
+	Sevfif = Province("Sevfif", "Isorropia", "coal", 1.1, "civilized", "Isorropia")
+	Sevfif.x = 7
+	Sevfif.y = 15
+	provinces["Sevfif"] = Sevfif
 
-	Ural = Province("Ural", "iron", 1.25, "civilized", "Russian")
-	Ural.x = 6
-	Ural.y = 20
-	Ural.ocean = False
-	provinces["Ural"] = Ural
-	
-	Tomsk = Province("Tomsk", "coal", 0.8, "civilized", "Russian")
-	Tomsk.x = 6
-	Tomsk.y = 21
-	Tomsk.ocean = False
-	provinces["Tomsk"] = Tomsk
+	Eigsix = Province("Eigsix", "Isorropia", "food", 1.1, "civilized", "Isorropia")
+	Eigsix.x = 8
+	Eigsix.y = 16
+	provinces["Eigsix"] = Eigsix
 
-	CentralSiberia = Province("CentralSiberia", "wood", 0.5, "uncivilized", "Siberian")
-	CentralSiberia.x = 5
-	CentralSiberia.y = 22
-	CentralSiberia.ocean = False
-	provinces["CentralSiberia"] = CentralSiberia
+	Seasix = Province("Seasix", "Isorropia", "iron", 1.1, "civilized", "Isorropia")
+	Seasix.x = 7
+	Seasix.y = 16
+	provinces["Seasix"] = Seasix
+
+	Eisev = Province("Eisev", "Isorropia", "food", 1.1, "civilized", "Isorropia")
+	Eisev.x = 8
+	Eisev.y = 17
+	Eisev.ocean = True
+	provinces["Eisev"] = Eisev
 
 
-	Irkutsk = Province("Irkutsk", "wood", 0.4, "uncivilized", "Siberian")
-	Irkutsk.x = 5
-	Irkutsk.y = 23
-	Irkutsk.ocean = False
-	provinces["Irkutsk"] = Irkutsk
+
+	Sevteeve  = Province("Sevteeve", "Karbouno", "coal", 1.3, "civilized", "Karbouno")
+	Sevteeve.x = 4
+	Sevteeve.y = 14
+	provinces["Sevteeve"] = Sevteeve 
+	
+	Fogaro = Province("Fogaro", "Karbouno", "coal", 1.2, "civilized", "Karbouno")
+	Fogaro.x = 4
+	Fogaro.y = 15
+	provinces["Fogaro"] = Fogaro
+	
+	Sartarva = Province("Sartarva", "Karbouno", "iron", 1.1, "civilized", "Karbouno")
+	Sartarva.x = 5
+	Sartarva.y = 16
+	Sartarva.ocean = False
+	provinces["Sartarva"] = Sartarva
+	
+	Sifoto = Province("Sifoto",   "Karbouno", "food", 1.0, "civilized", "Karbouno")
+	Sifoto.x = 4
+	Sifoto.y = 16
+	Sifoto.ocean = False
+	provinces["Sifoto"] = Sifoto
+
+	Togema = Province("Togema",  "Karbouno", "food", 1.1, "civilized", "Karbouno")
+	Togema.x = 5
+	Togema.y = 17
+	Togema.ocean = False
+	provinces["Togema"] = Togema
+	
+	Sisivo = Province("Sisivo", "Karbouno", "wood", 1.0, "civilized", "Karbouno")
+	Sisivo.x = 4
+	Sisivo.y = 17
+	Sisivo.ocean = False
+	provinces["Sisivo"] = Sisivo
+
+	
+	Enee = Province("Enee", "Situs", "cotton", 0.8, "civilized", "Situs")
+	Enee.x = 8
+	Enee.y = 9
+	Enee.ocean = False
+	provinces["Enee"] = Enee
+
+	Tennini = Province("Tennini", "Situs", "food", 1.1, "civilized", "Situs")
+	Tennini.x = 9
+	Tennini.y = 10
+	Tennini.ocean = False
+	provinces["Tennini"] = Tennini
+	
+	Perma = Province("Perma", "Hythen", "wood", 1.1, "civilized", "Hythen")
+	Perma.x = 4
+	Perma.y = 10
+	Perma.ocean = False
+	provinces["Perma"] = Perma
+
+	Urten = Province("Urten", "Hythen", "food", 0.9, "civilized", "Hythen")
+	Urten.x = 3
+	Urten.y = 10
+	Urten.ocean = False
+	provinces["Urten"] = Urten
+	
+	Tomski = Province("Tomski", "Intero", "gold", 1.1, "civilized", "Intero")
+	Tomski.x = 5
+	Tomski.y = 11
+	Tomski.ocean = False
+	provinces["Tomski"] = Tomski
+
+	Teetsito = Province("Teetsito", "Intero", "iron", 1, "uncivilized", "Intero")
+	Teetsito.x = 5
+	Teetsito.y = 12
+	Teetsito.ocean = False
+	provinces["Teetsito"] = Teetsito
 
 
-	Yakutsk = Province("Yakutsk", "wood", 0.45, "uncivilized", "Siberian")
+	Irku = Province("Irku",  "Kora", "coal", 1.2, "uncivilized", "Kora")
+	Irku.x = 3
+	Irku.y = 14
+	Irku.ocean = False
+	provinces["Irku"] = Irku
+
+
+	Yakutsk = Province("Yakutsk",  "Kora", "food", 1.0, "uncivilized", "Kora")
 	Yakutsk.x = 5
 	Yakutsk.y = 24
 	Yakutsk.ocean = False
 	provinces["Yakutsk"] = Yakutsk
 
-	Okhotsk = Province("Okhotsk", "food", 0.4, "uncivilized", "Siberian")
-	Okhotsk.x = 5
-	Okhotsk.y = 25
-	provinces["Okhotsk"] = Okhotsk
+	Okho = Province("Okho", "Southo", "wood", 1.0, "uncivilized", "Southo")
+	Okho.x = 12
+	Okho.y = 11
+	provinces["Okho"] = Okho
 
-	Finland = Province("Finland", "wood", 1.0, "civilized", "Finish")
-	Finland.x = 3
-	Finland.y = 12
-	provinces["Finland"] = Finland
+	Findee = Province("Findee", "Southo", "food", 1.1, "civilized", "Southo")
+	Findee.x = 11
+	Findee.y = 11
+	provinces["Findee"] = Findee
 
-	Naples = Province("Naples", "food", 1.1, "civilized", "Italian")
-	Naples.x = 10
-	Naples.y = 8
-	provinces["Naples"] = Naples
-	Lazio = Province("Lazio", "food", 1.0, "civilized", "Italian")
-	Lazio.x = 9
-	Lazio.y = 8
-	provinces["Lazio"] = Lazio
-	Sardinia_Piedmont = Province("Sardinia_Piedmont", "iron", 0.9, "civilized", "Italian")
-	Sardinia_Piedmont.x = 8
-	Sardinia_Piedmont.y = 7
-	provinces["Sardinia_Piedmont"] = Sardinia_Piedmont
-	Venezia = Province("Venezia", "cotton", 1.2, "civilized", "Italian")
-	Venezia.x = 8
-	Venezia.y = 8
-	provinces["Venezia"] = Venezia
-	Sicily = Province("Sicily", "coal", 0.8, "civilized", "Italian")
-	Sicily.x = 10
-	Sicily.y = 7
-	provinces["Sicily"] = Sicily
+	Napa = Province("Napa", "Cindra", "food", 1.1, "civilized", "Cindra")
+	Napa.x = 8
+	Napa.y = 14
+	provinces["Napa"] = Napa
+	Lazo = Province("Lazo", "Cindra", "coal", 1.0, "civilized", "Cindra")
+	Lazo.x = 7
+	Lazo.y = 14
+	provinces["Lazo"] = Lazo
 
-	Bosnia = Province("Bosnia", "food", 0.8, "civilized", "Bosnian")
-	Bosnia.x =10
-	Bosnia.y =10
-	provinces["Bosnia"] = Bosnia
+	Vene = Province("Vene", "Estos", "cotton", 0.8, "civilized", "Estos")
+	Vene.x = 10
+	Vene.y = 16
+	provinces["Vene"] = Vene
+	Eta = Province("Eta", "Estos", "food", 1, "civilized", "Estos")
+	Eta.x = 9
+	Eta.y = 16
+	provinces["Eta"] = Eta
 
-	Bulgaria = Province("Bulgaria", "wood", 0.75, "civilized", "Bulgarian")
-	Bulgaria.x = 10
-	Bulgaria.x = 11
-	provinces["Bulgaria"] = Bulgaria
+	Silseva = Province("Silseva","Lian",  "iron", 1.0, "civilized", "Lian")
+	Silseva.x = 6
+	Silseva.y = 16
+	provinces["Silseva"] = Silseva
 
-	Serbia = Province("Serbia", "wood", 0.8, "civilized", "Serbian")
-	Serbia.x = 10
-	Serbia.y = 11
-	provinces["Serbia"] = Serbia
-	Greece = Province("Greece", "food", 1.0, "civilized", "Greek")
-	Greece.x =11
-	Greece.y = 11
-	provinces["Greece"] = Greece
-	WestTurky = Province("WestTurky", "iron", 0.9, "civilized", "Turkish")
-	WestTurky.x = 10
-	WestTurky.y =12
-	provinces["WestTurky"] = WestTurky
-	CentralTurky = Province("CentralTurky", "cotton", 1.0, "civilized", "Turkish")
-	CentralTurky.x = 10
-	CentralTurky.y = 13
-	provinces["CentralTurky"] = CentralTurky
-	EastTurky = Province("EastTurky", "food", 1.1, "civilized", "Turkish")
-	EastTurky.x = 10
-	EastTurky.y = 14
-	EastTurky.ocean = False
-	provinces["EastTurky"] = EastTurky
-
-	Syria = Province("Syria", "food", 0.75, "old", "Arab")
-	Syria.x = 11
-	Syria.y = 14
-	provinces["Syria"] = Syria
-	Iraq = Province("Iraq", "oil", 1.2, "old", "Arab")
-	Iraq.x = 12
-	Iraq.y = 14
-	Iraq.ocean = False
-	provinces["Iraq"] = Iraq
+	Bosa = Province("Bosa", "Lian", "food", 1.0, "civilized", "Lian")
+	Bosa.x = 6
+	Bosa.y = 17
+	provinces["Bosa"] = Bosa
 
 
-	Andalusia = Province("Andalusia", "food", 1.0, "civilized", "Spanish")
-	Andalusia.x = 11
-	Andalusia.y = 5
-	provinces["Andalusia"] = Andalusia
 
-	Leon = Province("Leon", "iron", 1.2, "civilized", "Spanish")
-	Leon.x = 10
-	Leon.y = 4
-	Leon.ocean = False
-	provinces["Leon"] = Leon
+	Garia = Province("Garia", "Bulgo", "wood", 1.0, "civilized", "Bulgo")
+	Garia.x = 4
+	Garia.x = 10
+	provinces["Garia"] = Garia
 
-	Aragon = Province("Aragon", "iron", 1.0, "civilized", "Spanish")
-	Aragon.x = 9
-	Aragon.y = 5
-	provinces["Aragon"] = Aragon
+	Sebia = Province("Sebia", "Bulgo", "food", 1.0, "civilized", "Bulgo")
+	Sebia.x = 3
+	Sebia.y = 10
+	provinces["Sebia"] = Sebia
+
+
+
+	Grayto = Province("Grayto", "Kaygree", "oil", 1.0, "old", "Kaygree")
+	Grayto.x = 9
+	Grayto.y = 3
+	provinces["Grayto"] = Grayto
+	Tura = Province("Tura", "Kaygree", "rubber", 0.9, "old", "Kaygree")
+	Tura.x = 9
+	Tura.y =2
+	provinces["Tura"] = Tura
+	EastKish = Province("EastKish", "Kish", "spice", 0.9, "old", "Kish")
+	EastKish.x = 11
+	EastKish.y = 4
+	provinces["EastKish"] = EastKish
+	WestKish = Province("WestKish", "Kish", "gold", 1.1, "old", "Kish")
+	WestKish.x = 11
+	WestKish.y = 3
+	provinces["WestKish"] = WestKish
+
+	EastRabus = Province("EastRabus", "Rabus", "food", 1.0, "old", "Rabus")
+	EastRabus.x = 13
+	EastRabus.y = 4
+	provinces["EastRabus"] = EastRabus
+	WestRabus = Province("WestRabus", "Rabus", "gold", 1.0, "old", "Rabus")
+	WestRabus.x = 13
+	WestRabus.y = 3
+	provinces["WestRabus"] = WestRabus
+
+
+	EastSparko = Province("EastSparko", "Sparko", "food", 1.0, "old", "Sparko")
+	EastSparko.x = 15
+	EastSparko.y = 4
+	provinces["EastSparko"] = EastSparko
+
+	WestSparko = Province("WestSparko", "Sparko", "rubber", 1.0, "old", "Sparko")
+	WestSparko.x = 15
+	WestSparko.y = 3
+	provinces["WestSparko"] = WestSparko
+
+	NorthArgos = Province("NorthArgos", "Argos", "food", 1.0, "old", "Argos")
+	NorthArgos.x = 16
+	NorthArgos.y = 7
+	provinces["NorthArgos"] = NorthArgos
 	
-	Galicia = Province("Galicia", "coal", 0.85, "civilized", "Spanish")
-	Galicia.x = 9
-	Galicia.y = 4
-	provinces["Galicia"] = Galicia
+	SouthArgos = Province("SouthArgos", "Argos", "dyes", 0.9, "old", "Argos")
+	SouthArgos.x = 17
+	SouthArgos.y = 7
+	provinces["SouthArgos"] = SouthArgos
 	
-	La_Mancha = Province("La_Mancha", "food", 1.1, "civilized", "Spanish")
-	La_Mancha.x = 10
-	La_Mancha.y = 5
-	provinces["La_Mancha"] = La_Mancha
+	NorthMancha = Province("NorthMancha", "Mancha", "cotton", 0.9, "old", "Mancha")
+	NorthMancha.x = 16
+	NorthMancha.y = 10
+	provinces["NorthMancha"] = NorthMancha
+
+	SouthMancha = Province("SouthMancha", "Mancha", "dyes", 0.9, "old", "Mancha")
+	SouthMancha.x = 16
+	SouthMancha.y = 10
+	provinces["SouthMancha"] = SouthMancha
+
+	NorthGelder = Province("NorthGelder", "Gelder", "spice", 1.0, "old", "Gelder")
+	NorthGelder.x = 16
+	NorthGelder.y = 14
+	provinces["NorthGelder"] = NorthGelder
+	SouthGelder = Province("SouthGelder", "Gelder", "food", 1, "old", "Gelder")
+	SouthGelder.x = 17
+	SouthGelder.y = 14
+	provinces["SouthGelder"] = SouthGelder
 
 
-	Holland = Province("Holland", "food", 1.2, "civilized", "Dutch")
-	Holland.x = 4
-	Holland.y = 7
-	provinces["Holland"] = Holland
-	Gelderland = Province("Gelderland", "coal", 1.0, "civilized", "Dutch")
-	Gelderland.x = 5
-	Gelderland.y = 7
-	provinces["Gelderland"] = Gelderland
-	Wallonie = Province("Wallonie", "iron", 1.1, "civilized", "Dutch")
-	Wallonie.x = 5
-	Wallonie.y = 6
-	Wallonie.ocean = False
-	provinces["Wallonie"] = Wallonie
+	NorthPorta = Province("NorthPorta", "Porta", "spice", 1.0, "old", "Porta")
+	NorthPorta.x = 16
+	NorthPorta.y = 17
+	provinces["NorthPorta"] = NorthPorta
 
+	SouthPorta = Province("SouthPorta", "Porta", "oil", 1.0, "old", "Porta")
+	SouthPorta.x = 17
+	SouthPorta.y = 17
+	provinces["SouthPorta"] = SouthPorta
 
-	Portugal = Province("Portugal", "food", 1.1, "civilized", "Portugal")
-	Portugal.x = 11
-	Portugal.y = 4
-	provinces["Portugal"] = Portugal
+	WestNorra = Province("WestNorra", "Norra", "spice", 1.0, "old", "Norra")
+	WestNorra.x = 15
+	WestNorra.y = 20
+	provinces["WestNorra"] = WestNorra
+	EastNorra = Province("EastNorra", "Norra", "rubber", 1.0, "civilized", "Norra")
+	EastNorra.x = 15
+	EastNorra.y = 21
+	provinces["EastNorra"] = EastNorra
 
-	Svealand = Province("Svealand", "iron", 1.6, "civilized", "Swedish")
-	Svealand.x = 2
-	Svealand.y = 11
-	provinces["Svealand"] = Svealand
-	Norrland = Province("Norrland", "wood", 0.85, "civilized", "Swedish")
-	Norrland.x = 1
-	Norrland.y = 11
-	provinces["Norrland"] = Norrland
-	Ostlandet = Province("Ostlandet", "food", 0.9, "civilized", "Swedish")
-	Ostlandet.x = 3
-	Ostlandet.y = 11
-	provinces["Ostlandet"] = Ostlandet
+	WestWego = Province("WestWego", "Wego", "food", 1.0, "civilized", "Wego")
+	WestWego.x = 13
+	WestWego.y = 20
+	provinces["WestWego"] = WestWego
 
-	Norway = Province("Norway", "wood", 1.0, "civilized", "Norwegian")
-	Norway.x = 2
-	Norway.y = 10
-	provinces["Norway"] = Norway
+	EastWego = Province("EastWego", "Wego", "oil", 1.0, "civilized", "Wego")
+	EastWego.x = 13
+	EastWego.y = 21
+	provinces["EastWego"] = EastWego
 
-	Denmark = Province("Denmark", "food", 1.1, "civilized", "Danish")
-	Denmark.x = 4
-	Denmark.y = 9
-	provinces["Denmark"] = Denmark
+	WestArbaca = Province("WestArbaca", "Arbaca", "rubber", 1.0, "old", "Arbaca")
+	WestArbaca.x = 13
+	WestArbaca.y = 13
+	provinces["WestArbaca"] = WestArbaca
+	EastArbaca = Province("EastArbaca", "Arbaca", "oil", 1.0, "old", "Arbaca")
+	EastArbaca.x = 14
+	EastArbaca.y = 13
+	EastArbaca.ocean = False
+	provinces["EastArbaca"] = EastArbaca
 
-	UpperEgypt = Province("UpperEgypt", "cotton", 1.4, "old", "Arab")
-	UpperEgypt.x = 13
-	UpperEgypt.y = 13
-	provinces["UpperEgypt"] = UpperEgypt
-	MiddleEgypt = Province("MiddleEgypt", "food", 1.0, "old", "Arab")
-	MiddleEgypt.x = 14
-	MiddleEgypt.y = 13
-	MiddleEgypt.ocean = False
-	provinces["MiddleEgypt"] = MiddleEgypt
-	LowerEgypt = Province("LowerEgypt", "cotton", 0.8, "old", "Arab")
-	LowerEgypt.x = 15
-	LowerEgypt.y = 13
-	LowerEgypt.ocean = False
-	provinces["LowerEgypt"] = LowerEgypt
-	Sudan = Province("Sudan", "rubber", 0.8, "uncivilized", "Sudanese")
-	Sudan.x = 16
-	Sudan.y = 13
-	Sudan.ocean = False
-	provinces["Sudan"] = Sudan
-
-	Algiers = Province("Algiers", "food", 0.8, "old",  "Arab")
-	Algiers.x = 13
-	Algiers.y = 9
-	provinces["Algiers"] = Algiers
-	Constantine = Province("Constantine", "iron", 1.3, "old", "Arab")
-	Constantine.x = 13
-	Constantine.y = 10
-	provinces["Constantine"] = Constantine
-
-	Morocco = Province("Morocco", "food", 0.9, "old", "Arab")
-	Morocco.x = 13
-	Morocco.y = 8
-	provinces["Morocco"] = Morocco
-	South_Morocco = Province("South_Morocco", "gold", 0.9, "old", "Arab")
-	South_Morocco.x = 14
-	South_Morocco.y = 8
-	provinces["South_Morocco"] = South_Morocco
-
-	Tunis = Province("Tunis", "cotton", 0.8, "old", "Arab")
-	Tunis.x = 13
-	Tunis.y = 11
-	provinces["Tunis"] = Tunis
-
-
-	Libya = Province("Libya", "oil", 1.0, "old", "Arab")
-	Libya.x = 13
-	Libya.y = 12
-	provinces["Libya"] = Libya
-
-
-	WestKazakhstan = Province("WestKazakhstan", "cotton", 0.75, "uncivilized", "Kazak")
-	WestKazakhstan.x = 7
-	WestKazakhstan.y = 16
-	WestKazakhstan.ocean = False
-	provinces["WestKazakhstan"] = WestKazakhstan
-	EastKazakhstan = Province("EastKazakhstan", "food", 0.55, "uncivilized", "Kazak")
-	EastKazakhstan.x = 7
-	EastKazakhstan.y = 17
-	EastKazakhstan.ocean = False 
-	provinces["EastKazakhstan"] = EastKazakhstan
-
-	Khuzestan = Province("Khuzestan", "oil", 1.2, "old", "Persian")
-	Khuzestan.x = 9
-	Khuzestan.y = 15
-	provinces["Khuzestan"] = Khuzestan
-	Fars = Province("Fars", "food", 1.0, "old", "Persian")
-	Fars.x = 11
-	Fars.y = 16
-	provinces["Fars"] = Fars
-	Tehran = Province("Tehran", "cotton", 0.85, "old", "Persian")
-	Tehran.x = 10
-	Tehran.y = 16
-	Tehran.ocean = False
-	provinces["Tehran"] = Tehran
-	Isfahan = Province("Isfahan", "iron", 1.0, "old",  "Persian")
-	Isfahan.x = 11
-	Isfahan.y = 15
-	provinces["Isfahan"] = Isfahan
-	Khorasan = Province("Khorasan", "coal", 0.75, "old", "Persian")
-	Khorasan.x = 8
-	Khorasan.y = 16	
-	Khorasan.ocean = False
-	provinces["Khorasan"] = Khorasan
-
-	Nejd = Province("Nejd", "oil", 1.3, "old", "Arab")
-	Nejd.x = 12
-	Nejd.y = 14
-	provinces["Nejd"] = Nejd
-
-	Afghanistan = Province("Afghanistan", "food", 0.75,  "old", "Afghan")
-	Afghanistan.x = 9
-	Afghanistan.y = 17
-	Afghanistan.ocean = False
-	provinces["Afghanistan"] = Afghanistan
-
-
-	Punjab = Province("Punjab", "cotton", 1.0, "old", "Indian")
-	Punjab.x = 9
-	Punjab.y = 18
-	Punjab.ocean = False
-	provinces["Punjab"] = Punjab
-	United_Provinces = Province("United_Provinces", "food", 1.1, "old", "Indian")
-	United_Provinces.x = 9
-	United_Provinces.y = 19
-	United_Provinces.ocean = False
-	provinces["United_Provinces"] = United_Provinces
-	Rajputana = Province("Rajputana", "cotton", 1.0, "old", "Indian")
-	Rajputana.x = 10
-	Rajputana.y = 18
-	provinces["Rajputana"] = Rajputana
-	Central_India = Province("Central_India", "dyes", 1.0, "old", "Indian")
-	Central_India.x = 10
-	Central_India.y = 19
-	Central_India.ocean = False
-	provinces["Central_India"] = Central_India
-	Bombay = Province("Bombay", "spice", 1.1, "old", "Indian")
-	Bombay.x = 12
-	Bombay.y = 19
-	provinces["Bombay"] = Bombay
-	Madres = Province("Madres", "food", 1.15, "old", "Indian")
-	Madres.x = 13
-	Madres.y = 19
-	provinces["Madres"] = Madres
-	Nagpur = Province("Nagpur", "dyes", 0.85, "old", "Indian")
-	Nagpur.x = 10
-	Nagpur.y = 20
-	provinces["Nagpur"] = Nagpur
-
-	Bengal = Province("Bengal", "dyes", 1.1, "old", "Indian")
-	Bengal.x = 10
-	Bengal.y =21
-	provinces["Bengal"] = Bengal
-
-	Hyderabad = Province("Hyderabad", "cotton", 1.2, "old", "Indian")
-	Hyderabad.x = 11
-	Hyderabad.y = 19
-	provinces["Hyderabad"] = Hyderabad
-
-	Burma = Province("Burma", "wood", 1.0, "old", "Bamar")
-	Burma.x =11
-	Burma.y = 21
-	provinces["Burma"] = Burma
-
-	Bangkok = Province("Bangkok", "wood", 0.9, "old", "Thai")
-	Bangkok.x = 11
-	Bangkok.y = 22
-	provinces["Bangkok"] = Bangkok
-
-	Laos = Province("Laos", "food", 1.2, "old", "Thia")
-	Laos.x = 10
-	Laos.y = 22
-	Laos.ocean = False
-	provinces["Laos"] = Laos
-
-	North_Dai_Nam = Province("North_Dai_Nam", "food", 1.25, "old",  "Vietnamese")
-	North_Dai_Nam.x = 10
-	North_Dai_Nam.y = 23
-	provinces[North_Dai_Nam] = North_Dai_Nam
-	South_Dai_Nam = Province("South_Dai_Nam", "Spice", 1.1, "old", "Vietnamese")
-	South_Dai_Nam.x = 11
-	South_Dai_Nam.y = 23
-	provinces["South_Dai_Nam"] = South_Dai_Nam
-
-	Cambodia = Province("Cambodia", "rubber", 1.1, "old", "Cambodian")
-	Cambodia.x = 12
-	Cambodia.y = 23
-	provinces["Cambodia"] = Cambodia
-
-	Brunei = Province("Brunei", "oil", 0.8, "old", "Brunei ")
-	Brunei.x = 14
-	Brunei.y = 25
-	provinces["Brunei"] = Brunei
-
-	Java = Province("Java", "spice", 1.1, "old", "Javanese")
-	Java.x = 15
-	Java.y = 24
-	provinces["Java"] = Java
-
-	Malaysia = Province("Malaysia", "rubber", 1.0, "old", "Malaysian")
-	Malaysia.x = 13
-	Malaysia.y = 22
-	provinces["Malaysia"] = Malaysia
-	Sumatra = Province("Sumatra", "oil", 0.75, "old", "Malaysian")
-	Sumatra.x = 15
-	Sumatra.y = 22
-	provinces["Sumatra"] = Sumatra
-
-	Sulawesi = Province("Sulawesi", "spice", 1.0, "old", "Sulawesi")
-	Sulawesi.x = 14
-	Sulawesi.y = 28
-	provinces["Sulawesi"] = Sulawesi
-
-	NorthPhilippines = Province("NorthPhilippines", "food", 1.1, "old", "Filipino")
-	NorthPhilippines.x = 11
-	NorthPhilippines.y = 27
-	provinces["NorthPhilippines"] = NorthPhilippines
-	SouthPhilippines = Province("SouthPhilippines", "iron", 0.75, "old", "Filipino")
-	SouthPhilippines.x = 12
-	SouthPhilippines.y = 27
-	provinces["SouthPhilippines"] = SouthPhilippines
-
-	Manchuria = Province("Manchuria", "coal", 0.85, "old", "Manchurian")
-	Manchuria.x = 6
-	Manchuria.y = 26
-	provinces["Manchuria"] = Manchuria
-
-	Guangxi = Province("Guangxi", "cotton", 1.0, "old", "Chinese")
-	Guangxi.x = 9
-	Guangxi.y = 23
-	provinces["Guangxi"] = Guangxi
-
-	Guangdong = Province("Guangdong", "food", 1.1, "old", "Chinese")
-	Guangdong.x = 9
-	Guangdong.y = 24
-	provinces["Guangdong"] = Guangdong
-
-	Hunan = Province("Hunan", "cotton", 0.9, "old", "Chinese")
-	Hunan.x = 8
-	Hunan.y = 23
-	Hunan.ocean = False
-	provinces["Hunan"] = Hunan
-
-	Mongolia = Province("Mongolia", "food", 0.5, "old", "Mongolian")
-	Mongolia.x = 6
-	Mongolia.y = 23
-	Mongolia.ocean = False
-	provinces["Mongolia"] = Mongolia
-
-	Jiangsu = Province("Jiangsu", "food", 1.2, "old", "Chinese")
-	Jiangsu.x = 7
-	Jiangsu.y = 24
-	provinces["Jiangsu"] = Jiangsu
-	
-	#Jiangxi = Province("Jiangxi", "wood", 0.8, "China")
-	Qinghai = Province("Qinghai", "coal", 0.75, "old", "Chinese")
-	Qinghai.x = 7
-	Qinghai.y = 22
-	Qinghai.ocean = False
-	provinces["Qinghai"] = Qinghai
-	#Shandong = Province("food", "food", 1.2, "China")
-	Shanxi = Province("Shanxi", "coal", 0.85, "old", "China")
-	Shanxi.x = 6
-	Shanxi.y = 24
-	provinces["Shanxi"] = Shanxi
-	Sichuan = Province("Sichuan", "spice", 1.0, "old", "Chinese")
-	Sichuan.x = 8
-	Sichuan.y = 22
-	Sichuan.ocean = False
-	provinces["Sichuan"] = Sichuan
-	Zhejiang = Province("Zhejiang", "wood", 0.9, "old", "Chinese")
-	Zhejiang.x = 8
-	Zhejiang.y = 24
-	provinces["Zhejiang"] = Zhejiang
-	Liaoning = Province("Liaoning", "iron", 1.0, "old", "Chinese")
-	Liaoning.x = 6
-	Liaoning.y = 25
-	provinces["Liaoning"] = Liaoning
-
-	Pyongyang = Province("Pyongyang", "coal", 1.3, "old",  "Korea")
-	Pyongyang.x = 7
-	Pyongyang.y = 26
-	provinces["Pyongyang"] = Pyongyang
-	Sariwon = Province("Sariwon", "iron", 1.2, "old",  "Korea")
-	Sariwon.x = 7
-	Sariwon.y = 27
-	provinces["Sariwon"] = Sariwon
-	Seoul = Province("Seoul", "food", 1.2, "old", "Korea")
-	Seoul.x = 8
-	Seoul.y = 27
-	provinces["Seoul"] = Seoul
-
-	Kansai = Province("Kansai", "food", 1.1, "old", "Japanese")
-	Kansai.x = 8
-	Kansai.y = 29
-	provinces["Kansai"] = Kansai
-	Tohoku = Province("Tohoku", "iron", 0.85, "old", "Japanese")
-	Tohoku.x = 6
-	Tohoku.y = 29
-	provinces["Tohoku"] = Tohoku
-	Chugoku = Province("Chugoku", "cotton", 1.2,  "old", "Japanese")
-	Chugoku.x = 9
-	Chugoku.y = 29
-	provinces["Chugoku"] = Chugoku
-	Kanto = Province("Kanto", "food", 1.05, "old", "Japanese")
-	Kanto.x = 7
-	Kanto.y = 29
-	provinces["Kanto"] = Kanto
-	Kyushu = Province("Kyushu", "coal", 1.0, "old", "Japanese")
-	Kyushu.x = 10
-	Kyushu.y = 29
-	provinces["Kyushu"] = Kyushu
-
-	Mauritania = Province("Mauritania", "food", 0.8, "old", "Arab")
-	Mauritania.x = 15
-	Mauritania.y = 8
-	provinces["Mauritania"] = Mauritania
-
-	Liberia = Province("Liberia", "rubber", 0.9, "uncivilized", "Kpelle")
-	Liberia.x = 16
-	Liberia.y = 8
-	provinces["Liberia"] = Liberia
-
-	Mali = Province("Mali", "food", 0.75, "uncivilized", "Bambara")
-	Mali.x = 15
-	Mali.y = 9
-	provinces["Mali"] = Mali
-
-	Ghana = Province("Ghana", "food", 0.85, "uncivilized", "Akan")
-	Ghana.x = 16
-	Ghana.y = 9
-	provinces["Ghana"] = Ghana
-
-	Niger = Province("Niger", "cotton", 0.5, "uncivilized", "Hausa")
-	Niger.x = 15
-	Niger.y = 10
-	Niger.ocean = False
-	provinces["Niger"] = Niger
-
-	Nigeria = Province("Nigeria", "rubber", "uncivilized", 1.2, "Hausa")
-	Nigeria.x = 16
-	Nigeria.y =10
-	provinces["Nigeria"] = Nigeria
-
-	Cameroon = Province("Cameroon", "wood", 1.0, "uncivilized", "Cameroon")
-	Cameroon.x = 17
-	Cameroon.y = 10
-	provinces["Cameroon"] = Cameroon
-
-	Angola = Province("Angola", "iron", 0.65, "uncivilized", "Ovimbundu")
-	Angola.x = 18
-	Angola.y = 10
-	provinces["Angola"] = Angola
-
-	Nambia = Province("Nambia", "gold", 0.5, "uncivilized", "Bantu")
-	Nambia.x = 19
-	Nambia.y = 10
-	provinces["Nambia"] = Nambia
-
-	Cape = Province("cape", "gold", 1.0, "uncivilized", "Zulu")
-	Cape.x = 20
-	Cape.y = 10
-	provinces["Cape"] = Cape
-	Zululand = Province("Zululand", "food", 1.0, "uncivilized", "Zulu")
-	Zululand.x = 20
-	Zululand.y = 11
-	provinces["Zululand"] = Zululand
-
-	Mozambique = Province("Mozambique", "iron", 0.75, "uncivilized", "Bantu")
-	Mozambique.x = 19
-	Mozambique.y = 11
-	provinces["Mozambique"] = Mozambique
-
-	Tanzania = Province("Tanzania", "food", 1.0, "uncivilized", "Sukuma")
-	Tanzania.x = 18
-	Tanzania.y = 11
-	provinces["Tanzania"] = Tanzania
-
-	Kenya = Province("Kenya", "spice", 0.75, "uncivilized", "Bantu")
-	Kenya.x = 17
-	Kenya.y = 12
-	provinces["Kenya"] = Kenya
-
-	Ethiopia = Province("Ethiopia", "food", 0.8, "uncivilized", "Oromo")
-	Ethiopia.x = 16
-	Ethiopia.y = 13
-	provinces["Ethiopia"] = Ethiopia
-
-	Congo = Province("Congo", "rubber", 0.8, "uncivilized", "Bantu")
-	Congo.x = 17
-	Congo.y = 11
-	Congo.ocean = False
-	provinces["Congo"] = Congo
-
-	Madagascar = Province("Madagascar", "wood", 0.8, "uncivilized", "Merina")
-	Madagascar.x = 19
-	Madagascar.y = 13
-	provinces["Madagascar"] = Madagascar
-
-	New_South_Wales = Province("New_South_Wales", "food", 0.9, "uncivilized", "Aboriginal")
-	New_South_Wales.x = 18
-	New_South_Wales.y = 31
-	provinces["New_South_Wales"] = New_South_Wales
-
-	Queensland = Province("Queensland", "food", 0.8, "uncivilized", "Aboriginal")
-	Queensland.x = 17
-	Queensland.y = 31
-	provinces["Queensland"] = Queensland
-
-	South_Australia = Province("South_Australia", "cotton", 0.85, "uncivilized", "Aboriginal")
-	South_Australia.x = 18
-	South_Australia.y = 30
-	provinces["South_Australia"] = South_Australia
-
-	West_Australia = Province("West_Australia", "gold", 1.0, "uncivilized", "Aboriginal")
-	West_Australia.x = 17
-	West_Australia.y = 30
-	provinces["West_Australia"] = West_Australia 
-
-	New_Zealand = Province("New Zealand", "cotton", 0.8, "uncivilized", "Aboriginal")
-	New_Zealand.x = 15
-	New_Zealand.y = 32
-	provinces["New Zealand"] = New_Zealand
+	WestEgaro = Province("WestEgaro", "Egaro", "spice", 1.0, "old", "Egaro")
+	WestEgaro.x = 9
+	WestEgaro.y = 22
+	WestEgaro.ocean = False
+	provinces["WestEgaro"] = WestEgaro
+	EastEgaro = Province("EastEgaro",  "Egaro", "food", 0.8, "old", "Egaro")
+	EastEgaro.x = 9
+	EastEgaro.y = 23
+	EastEgaro.ocean = False
+	provinces["EastEgaro"] = EastEgaro
 
 	return provinces
+	

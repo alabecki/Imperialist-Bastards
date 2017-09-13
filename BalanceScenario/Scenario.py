@@ -3,55 +3,62 @@ from player_class import*
 from historical.Scenario_provinces import*
 from technologies import*
 from start import*
-from historical.ScenarioNations import*
+from BalanceScenario.ScenarioNations import*
+from random import*
 
 
-def get_name_from_major_choice(choice):
-	if choice == "1":
-		name = "England"
-	if choice == "4":
-		name = "Germany"
-	if choice == "2":
-		name = "France"
-	if choice == "3":
-		name = "Russia"
-	if choice == "5":
-		name = "Austria"
-	if choice == "6":
-		name = "Italy"
-	if choice == "7":
-		name = "Ottoman"
-	if choice == "8":
-		name = "Spain"
-	return name
 
-def get_name_from_minor_choice(choice):
-	if choice == "1":
-		name = "Netherlands"
-	if choice == "2":
-		name = "Sweden"
-	if choice == "3":
-		name = "Portugal"
-	if choice == "4":
-		name = "Norway"
+def get_name_from_major_choice(pick):
+	if pick == "1":
+		name = "Bambaki"
+	if pick == "4":
+		name = "Hyle"
+	if pick == "2":
+		name = "Trope"
+	if pick == "3":
+		name = "Sidero"
+	if pick == "5":
+		name = "Isorropia"
+	if pick == "6":
+		name = "Karbouno"
 
-def historical():
+def get_name_from_minor_choice(pick):
+	if pick == "1":
+		name = "Situs"
+	if pick == "2":
+		name = "Hythen"
+	if pick == "3":
+		name = "Intero"
+	if pick == "4":
+		name = "Kora"
+	if pick == "5":
+		name = "Southo"
+	if pick == "6":
+		name = "Cindra"
+	if pick == "7":
+		name = "Estos"
+	if pick == "8":
+		name = "Lian"
+	if pick == "9":
+		name = "Bulgo"
+
+
+def balance():
 
 	provinces = create_provinces()
 
 	players = dict()
-	uncivilized_minors = dict()
 	i = 1
 
-	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Ottoman", "Italy", "Spain", "Netherlands"]
-	modern_minors = ["Sweden", "Portugal", "Norway"]
-	old_empires = ["China", "India", "Japan", "Persia"]
-	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dia Dam", "Siam", "Malaysia", \
-	"Brunei", "Tunisia", "Libya", "Nejid", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi"]
-	unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
-	"South Australia", "New Zealand", "Zululand"]
-	unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
-	"Congo", "Madagascar"] 
+	modern_major = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
+	modern_minors = ["Situs", "Hythen", "Intero", "Kora", "Southo", "Cindra", "Estos", "Lian", "Bulgo" ]
+	#old_empires = ["China", "India", "Japan", "Persia"]
+	old_minors = ["Kaygree", "Kish", "Rabus", "Sparko", "Argos", "Mancha", "Gelder", "Porta", "Norra", \
+	"Wego", "Arbaca", "Egaro"]
+	#unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
+	#"South Australia", "New Zealand", "Zululand"]
+	#unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
+	#"Congo", "Madagascar"] 
 
 	print("How many nations are to be controlled by human players? \n")
 	num_humans = input()
@@ -67,28 +74,30 @@ def historical():
 			for m in modern_major:
 				print("%s: %s" % (count, m))
 				count += 1
-			choice = input()
-			name = get_name_from_major_choice(choice)
+			pick = input()
+			name = get_name_from_major_choice(pick)
 			new = Human(name, "major", i)
 			players[name] = new
 			player = players[name]
 			initialize_major_power(player)
-			if choice == "1":
+			if pick == "1":
 				england(player, provinces)
-			if choice == "4":
+			if pick == "4":
 				germany(player, provinces)
-			if choice == "2":
+			if pick == "2":
 				france(player, provinces)
-			if choice == "3":
+			if pick == "3":
 				russia(player, provinces)
-			if choice == "5":
+			if pick == "5":
 				austria(player, provinces)
-			if choice == "6":
+			if pick == "6":
 				italy(player)
-			if choice == "7":
+			if pick == "7":
 				ottoman(player, provinces)
-			if choice == "8":
+			if pick == "8":
 				spain(player)
+			if pick == "9":
+				netherlands(player)
 			human_choices.append(name)
 		if kind == "2":
 			print("Which Minor Modern nation will player " + i + " control? \n")
@@ -96,19 +105,19 @@ def historical():
 			for m in modern_minors:
 				print("%s: %s" % (count, m))
 				count += 1
-			choice = input()
-			name = get_name_from_minor_choice(choice)
-			new = Human(choice, "modern_minor", i)
+			pick = input()
+			name = get_name_from_minor_choice(pick)
+			new = Human(pick, "modern_minor", i)
 			players[name] = new
 			player = players[name]
 			initialize_modern_minor(player)
-			if choice == "1":
-				netherlands(player, provinces)
-			if choice == "2":
+			if pick == "1":
+				demark(player, provinces)
+			if pick == "2":
 				sweden(player)
-			if choice == "3":
+			if pick == "3":
 				portugal(player, provinces)
-			if choice == "4":
+			if pick == "4":
 				norway(player)
 			human_choices.append(name)
 
@@ -124,22 +133,21 @@ def historical():
 			players[m] = new
 			player = players[m]
 			initialize_major_power(player)
-			if player.name == "England":
-				england(player, provinces)
-			if player.name == "Germany":
-				germany(player, provinces)
-			if player.name == "France":
-				france(player, provinces)
-			if player.name == "Russia":
-				russia(player, provinces)
-			if player.name == "Austria":
-				austria(player, provinces)
-			if player.name == "Italy":
-				italy(player, provinces)
-			if player.name == "Ottoman":
-				ottoman(player, provinces)
-			if player.name == "Spain":
-				spain(player, provinces)
+			if player.name == "Bambaki":
+				bambaki(player, provinces)
+			if player.name == "Hyle":
+				hyle(player, provinces)
+			if player.name == "Trope":
+				trope(player, provinces)
+			if player.name == "Sidero":
+				sidero(player, provinces)
+			if player.name == "Isorropia":
+				isorropia(player, provinces)
+			if player.name == "Karbouno":
+				karbouno(player, provinces)
+
+
+		
 			i += 1
 	for m in modern_minors:
 		if m not in human_choices:
@@ -147,31 +155,27 @@ def historical():
 			players[m] = new
 			player = players[m]
 			initialize_modern_minor(player)
-			if player.name == "Netherlands":
-				netherlands(player, provinces)
-			if player.name == "Sweden":
-				sweden(player, provinces)
-			if player.name == "Portugal":
-				portugal(player, provinces)
-			if player.name == "Norway":
-				norway(player, provinces)
-			i +=1
+			if player.name == "Situs":
+				situs(player, provinces)
+			if player.name == "Hythen":
+				hythen(player, provinces)
+			if player.name == "Intero":
+				intero(player, provinces)
+			if player.name == "Kora":
+				kora(player, provinces)
+			if player.name == "Southo":
+				southo(player, provinces)
+			if player.name == "Cindra":
+				cindra(player, provinces)
+			if player.name == "Estos":
+				estos(player, provinces)
+			if player.name == "Lian":
+				lian(player, provinces)
+			if player.name == "Bulgo":
+				bulgo(player, provinces)
 
-	for e in old_empires:
-		if e not in human_choices:
-			new = AI(e, "old_empire", i)
-			players[e] = new
-			player = players[e]
-			initialize_oldemp(player)
-			if player.name == "China":
-				china(player, provinces)
-			if player.name == "India":
-				india(player, provinces)
-			if player.name == "Persia":
-				persia(player, provinces)
-			if player.name == "Japan":
-				japan(player, provinces)
-			i += 1
+
+			i +=1
 
 	for o in old_minors:
 		if o not in human_choices:
@@ -179,112 +183,46 @@ def historical():
 			players[o] = new
 			player = players[o]
 			initialize_old_minor(player)
-			if player.name == "Korea":
-				korea(player, provinces)
-			if player.name == "Egypt":
-				egypt(player, provinces)
-			if player.name == "Algeria":
-				algeria(player, provinces)
-			if player.name == "Morocco":
-				morocco(player, provinces)
-			if player.name == "Kazakhstan":
-				kazakhstan(player, provinces)
-			if player.name == "Philippines":
-				philippines(player, provinces)
-			if player.name == "Dai Dam":
-				dai_dam(player, provinces)
-			if player.name == "Siam":
-				siam(player, provinces)
-			if player.name == "Malaysia":
-				malaysia(player, provinces)
-			if player.name == "Brunei":
-				brunei(player, provinces)
-			if player.name == "Tunisia":
-				tunisia(player, provinces)
-			if player.name == "Libya":
-				libya(player, provinces)
-			if player.name == "Nejid":
-				nejd(player, provinces)
-			if player.name == "Afghanistan":
-				afghanistan(player, provinces)
-			if player.name == "Bengal":
-				bengal(player, provinces)
-			if player.name == "Hyderabad":
-				hyderabad(player, provinces)
-			if player.name == "Burma":
-				burma(player, provinces)
-			if player.name == "Cambodia":
-				cambodia(player, provinces)
-			if player.name == "Brunei":
-				brunei(player, provinces)
-			if player.name == "Sulawesi":
-				sulawesi(player, provinces)
-
-	for u in unciv:
-		new = Uncivilized_minor(u)
-		uncivilized_minors[u] = new
-		nation = uncivilized_minors[u]
-		if u == "Zululand":
-			zululand(nation, provinces)
-		if u == "Mozambique":
-			mozambique(nation, provinces)
-		if u == "Tanzania":
-			tanzania(nation, provinces)
-		if u == "Kenya":
-			kenya(nation, provinces)
-		if u == "Ethiopia":
-			ethiopia(nation, provinces)
-		if u == "New South Wales":
-			new_south_wales(nation, provinces)
-		if u == "Queensland":
-			queensland(nation, provinces)
-		if u == "West Australia":
-			west_australia(nation, provinces)
-		if u == "South Australia":
-			south_australia(nation, provinces)
-		if u == "New Zealand":
-			new_zealand(nation, provinces)
-
+			if player.name == "Kaygree":
+				kaygree(player, provinces)
+			if player.name == "Kish":
+				kish(player, provinces)
+			if player.name == "Rabus":
+				rabus(player, provinces)
+			if player.name == "Sparko":
+				sparko(player, provinces)
+			if player.name == "Argos":
+				argos(player, provinces)
+			if player.name == "Mancha":
+				mancha(player, provinces)
+			if player.name == "Gelder":
+				gelder(player, provinces)
+			if player.name == "Porta":
+				porta(player, provinces)
+			if player.name == "Norra":
+				norra(player, provinces)
+			if player.name == "Wego":
+				wego(player, provinces)
+			if player.name == "Arbaca":
+				arbaca(player, provinces)
+			if player.name == "Egaro":
+				egaro(player, provinces)
 		i += 1
 
-	for u in unciv_rough:
-		new = Uncivilized_minor(u)
-		uncivilized_minors[u] = new
-		nation = uncivilized_minors[u]
-		if u == "Mauritania":
-			mauritania(nation, provinces)
-		if u == "Liberia":
-			liberia(nation, provinces)
-		if u == "Mali":
-			mali(nation, provinces)
-		if u == "Ghana":
-			ghana(nation, provinces)
-		if u == "Niger":
-			niger(nation, provinces)
-		if u == "Nigeria":
-			nigeria(nation, provinces)
-		if u == "Cameroon":
-			cameroon(nation, provinces)
-		if u == "Angola":
-			angola(nation, provinces)
-		if u == "Nambia":
-			nambia(nation, provinces)
-		if u == "Ethiopia":
-			ethiopia(nation, provinces)
-		if u == "Congo":
-			congo(nation, provinces)
-		if u == "Madagascar":
-			madagascar(nation, provinces)
-		i += 1
+	print("Players")
+	for p, play in players.items():
+		print(play.name)
+		print("Provinces_________________________________________________________")
+		for prov in play.provinces.values():
+			print(prov.name)
 
-	for unciv in uncivilized_minors.values():
-		print(unciv.name)
 
 	for p, play in players.items():
 		if play.capital == "":
-			#x = choice(play.provinces.keys())
-			for k, v in play.provinces.items():
-				play.capital = play.provinces[k]
+			provs = list(play.provinces.keys())
+			cap = choice(provs)
+			#for k, v in play.provinces.items():
+			play.capital = cap
 
 	for p, play in players.items():
 		for p, prov in play.provinces.items():
@@ -312,21 +250,31 @@ def historical():
 		pair = frozenset(pair)
 		relations[pair] = Relation(pair)
 
-	for r, rel in relations.items():
-		print(r, rel.relata)
+	#for r, rel in relations.items():
+	#	print(r, rel.relata)
 
+	old_provs = []
+	for p, pl in players.items():
+		if pl.type == "old_minor":
+			for prov in pl.provinces.values():
+				old_provs.append(prov.name)
+
+
+	for p, pl in players.items():
+		if pl.type == "major":
+			pl.objectives = old_provs
 
 	market = Market()
 
-	globe = Globe()
+	#globe = Globe()
 
 	initial = {
 		"players" : players, 
 		"provinces": provinces, 
 		"relations": relations, 
-		"uncivilized_minors": uncivilized_minors,
+		#"uncivilized_minors": uncivilized_minors,
 		"market": market,
-		"globe": globe,
+		#"globe": globe,
 	 }
 
 	return initial
