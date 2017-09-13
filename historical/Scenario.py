@@ -7,14 +7,15 @@ from historical.ScenarioNations import*
 
 
 def get_name_from_major_choice(choice):
+	name = ""
 	if choice == "1":
 		name = "England"
-	if choice == "4":
-		name = "Germany"
 	if choice == "2":
 		name = "France"
 	if choice == "3":
 		name = "Russia"
+	if choice == "4":
+		name = "Germany"
 	if choice == "5":
 		name = "Austria"
 	if choice == "6":
@@ -27,7 +28,9 @@ def get_name_from_major_choice(choice):
 		name = "Netherlands"
 	return name
 
+		
 def get_name_from_minor_choice(choice):
+	name = ""
 	if choice == "1":
 		name = "Demark"
 	if choice == "2":
@@ -35,11 +38,11 @@ def get_name_from_minor_choice(choice):
 	if choice == "3":
 		name = "Portugal"
 	if choice == "4":
-		name = "Norway"
+		name = "Two Sicilies"
 	if choice == "5":
-		name = "Poland"
-	if choice == "6":
-		name = Switzerland 
+		name = "Switzerland"
+	return name 
+	 
 
 def historical():
 
@@ -49,10 +52,10 @@ def historical():
 	uncivilized_minors = dict()
 	i = 1
 
-	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Spain", "Netherlands"]
+	modern_major = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Ottoman", "Spain", "Netherlands"]
 	modern_minors = ["Denmark", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", \
 	"Bavaria", "NorthGermany", "Papal States"]
-	old_empires = ["China", "India", "Japan", "Persia", "Ottoman"]
+	old_empires = ["China", "India", "Japan", "Persia"]
 	old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dai Nam", "Siam", "Malaysia", \
 	"Brunei", "Tunisia", "Libya", "Nejd", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
 	#unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
@@ -71,55 +74,70 @@ def historical():
 		if kind == "1":
 			print("Which Great Power will player " + str(i) + " control? \n")
 			count = 1
-			for m in modern_major:
-				print("%s: %s" % (count, m))
-				count += 1
-			choice = input()
+			choice = ""
+			#while choice not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+			while choice not in range(len(modern_major) + 1):
+				for m in modern_major:
+					print("%s: %s" % (count, m))
+					count += 1
+				choice = input()
+				choice = int(choice)
+				count = 1
+			choice = str(choice)
 			name = get_name_from_major_choice(choice)
 			new = Human(name, "major", i)
 			players[name] = new
 			player = players[name]
+
 			initialize_major_power(player)
 			if choice == "1":
 				england(player, provinces)
-			if choice == "4":
-				germany(player, provinces)
 			if choice == "2":
 				france(player, provinces)
 			if choice == "3":
 				russia(player, provinces)
+			if choice == "4":
+				germany(player, provinces)
 			if choice == "5":
 				austria(player, provinces)
 			if choice == "6":
 				italy(player, provinces)
 			if choice == "7":
+				ottoman(player, provinces)
+			if choice == "8":
 				spain(player, provinces)
-			if choice == "7":
+			if choice == "9":
 				netherlands(player, provinces)
 			human_choices.append(name)
 		if kind == "2":
-			print("Which Minor Modern nation will player " + i + " control? \n")
+			print("Which Minor Modern nation will player " + str(i) + " control? \n")
 			count = 1
-			for m in modern_minors:
-				print("%s: %s" % (count, m))
-				count += 1
-			choice = input()
+			choice = ""
+			while choice not in range(6):
+				for m in modern_minors:
+					if m in ["Denmark", "Sweden", "Portugal", "Two Sicilies", "Switzerland"]:
+						print("%s: %s" % (count, m))
+						count += 1
+				choice = input()
+				choice = int(choice)
+				count = 1
+			choice = str(choice)
 			name = get_name_from_minor_choice(choice)
-			new = Human(choice, "minor", i)
+			print("Name: %s" % (name))
+			new = Human(name, "minor", i)
 			players[name] = new
 			player = players[name]
 			initialize_modern_minor(player)
 			if choice == "1":
 				denmark(player, provinces)
 			if choice == "2":
-				sweden(player)
+				sweden(player, provinces)
 			if choice == "3":
 				portugal(player, provinces)
-			
+			if choice == "4":
+				two_sicilies(player, provinces)
 			if choice == "5":
-				two_sicilies(player)
-			if choice == "6":
-				switzerland(player) 
+				switzerland(player, provinces) 
 			human_choices.append(name)
 
 
@@ -131,6 +149,7 @@ def historical():
 	i = num_humans
 	for m in modern_major:
 		if m not in human_choices:
+			print("Human Choices %s" % (human_choices))
 			new = AI(m, "major", i)
 			players[m] = new
 			player = players[m]

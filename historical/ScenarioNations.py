@@ -45,12 +45,12 @@ def england(player, provinces):
 		player.build_factory_priority["parts"] = 1.7
 		player.build_factory_priority["clothing"] = 1.6
 		player.resource_priority["cotton"] = 2.8
-		player.resource_priority["dyes"] = 3.2
+		player.resource_priority["dyes"] = 3.6
 		player.improve_province_priority["cotton"] = 1.3
 		player.improve_province_priority["dyes"] = 1.1
 		player.sphere_targets = {"Netherlands", "Sweden", "Denmark", "Persia", "Portugal"}
 		player.mid_class_priority["bureaucrats"] += 0.15
-		player.resourse_to_keep["dyes"] = 18
+		player.resourse_to_keep["dyes"] = 20
 
 
 		player.reputation = 1.1
@@ -132,7 +132,7 @@ def germany(player, provinces):
 	player.cavalry["defend"] += 0.1
  
 	if type(player) == AI:
-		player.personality["Army"] = 1.9
+		player.personality["Army"] = 1.35
 		player.personality["Navy"] = 0.68
 		player.build_factory_priority["paper"] = 1.3
 		player.personality["Offensive"] = 0.68
@@ -962,7 +962,7 @@ def japan(player, provinces):
 		player.build_factory_priority["cannons"] += 0.15
 		player.personality["Army"] = 1.5
 		player.personality["Navy"] = 1
-		player.improve_province_priority["shipyard"] = 99
+		player.improve_province_priority["shipyard"] = 65
 
 
 	player.objectives = {"Kansai", "Tohoku", "Chugoku", "Kanto", "Kyushu", "Pyongyang", "Sariwon", \
