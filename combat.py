@@ -162,7 +162,7 @@ def calculate_ammo_needed(p):
 	ammo_needed += p.military["artillery"] * p.artillery["ammo_use"]
 	ammo_needed += p.military["tank"] * p.cavalry["ammo_use"]
 	ammo_needed += p.military["fighter"] * p.artillery["ammo_use"]
-	print("Ammo Needed for %s: %s" % (p.name, ammo_needed))
+	#print("Ammo Needed for %s: %s" % (p.name, ammo_needed))
 
 	return ammo_needed
 
@@ -170,7 +170,7 @@ def calculate_oil_needed(p):
 	oil_needed = 0.0
 	oil_needed += p.military["tank"] * p.tank["oil_use"]
 	oil_needed += p.military["fighter"] * p.fighter["oil_use"]
-	print("Oil Needed for %s: %s" % (p.name, oil_needed))
+	#print("Oil Needed for %s: %s" % (p.name, oil_needed))
 	return oil_needed
 
 def calculate_manouver(p):
@@ -345,6 +345,7 @@ def distribute_losses_amph(player, losses, num_units, current_makeup):
 
 def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 	if winner == p1.name:
+		p1.reputation -= 0.5
 		print("%s has sucessfuly invaded %s ! \n" % (p1.name, p2.name))
 		if p2.number_developments >= 4:
 			opts = []
@@ -457,13 +458,13 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			p2_borders = set()
 			for k, v in players.items():
 				if p2.check_for_border(v) == True:
-					p2_borders.add(v)
+					p2_borders.add(k)
 				p2.borders = p2_borders
 		#recalculate borders of nations:
 		p1_borders = set()
 		for k, v in players.items():
 			if p1.check_for_border(v) == True:
-				p1_borders.add(v)
+				p1_borders.add(k)
 		p1.borders = p1_borders
 		print("%s has lost a total war to %s" % (p2.name, p1.name))
 		pause = input()
@@ -494,8 +495,8 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 						pl.allied_target.remove(p2)
 				if p2.name in pl.objectives:
 					pl.objectives.remove(p2.name)
-				if p2 in pl.embargo:
-					pl.embargo.remove(p2)	
+				if p2.name in pl.embargo:
+					pl.embargo.remove(p2.name)	
 				#sphere_target_copy = deepcopy(pl.sphere_targets)
 				#for st in sphere_target_copy:
 					#if st == p2.name:
@@ -521,25 +522,31 @@ def combat_outcome(winner, p1, p2, prov, players, market, relations):
 	if prov == "total":
 		resolve_total_war(winner, p1, p2, prov, players, market, relations)
 		return
-
-	p1.rival_target = []
+	if type(p1) == AI:
+		p1.rival_target = []
 	relata = frozenset([p1.name, p2.name])
 	p1.rival_target = []
 	relations[relata].relationship += 1
-	cb_copy = deepcopy(p1.CB)
-	for cb in cb_copy:
-		if cb.opponent == p2.name:
-			p1.CB.discard(cb)
+	#cb_copy = deepcopy(p1.CB)
+
+
+	cb_keys = []
+	for cb in p1.CB:
+		cb_keys.append(cb)
+
+	for cb in cb_keys:
+		if cb.province == prov.name:
+			print("CB discharged: %s %s" % (cb.province, cb.opponent))
+			p1.CB.remove(cb)
 			del cb
 
 	if winner == p1.name:
-		p1.reputation -= 0.5
+		
 		print("%s has sucessfuly invaded %s ! \n" % (p1.name, p2.name))
 		#p1.stability += 0.5
 		#if p1.stability > 3:
 		#	p1.stability = 3
 		#maybe gain stability with Nationalism
-		p1.CB.discard(p2)
 		p2.just_attacked = 3
 
 		if p2.number_developments >= 2:
@@ -644,27 +651,28 @@ def gain_province(p1, p2, prov, players, market, relations):
 			p1.goods[k] += v
 		for k, v in market.market.items():
 			for i in v:
-				if i.owner == p2:
+				if i.owner == p2.name:
 					if k in p1.resources.keys():
 						p1.resources[k] += 1
 					if k in p1.goods.keys():
 						p1.goods[k] +=1
 					market.market[k].remove(i)
+					print("removed %s %s"% (i.owner, i.kind))
 					del i
-			relkeys = list(relations.keys())
-			for r in relkeys:
-				if p2.name in relations[r].relata:
-					del relations[r]
-			for pl in players.values():
-				if type(pl) == AI:
-					if p2.name in pl.sphere_targets:
-						pl.sphere_targets.remove(p2.name)
-					if p2 in pl.allied_target:
-						pl.allied_targets.remove(p2)
-					if p2.name in pl.objectives:
-						pl.objectives.remove(p2.name)
-					if p2 in pl.embargo:
-						pl.embargo.remove(p2)
+		relkeys = list(relations.keys())
+		for r in relkeys:
+			if p2.name in relations[r].relata:
+				del relations[r]
+		for pl in players.values():
+			if type(pl) == AI:
+				if p2.name in pl.sphere_targets:
+					pl.sphere_targets.remove(p2.name)
+				if p2 in pl.allied_target:
+					pl.allied_targets.remove(p2)
+				if p2.name in pl.objectives:
+					pl.objectives.remove(p2.name)
+				if p2.name in pl.embargo:
+					pl.embargo.remove(p2.name)
 	
 		del players[p2.name]
 	else:
@@ -672,13 +680,13 @@ def gain_province(p1, p2, prov, players, market, relations):
 		p2_borders = set()
 		for k, v in players.items():
 			if p2.check_for_border(v) == True:
-				p2_borders.add(v)
+				p2_borders.add(k)
 		p2.borders = p2_borders
 	#recalculate borders of nations:
 	p1_borders = set()
 	for k, v in players.items():
 		if p1.check_for_border(v) == True:
-			p1_borders.add(v)
+			p1_borders.add(k)
 	p1.borders = p1_borders 
 
 	print(str(prov) + " is now part of " + p1.name)
@@ -1266,13 +1274,13 @@ def calculate_ammo_needed_navy(player):
 	amount += player.military["frigates"] * player.frigates["ammo_use"]
 	amount += player.military["iron_clad"] * player.iron_clad["ammo_use"]
 	amount += player.military["battle_ship"] * player.battle_ship["ammo_use"]
-	print("Oil Needed for %s: %s" % (player.name, amount))
+	#print("Oil Needed for %s: %s" % (player.name, amount))
 
 	return amount
 
 def calculate_oil_needed_navy(player):
 	amount = player.military["battle_ship"] * player.battle_ship["oil_use"]
-	print("Oil Needed for %s: %s" % (player.name, amount))
+	#print("Oil Needed for %s: %s" % (player.name, amount))
 	return amount
 
 

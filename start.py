@@ -34,7 +34,7 @@ def findsubsets(S,m):
 
 def initialize_major_power(player):
 
-	player.stability = 1.0
+	player.stability = 0.5
 	player.government = "absolute monarchy"
 	player.AP = 2
 	player.POP = 8.2

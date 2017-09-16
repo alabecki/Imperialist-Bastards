@@ -12,8 +12,9 @@ class Market(object):
 
 		self.defeated = []
 
-		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
+		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "/", "//", "///"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
+
 
 		self.market_keys = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
@@ -43,7 +44,10 @@ class Market(object):
 			"telephone": [],
 			"fighter": [],
 			"tank": [],
-			"auto": []
+			"auto": [],
+			"/": [],
+			"//": [],
+			"///": [],
 		}
 
 		self.global_factories = {
@@ -126,6 +130,10 @@ class Market(object):
 			28: 3,
 			29: 3,
 			30: 3,
+			31: 2,
+			32: 2,
+			32: 2,
+			33: 2
 	}
 
 	food_production = dict()
@@ -150,7 +158,7 @@ class Market(object):
 
 
 
-	def buy_item(self, _type, player, players, market):
+	def buy_item(self, _type, player, players, market, relations):
 		#amount = int(input("How many %s do you wish to buy? \n" % (_type)))
 		stock = player.supply[_type]
 		if(stock < 1):
@@ -170,21 +178,29 @@ class Market(object):
 				else:
 					temp = []
 					#count = 1
+					#for o in player.embargo:
+					#	print(o)
 					for i in self.market[_type]:
+						#print("i owner: %s" % (i.owner))
 						pl = i.owner
-						if player not in pl.embargo:
-							temp.append(pl.name)
+						if i.owner in player.embargo:
+							#print("Embarged by %s" % (i.owner))
+							continue
+						#print("Appending item from %s" % (i.owner))
+						temp.append(i.owner)
 					buy_from = " "
 					while buy_from not in temp:
 						print("From whom would you like to buy %s?" % (_type))
-						for t in temp:
-							print(t)
+					#	for t in temp:
+					#		print(t)
+						for i in range(int(len(temp)/5+1)):
+							print("    ".join(temp[i*5:(i+1)*5]) + "\n")
 						buy_from = input()
 					
 					for i in self.market[_type]:
 						#print("Owner: %s, Other: %s" % (i.owner.name, buy_from))
-						if i.owner.name == buy_from:
-							print("Removing item...%s" % (i.owner))
+						if i.owner == buy_from:
+							#print("Removing item...%s" % (i.owner))
 							self.market[_type].remove(i)
 							del i
 							break
@@ -214,12 +230,12 @@ class Market(object):
 		if(kind in self.resources):
 			#amount = len(self.market[kind]) 
 			if(supply < 1):
-				price = 100000
+				price = 1000
 				return price
-			elif(supply > 28 and supply <= 32):
+			elif(supply > 28 and supply <= 33):
 				price = 1
 				return price
-			elif(supply > 32):
+			elif(supply > 33):
 				price = 0
 				return price
 			else:
@@ -229,7 +245,7 @@ class Market(object):
 			#amount = self.market[kind]
 			#print("Amount in Market: %s" % (amount))
 			if supply < 1:
-				return 100000
+				return 1000
 			mod = 1
 			if kind == "clothing":
 				mod = 1.2
@@ -244,21 +260,10 @@ class Market(object):
 				mod = 3.2
 			if kind == "auto":
 				mod = 3.5
+			if supply > 33:
+				return 1 * mod
 			
-			if(supply < 1):
-				price = 10 * mod
-				return price
-			if(supply >= 21 and supply < 26):
-				price = 2 * mod
-				return price
-			if(supply >= 26 and supply <= 30):
-				price = 1 * mod
-				return price
-			if(supply > 30):
-				price = 0.5 * mod
-				return price
-			else:
-				price = self.goods_sell_price[supply] * mod
+			price = self.goods_sell_price[supply] * mod
 			return price 
 
 
@@ -277,7 +282,7 @@ class Market(object):
 		while len(self.market[kind]) < 32 and amount >= 1:
 			st = random()
 			ID = player.name + str(st)
-			new = MarketItem(ID, kind, player)
+			new = MarketItem(ID, kind, player.name)
 			self.market[kind].append(new)
 			if kind in player.resources.keys():
 				player.resources[kind] -= 1
@@ -288,10 +293,13 @@ class Market(object):
 	
 
 
-
 	def show_market(self, player):
 		print("Market _____________________________________________________________________________________________")
-		for i in self.market_keys:
-			print("%s : amount %s price %s \n" % (i, player.supply[i], self.buy_price(i, player.supply[i]) ))
+		for k1,k2 in zip(self.resources, self.goods):
+			print( " %-12s: amount: %-6.1f (%-6.1f)  price: %-6.1f (%-6.1f)      %-12s: amount: %-6.1f (%-6.1f)  price: %-6.1f (%-6.1f)" % \
+			(k1, len(self.market[k1]), player.supply[k1], self.buy_price(k1, len(self.market[k1])), self.buy_price(k1, player.supply[k1]), \
+			k2, len(self.market[k2]), player.supply[k2], self.buy_price(k2, len(self.market[k2])), self.buy_price(k2, player.supply[k2]) ))
+		#for i in self.market_keys:
+		#	print("%s : amount %s price %s \n" % (i, player.supply[i], self.buy_price(i, player.supply[i]) ))
 		print("_____________________________________________________________________________________________________")
 		return

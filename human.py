@@ -5,6 +5,21 @@ import minor_classes
 from technologies import technology_dict
 from commands import*
 
+pro_input = {
+	"1": "parts",
+	"2": "cannons",
+	"3": "clothing",
+	"4": "paper",
+	"5": "furniture",
+	"6": "chemicals",
+	"7": "gears",
+	"8": "telephone",
+	"9": "radio",
+	"10": "auto",
+	"11": "fighter",
+	"12": "tank"
+}
+
 
 class Human(Player):
 	def __init__(self, _name, _type, number, *args, **kwargs):
@@ -66,6 +81,8 @@ class Human(Player):
 				print(r)
 			return
 		else:
+			#allow = False
+			least_mid = 100
 			for m, mid in self.midPOP.items():
 				if self.midPOP[m]["number"] < least_mid:
 					least_mid = self.midPOP[m]["number"]
@@ -326,27 +343,27 @@ class Human(Player):
 		print("What kind of unit would you like to build? \n")
 		for k, v in self.military.items():
 			print(k, v)
+		print("1: Infantry,  2: Cavalry,  3: Artillery,  4:  Tank,  5: fighter")
+		print("6: Frigates,  7: Ironclad,  8:  Battleship")
 		choice = " "
-		while choice not in self.military.keys():
+		while choice not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
 			choice = input()
-		if(choice == "infantry"):
+		if(choice == "1"):
 			self.build_infantry()
-		elif(choice == "cavalry"):
+		elif(choice == "2"):
 			self.build_cavalry ()
-		elif(choice == "artillery"):
+		elif(choice == "3"):
 			self.build_artillery()
-		elif(choice == "tank"):
+		elif(choice == "4"):
 			self.build_tank()
-		elif(choice == "fighter"):
+		elif(choice == "5"):
 			self.build_fighter()
-		elif(choice == "frigates"):
+		elif(choice == "6"):
 			self.build_frigates()
-		elif(choice == "iron_clad"):
+		elif(choice == "7"):
 			self.build_ironclad()
-		elif(choice == "battle_ship"):
+		elif(choice == "8"):
 			self.build_battleship()
-		else:
-			return
 
 
 	def disband_unit(self):
@@ -786,13 +803,15 @@ class Human(Player):
 			print("You do not have any Action Points left \n")
 			return
 		_type = " "
-		while _type not in self.goods.keys():
-			_type = input("What kind of good do you want to produce with craftsmen?: parts cannons clothing paper furniture \n")
+		while _type not in ["1", "2", "3", "4", "5"]:
+			print("What kind of good do you want to produce with craftsmen?:") 
+			_type = input("1: parts,  2: cannons, 3: clothing, 4: paper, 5: furniture \n")
 		
+		_type = pro_input[_type]
 		for i in craft[_type]:
 			if i in self.resources.keys():
 				if(craft[_type][i] > self.resources[i]):
-					print("You do not have sufficient %s to craft %s \n" % (i, amount, _type))
+					print("You do not have sufficient %s to craft %s \n" % (i, _type))
 					return
 		else:
 			for i in craft[_type]:
@@ -827,10 +846,15 @@ class Human(Player):
 			print("You do not have any Action Points left \n")
 			return
 		_type =  " "
-		while _type not in self.goods.keys():
+		while _type not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
 			for k in self.factories.keys():
 				print(k)
-			_type = input("What kind of good do you want to produce with factory? \n")
+			print("What kind of good do you want to produce in a factory?:") 
+			print("1: parts,  2: cannons, 3: clothing, 4: paper, 5: furniture, 6: chemicals")
+			print("7: gears, 8: telephones, 9: radio, 10: auto, 11: fighter, 12: tank")
+			_type = input()
+		
+
 		if self.factories[_type]["number"] == 0:
 			print("You do not have a %s factory \n" % (_type))
 			return
@@ -873,11 +897,15 @@ class Human(Player):
 
 	def view_inventory(self):
 		#print("gold: %s \n" % (self.gold))
-		for key, value in self.resources.items():
-			if key != "gold":
-				print (" %s : %s \n" % (key, value))
-		for key, value in self.goods.items():
-			print (" %s : %s \n" % (key, value))
+	#	for key, value in self.resources.items():
+	#		if key != "gold":
+	#			print (" %s : %s \n" % (key, value))
+	#	for key, value in self.goods.items():
+	#		print (" %s : %s \n" % (key, value))
+
+		for (k1,v1), (k2,v2) in zip(self.resources.items(), self.goods.items()):
+			print(" %-10s: %-8.2f        %-10s: %-8.2f" % (k1, v1, k2, v2))
+
 
 	def view_inventory_production_needs(self):
 		stab_rounds = round(self.stability * 2) / 2
@@ -896,7 +924,8 @@ class Human(Player):
 					if p.resource == key and p.worked == True:
 						current_production += development_map[p.development_level] * stability_map[stab_rounds] * p.quality
 				forecast = (self.resources[key] + current_production) - need
-				print("Resource: %s, Current Supply: %s, Current Consumption: %s, Current Production: %s, New Turn Forecast %s \n" % \
+				print("Current Needs:")
+				print("Resource: %-4s, Current Supply: %-4.2f, Current Consump: %.2f, Current Pro: %.2f, Forecast %.2f \n" % \
 				(key, self.resources[key], need, current_production, forecast))
 
 

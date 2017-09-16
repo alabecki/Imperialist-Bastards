@@ -19,6 +19,9 @@ def AI_turn(players, player, market, relations, provinces):
 
 	print("___________________________________________________________________")
 
+	for k in player.goods_produced.keys():
+			player.goods_produced[k] = 0
+
 	if player.reputation < 0.65:
 		player.reputation += player.midPOP["artists"]["number"] * 0.1
 
@@ -85,7 +88,8 @@ def AI_turn(players, player, market, relations, provinces):
 			improve = sample(player.embargo, 1)
 			improve = improve[0]
 
-			relata = frozenset({player.name, improve.name})
+			relata = frozenset({player.name, improve})
+			improve = players[improve]
 			player.diplo_action -=1
 			if relata in relations.keys():
 				relations[relata].relationship += min(1, 5/(improve.POP + 0.001))

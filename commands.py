@@ -1,7 +1,7 @@
 
 # Commands
 
-commands = {
+'''commands = {
 	"1": "Get Information on...",
 	"2": "Manage POPs",
 	"3": "Manifacture Goods",
@@ -14,19 +14,20 @@ commands = {
 	"10": "End Turn",
 	"11": "Save Game",
 	"12": "End Game"
-}
+}'''
 
-information = {
-	"1": "Overview of my empire",
-	"2": "View Provinces",
-	"3": "View POPs",
-	"4": "View Military",
-	"5": "View Inventory",
-	"6": "View Needs",
-	"7": "View Other Nations",
-	"8": "View My Technologies",
-	"9": "View My Relations with Other Nations"
-}
+commands = [
+	"1:   Get Information on...   5: Military Action        9:  Culture",
+	"2:   Manage POPs             6: Diplomatic Actions     10: End Turn",
+	"3:   Manifacture Goods       7: Research Technology    11: Save Game",
+	"4:   Build                   8: Trade                  12: End Game"             
+	]
+
+information = [
+	"1:   Overview of my empire   4: View Military       7: View Other Nations",
+	"2:   View Provinces          5: View Inventory      8: View My Tehnologies",
+	"3:   View POPs               6: View Needs          9: View My Relations with Other Nations"
+	]
 
 manage_pops = {
 	"1": "Increase Population",

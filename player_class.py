@@ -100,6 +100,9 @@ class Player(object):
 			"dyes": 0.0,
 			"rubber": 0.0,
 			"oil": 0.0,
+			"/": 0.0,
+			"//": 0.0,
+			"///": 0.0
 		}
 
 		self.goods = {
@@ -141,6 +144,9 @@ class Player(object):
 			"auto": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0,
+			"/": 0.0,
+			"//": 0.0,
+			"///": 0.0
 		}
 
 		self.embargo = set()
@@ -449,9 +455,7 @@ class Player(object):
 		for k, p in self.goods_produced.items():
 			#print("%s: %s " % (k, p))
 			self.goods[k] += p
-		for k in self.goods_produced.keys():
-			self.goods_produced[k] = 0
-
+		
 		for k, v in self.military_produced.items():
 			self.military[k] += v
 
@@ -504,14 +508,19 @@ class Player(object):
 
 
 	def calculate_access_to_goods(self, market):
+		#for i in self.embargo:
+			#print("Embargo by: %s" %  (i))
 		for k, v in self.supply.items():
 			self.supply[k] = 0
 		for k, v in self.supply.items():
+		#	print("Market Supply: %s" % (len(market.market[k])))
 			for i in market.market[k]:
+				#print(i.owner)
 				if i.owner in self.embargo:
+					#print("Blocked by %s" % (i))
 					continue
-				else:
-					self.supply[k] += 1
+				self.supply[k] += 1
+			#print("Your supply: %s" % (self.supply[k]))
 
 	def turn(self, market):
 		if self.stability < -3: 
@@ -569,9 +578,6 @@ class Player(object):
 			if cb.time < 0:
 				self.CB.discard(cb)
 				del cb
-
-		
-
 
 	def b_borders_a(self, p2):
 		bBa = set()
@@ -817,7 +823,7 @@ class Player(object):
 		ammo_needed += self.military["artillery"] * self.artillery["ammo_use"]
 		ammo_needed += self.military["tank"] * self.cavalry["ammo_use"]
 		ammo_needed += self.military["fighter"] * self.artillery["ammo_use"]
-		print("Ammo Needed for %s: %s" % (self.name, ammo_needed))
+	#	print("Ammo Needed for %s: %s" % (self.name, ammo_needed))
 
 		return ammo_needed
 
@@ -825,5 +831,5 @@ class Player(object):
 		oil_needed = 0.0
 		oil_needed += self.military["tank"] * self.tank["oil_use"]
 		oil_needed += self.military["fighter"] * self.fighter["oil_use"]
-		print("Oil Needed for %s: %s" % (self.name, oil_needed))
+		#print("Oil Needed for %s: %s" % (self.name, oil_needed))
 		return oil_needed

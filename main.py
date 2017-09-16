@@ -106,8 +106,8 @@ while True:
 	
 		initial = {"players": players, "provinces": provinces, "relations": relations, "market": market}
 
-		for k, v in players.items():
-			print(k, v)
+		#for k, v in players.items():
+		#	print(k, v)
 	elif selection == "O":
 		print("Did you really think we were going to give you options? \n")
 		print("Maybe we will give you some options someday... \n")
@@ -140,13 +140,18 @@ while True:
 		
 		market.turn +=1
 		print("\n Turn: %s \n" % (market.turn))
+		print("|-------------------------- Market --------------------------|")
 		#print("Gold in market: %s \n" % (market.gold))
-		for k in market.market_keys:
+		for k1,k2 in zip(market.resources, market.goods):
+			print( " %-20s: %-5.2f      %-20s: %-5.2f" % (k1, len(market.market[k1]), k2, len(market.market[k2])))
+		#for k in market.market_keys:
 		#for k, v in market.market.items():
-			print (k, len(market.market[k]))
+	#		print (k, len(market.market[k]))
 		print("Players len: %s " % (len(players.keys())))
 		print("Prov len: %s" % (len(provinces.keys())))
 		print("Relations len %s" % (len(relations.keys())))
+		print("\n")
+		print("< Press Enter >")
 		cont = input()
 		order = list(players.keys())
 		print("order len %s" % (len(order)))
@@ -173,94 +178,128 @@ while True:
 				while(True):
 					print(" ######################################################################################################## \n")
 					
+
+					for k in player.goods_produced.keys():
+						player.goods_produced[k] = 0
+					print("Turn: %s" %(market.turn))
 					player.calculate_access_to_goods(market)
 					print("%s, what is your imperial decree? \n" % (player.name))
 					print("AP: %s    " % (player.AP))
-					for key, value in commands.items():
-						print(key, value)
+					for i in commands:
+						print(i)
+				
+					#for key, value in commands.items():
+					#	print(key, value)
 					command = ""
-					while (command not in commands.keys()):
+					#while (command not in commands.keys()):
+					while command not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
 						command = input()
 					if command == "1":
 						print("What would you like to know? ################################################################################\n")
-						for key, value in information.items():
-							print(key, value)
+						for i in information:
+							print(i)
 						info_command = " "
-						while info_command not in information.keys():
+						while info_command not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
 							info_command = input()
 						if info_command == "1":
+							print("\n")
+							print(" Currently, your glorious empire has: ###################################################################\n")
+							print(" Gold: %-12.2f             Stability %-12.2f          Action Points: %-12.2f" % \
+							(player.resources["gold"], player.stability, player.AP))
+							print(" Culture Points: %-12.2f   Diplo Points: %-12.2f      Science Points: %-12.2f" % \
+							(player.culture_points, player.diplo_action, player.research))
+							print(" Col Points: %-12.2f       Num of colonies: %-12.s   Col. Points needed: %-12s" % \
+							(player.colonization, player.num_colonies, player.num_colonies * 1.5)) 
+							print(" Free POPS: %-12.2f        Population: %-12.2f        Mid Pops: %-12.2f" % \
+							(player.freePOP, player.POP, player.numMidPOP))
+							print(" Dev Points: %-12.2f       Dev Level: %-12.2f         Reputation: %-12.2f" %  \
+							(player.new_development, player.number_developments, player.reputation))
+					
 
-							print("Currently, your glorious empire has: ###################################################################\n")
-									#print("Gold: %s 				Action Points: %s \n" % (player.gold, player.AP))
-							print("Stability: %.2f  ______________  Total Population: %.2f\n" % (player.stability, player.POP))
-							print("Gold: %.2f  ___________________  Action Points: %.2f \n" % (player.resources["gold"], player.AP))
-							print("Diplomatic: %.2f  _____________  Science Points: %.2f \n " % (player.diplo_action, player.research))
-							print("Colonization: %.2f  ___________  Reputation: %.2f \n" % (player.colonization, player.reputation))
-							print("Number of colonies: %s ______  Col. points needed for next colony: %s "% (player.num_colonies, 1 + player.num_colonies * 1.5))
-							print("Lower Class Pops: %.2f  _______  Middle Class Pops: %.2f \n" % (player.numLowerPOP, player.numMidPOP))
-							print("Development Points: %.2f  _____ Development Level: %.2f \n" % (player.new_development, player.number_developments))
-							print("Free POPs: %.2f  _______________ Culture Points: %.2f" % (player.freePOP, player.culture_points))
-							print("Factories:")
-							for k, v in player.factories.items():
-								print(k,v)
-							print("Objectives:")
+							print("\n")
+							print(" Factories:")   
+							f_key_one = ["parts", "cannons", "clothing", "paper", "furniture", "chemicals"]
+							f_key_two = ["gear", "telephone", "radio", "auto", "fighter", "tank"]
+							for k1, k2 in zip(f_key_one, f_key_two):
+								print(" %-12s  Level: %-6.2f  Used: %-12s   %-12s  Level: %-6.2f  Used: %-6s" % \
+								(k1, player.factories[k1]["number"], player.factories[k1]["used"], k2, player.factories[k2]["number"], player.factories[k2]["used"]))
+							#for k, v in player.factories.items():
+							#	print("%22s: Level: %.2f, Used %-8s" k,v["number"], v["used"])
+							print("\n")
+							print(" Objectives:")
 							for o in player.objectives:
 								if o not in player.provinces.keys():
 									print(o, end = ", ")
 							print("\n")
-							print("CBs:")
+							print(" CBs:----------------------------------")
 							for cb in player.CB:
-								print(cb.province, cb.owner)
-							print("You are currently embargoed by:")
+								print(cb.province, cb.opponent)
+							if len(player.CB) == 0:
+								print("None")
+							print(" You are currently embargoed by:")
+							if len(player.embargo) == 0:
+								print("None")
 							for e in player.embargo:
-								print(e.name, end = ", ")
+								print(e, end = " ")
+							print("\n")
+
 
 						if info_command == "2":
-							print("Province Overview: ######################################################################################## \n")
+							print("\n")
+							print(" Province Overview: ######################################################################################## \n")
 							for k, province in player.provinces.items():
-								print("Name: %-20s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %.2f \n" % \
-									(province.name, province.resource, province.development_level, province.worked, province.quality))
+								print(" %-16s 	Res: %s 	Dev Level: %s 	Worked?: %s 	Quality: %.2f    Culture: %s" % \
+									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 						if info_command == "3":
-							print("Population Overview: ####################################################################################### \n")
-							print("Total Population: %.2f 	Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Middle Class Pops: %.2f \n" % \
+							print("\n")
+							print(" Population Overview: ####################################################################################### \n")
+							print(" Total Population: %.2f 	    Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Middle Class Pops: %.2f \n" % \
 							(player.POP, player.freePOP, player.numLowerPOP, player.numMidPOP))
-							print("Urban Worker Pops: %.2f 	Military Pops: %.2f \n" % (player.proPOP, player.milPOP))
-							print("Middle Class POPs: \n")
+							print(" Urban Worker Pops: %.2f 	Military Pops: %.2f \n" % (player.proPOP, player.milPOP))
+							print(" Middle Class POPs:")
 							for k, v in player.midPOP.items():
-								print("%s: %.2f"  % (k, v["number"]))
+								print(" %-12s: %-12.2f"  % (k, v["number"]))
 						if info_command == "4" :
-							print("Military Overview: ################################################################################################ \n")
-							for k, v in player.military.items():
-								print(" %s: %.2f " % (k, v) )
-
 							print("\n")
-							print("Infantry, Attack: %s, Defend: %s, Manouver: %s" % (player.infantry["attack"], player.infantry["defend"], player.infantry["manouver"]))
-							print("Cavalry, Attack: %s, Defend: %s, Manouver: %s" % (player.cavalry["attack"], player.cavalry["defend"], player.cavalry["manouver"]))
-							print("Artillery, Attack: %s, Defend: %s, Manouver: %s" % (player.artillery["attack"], player.artillery["defend"], player.artillery["manouver"]))
-							print("Fighter, Attack: %s, Defend: %s, Manouver: %s" % (player.fighter["attack"], player.fighter["defend"], player.fighter["manouver"]))
-							print("Tank, Attack: %s, Defend: %s, Manouver: %s" % (player.tank["attack"], player.tank["defend"], player.tank["manouver"]))
-							print("Frigate, Attack: %s" % (player.frigates["attack"]))
-							print("Ironclad, Attack: %s" % (player.iron_clad["attack"]))
-							print("Battleship, Attack: %s" % (player.battle_ship["attack"]))
+							print(" Military Overview: ################################################################################################")
 							print("\n")
+							print("Infantry -   Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" %  \
+								(player.military["infantry"],player.infantry["attack"], player.infantry["defend"], player.infantry["manouver"]))
+							print("Cavalry -    Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(player.military["cavalry"],  player.cavalry["attack"], player.cavalry["defend"], player.cavalry["manouver"]))
+							print("Artillery -  Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(player.military["artillery"], player.artillery["attack"], player.artillery["defend"], player.artillery["manouver"]))
+							print("Fighter -    Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(player.military["fighter"], player.fighter["attack"], player.fighter["defend"], player.fighter["manouver"]))
+							print("Tank -       Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(player.military["tank"], player.tank["attack"], player.tank["defend"], player.tank["manouver"]))
+							print("Frigate -    Num: %.2f   Att: %.2f" % (player.military["frigates"], player.frigates["attack"]))
+							print("Ironclad -   Num: %.2f   Att: %.2f" % (player.military["iron_clad"], player.iron_clad["attack"]))
+							print("Battleship - Num: %.2f   Att: %.2f" % (player.military["battle_ship"], player.battle_ship["attack"]))
+							print("\n")
+							
 							ammo_needed = calculate_ammo_needed(player)
 							oil_needed = calculate_oil_needed(player)
-							print("Ammo (number of cannons) needed for land combat: %s" % (ammo_needed))
-							print("Oil Needed for land combat: %s" % (oil_needed))
+							print("Ammo (number of cannons) needed for land combat: %-24s" % (ammo_needed))
+							print("Oil Needed for land combat: %-24s" % (oil_needed))
 							ammo_navy_needed = calculate_ammo_needed_navy(player)
 							oil_navy_needed = calculate_oil_needed_navy(player)
-							print("Ammo (number of cannons) needed for naval combat: %s" % (ammo_navy_needed))
-							print("Oil Needed for naval combat %s" % (oil_navy_needed))
+							print("Ammo (number of cannons) needed for naval combat: %-24s" % (ammo_navy_needed))
+							print("Oil Needed for naval combat %-24s" % (oil_navy_needed))
 
 
 						if info_command == "5":
+							print("\n")
 							print("Inventory: ##########################################################################################################\n")
-							for k in market.resources:
+							for (k1,v1), (k2,v2) in zip(player.resources.items(), player.goods.items()):
+								print(" %-10s: %-8.2f        %-10s: %-8.2f" % (k1, v1, k2, v2))
+
+						#	for k in market.resources:
 							#for k, v in player.resources.items():
-								print(" %s: %.2f " % (k, player.resources[k]) )
+						#		print(" %s: %.2f " % (k, player.resources[k]) )
 							#for k, v in player.goods.items():
-							for k in market.goods:
-								print(" %s: %.2f " % (k, player.goods[k]) )
+						#	for k in market.goods:
+						#		print(" %s: %.2f " % (k, player.goods[k]) )
 						if info_command == "6":
 							player.view_inventory_production_needs()
 						if info_command == "7":
@@ -268,60 +307,62 @@ while True:
 								print (k, v)
 							which = input()
 							if which == "1":
-								for k, v in players.items():
-									print(v.name)
-								nation = input("Please input the name of the nation you would like to view \n")
+								for i in range(int(len(players.keys())/5+1)):
+									print("    ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
+								nation = input("Please input the NAME of the nation you would like to view \n")
 								nation = players[nation]
 								print("Information Report on %s: ###################################################################\n" % (nation.name))
-										#print("Gold: %s 				Action Points: %s \n" % (player.gold, player.AP))
-								print("Type: %s ____________________   Culture: %s" % (nation.type, nation.culture))
-								print("Stability: %.2f  ____________    Total Population: %.2f\n" % (nation.stability, nation.POP))
-								print("Gold: %s  _____________________  Action Points: %.2f \n" % (nation.resources["gold"], nation.AP))
-								print("Diplomatic: %.2f  _____________  Science Points: %.2f \n " % (nation.diplo_action, nation.research))
-								print("Colonization: %.2f  ___________  Number of Colonies: %s \n " % (nation.colonization, nation.num_colonies))
-								print("Government: %s  _____________  Reputation: %.2f \n" % (nation.government, nation.reputation))
-								print("Lower Class Pops: %.2f  _______  Middle Class Pops: %.2f \n" % (nation.numLowerPOP, nation.numMidPOP))
-								print("Development Points: %.2f  _____  Development Level: %.2f \n" % (nation.new_development, nation.number_developments))
-								print("Free POPS: %.2f _______________  ProPops: %.2f\n" % (nation.freePOP, nation.proPOP))
-								print("Factories:")
+										#print("Gold: %s 				Action Points: %s \n" % (player.gold, player.AP))								
+								print(" Gold: %-12.2f             Population %-12.2f         Action Points: %-12.2f" % \
+								(nation.resources["gold"], nation.POP, nation.AP))
+								print(" Culture Points: %-12.2f   Diplo Points: %-12.2f      Science Points: %-12.2f" % \
+								(nation.culture_points, nation.diplo_action, nation.research))
+								print(" Col Points: %-12.2f       Num of colonies: %-12.3f   Col. Points needed: %-12s" % \
+								(nation.colonization, nation.num_colonies, nation.num_colonies * 1.5)) 
+								print(" Free POPS: %-12.2f        Low Pops: %-12.2f          Mid Pops: %-12.2f" % (nation.freePOP, nation.numLowerPOP, nation.numMidPOP))
+								print(" Dev Points: %-12.2f       Dev Level: %-12.2f         Reputation: %-12.2f" % (nation.new_development, nation.number_developments, nation.reputation))
 
 
-								for k, v in nation.factories.items():
-									print(k, v)
+								print(" Factories_________________________________________________________________________")   
+								f_key_one = ["parts", "cannons", "clothing", "paper", "furniture", "chemicals"]
+								f_key_two = ["gear", "telephone", "radio", "auto", "fighter", "tank"]
+								for k1, k2 in zip(f_key_one, f_key_two):
+									print(" %-12s  Level: %-6.2f  Used: %-12s   %-12s  Level: %-6.2f  Used: %-6s" % \
+								(k1, nation.factories[k1]["number"], nation.factories[k1]["used"], k2, nation.factories[k2]["number"], nation.factories[k2]["used"]))
+							#for k, v in player.factories.items():
+								
 								print("Province Overview: ######################################################################################## \n")
 								for k, province in nation.provinces.items():
-									print("Name: %-20s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %s   Culture: %s \n" % \
+									print("Name: %-16s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %s   Culture: %s \n" % \
 									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 								print("Population Overview: ######################################################################################### \n")
 								for k, v in nation.midPOP.items():
 									print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
 								print("Military Overview: ################################################################################################ \n")
-								for k, v in nation.military.items():
-									print(" %s: %.2f " % (k, v) )
-								
-								print("\n")
-								print("Infantry: Attack: %s, Defense: %s, Manouver: %s" % (nation.infantry["attack"], nation.infantry["defend"], nation.infantry["manouver"]))
-								print("Artillery: Attack: %s, Defense: %s, Manouver: %s" % (nation.artillery["attack"], nation.artillery["defend"], nation.artillery["manouver"]))
-								print("Cavalry: Attack: %s, Defense: %s, Manouver: %s" % (nation.cavalry["attack"], nation.cavalry["defend"], nation.cavalry["manouver"]))
-								print("Fighter: Attack: %s, Defense: %s, Manouver: %s" % (nation.fighter["attack"], nation.fighter["defend"], nation.fighter["manouver"]))
-								print("Tank: Attack: %s, Defense: %s, Manouver: %s" % (nation.tank["attack"], nation.tank["defend"], nation.tank["manouver"]))
-								print("Frigate: Attack: %s" % (nation.frigate["attack"]))
-								print("Ironclad: Attack: %s" % (nation.iron_clad["attack"]))
-								print("Battleship: Attack: %s" % (nation.battle_ship["attack"]))
-								print("\n")
-								print("CBs:")
+								print("Infantry -   Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" %  \
+								(nation.military["infantry"], nation.infantry["attack"], nation.infantry["defend"], nation.infantry["manouver"]))
+								print("Cavalry -    Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(nation.military["cavalry"],  nation.cavalry["attack"], nation.cavalry["defend"], nation.cavalry["manouver"]))
+								print("Artillery -  Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(nation.military["artillery"], nation.artillery["attack"], nation.artillery["defend"], nation.artillery["manouver"]))
+								print("Fighter -    Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(nation.military["fighter"], nation.fighter["attack"], nation.fighter["defend"], nation.fighter["manouver"]))
+								print("Tank -       Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" % \
+								(nation.military["tank"], nation.tank["attack"], nation.tank["defend"], nation.tank["manouver"]))
+								print("Frigate -    Num: %.2f   Att: %.2f" % (nation.military["frigates"], nation.frigates["attack"]))
+								print("Ironclad -   Num: %.2f   Att: %.2f" % (nation.military["iron_clad"], nation.iron_clad["attack"]))
+								print("Battleship - Num: %.2f   Att: %.2f" % (nation.military["battle_ship"], nation.battle_ship["attack"]))
 								for cb in nation.CB:
 									print("Opponent: %s, Province: %s, Action: %s, Time: %s" % (cb.opponent, cb.province, cb.action, cb.time))
 
 								print("Inventory: ##########################################################################################################\n")
-								for v, k in nation.resources.items():
-									print(v, k)
-								for v, l in nation.goods.items():
-									print(v,k)
+								for (k1,v1), (k2,v2) in zip(nation.resources.items(), nation.goods.items()):
+									print(" %-12s: %.2f        %-12s: %.2f" % (k1, v1, k2, v2))
 								print("\n")
 								print("Technologies: ################################################################################################### \n")
 								for tech in nation.technologies:
 									print(tech, end=" ")
+								print("\n")
 
 
 							if which == "2":
@@ -338,7 +379,7 @@ while True:
 									wealth = wealth[:10]
 									count = 1
 									for w in wealth:
-										print(" %-2s. %-16s: %s" % (count, w.name, w.resources["gold"]))
+										print(" %-2s. %-16s: %.2f" % (count, w.name, w.resources["gold"]))
 										count += 1
 									print("\n")
 									
@@ -347,7 +388,7 @@ while True:
 									middle = sorted(player_list, key=lambda x: x.numMidPOP, reverse = True)
 									middle = middle[:10]
 									for m in middle:
-										print(" %-2s. %-16s: %s" % (count, m.name, m.numMidPOP))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.numMidPOP))
 										count += 1
 									print("\n")
 
@@ -356,7 +397,7 @@ while True:
 									research = sorted(player_list, key=lambda x: x.midPOP["researchers"]["number"], reverse = True)
 									research = research[:10]
 									for r in research:
-										print(" %-2s. %-16s: %s" % (count, r.name, r.midPOP["researchers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, r.name, r.midPOP["researchers"]["number"]))
 										count += 1
 									print("\n")
 
@@ -365,7 +406,7 @@ while True:
 									officer = sorted(player_list, key=lambda x: x.midPOP["officers"]["number"], reverse = True)
 									officer = officer[:10]
 									for o in officer:
-										print(" %-2s. %-16s: %s" % (count, o.name, o.midPOP["officers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, o.name, o.midPOP["officers"]["number"]))
 										count += 1
 									print("\n")
 
@@ -374,7 +415,7 @@ while True:
 									art = sorted(player_list, key=lambda x: x.midPOP["artists"]["number"], reverse = True)
 									art = art[:10]
 									for a in art:
-										print(" %-2s. %-16s: %s" % (count, a.name, a.midPOP["artists"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, a.name, a.midPOP["artists"]["number"]))
 										count += 1
 									print("\n")
 
@@ -383,7 +424,7 @@ while True:
 									gov = sorted(player_list, key=lambda x: x.midPOP["bureaucrats"]["number"], reverse = True)
 									gov = gov[:10]
 									for g in gov:
-										print(" %-2s. %-16s: %s" % (count, g.name, g.midPOP["bureaucrats"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, g.name, g.midPOP["bureaucrats"]["number"]))
 										count += 1
 									print("\n")
 
@@ -392,7 +433,7 @@ while True:
 									man = sorted(player_list, key=lambda x: x.midPOP["managers"]["number"], reverse = True)
 									man = man[:10]
 									for m in man:
-										print(" %-2s. %-16s: %s" % (count, m.name, m.midPOP["managers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.midPOP["managers"]["number"]))
 										count += 1
 									print("\n")
 
@@ -401,7 +442,7 @@ while True:
 									tech = sorted(player_list, key=lambda x: len(x.technologies), reverse = True)
 									tech = tech[:10]
 									for t in tech:
-										print(" %-2s. %-16s: %s" % (count, t.name, len(t.technologies)))
+										print(" %-2s. %-16s: %.2f" % (count, t.name, len(t.technologies)))
 										count += 1
 									print("\n")
 
@@ -410,7 +451,7 @@ while True:
 									col = sorted(player_list, key=lambda x: x.num_colonies, reverse = True)
 									col = col[:10]
 									for c in col:
-										print(" %-2s. %-16s: %s" % (count, c.name, c.num_colonies))
+										print(" %-2s. %-16s: %.2f" % (count, c.name, c.num_colonies))
 										count += 1
 									print("\n")
 
@@ -419,22 +460,22 @@ while True:
 									pop = sorted(player_list, key=lambda x: x.POP, reverse = True)
 									pop = pop[:10]
 									for p in pop:
-										print(" %-2s. %-16s: %s" % (count, p.name, p.POP))
+										print(" %-2s. %-16s: %.2f" % (count, p.name, p.POP))
 										count += 1
 									print("\n")
 
 									print(" Top 10 Nations by Number of Factories:")
 									count = 1
-									factories = {}
+									facts = {}
 									for k, v in players.items():
 										number = 0
 										for f, fac in v.factories.items():
-											number += fac
-										factories[k] = number
-									factories = sorted(factories.items(), key= operator.itemgetter(1), reverse = True) 
-									factories = factories[:10]
-									for f in factories:
-										print(" %-2s. %s" % (count, f))
+											number += fac["number"]
+										facts[k] = number
+									facts = sorted(facts.items(), key= operator.itemgetter(1), reverse = True) 
+									facts = facts[:10]
+									for f in facts:
+										print(" %-2s. %-16s: %.2f" % (count, f[0], f[1]))
 										count +=1
 									print("\n")
 
@@ -446,7 +487,7 @@ while True:
 									developments = sorted(developments.items(), key= operator.itemgetter(1), reverse = True)
 									developments = developments[:10]
 									for d in developments:
-										print(" %-2s. %s" % (count, d))
+										print(" %-2s. %-16s: %.2f" % (count, d[0], d[1]))
 										count +=1
 									print("\n")
 
@@ -457,7 +498,7 @@ while True:
 									food = sorted(market.food_production.items(), key= operator.itemgetter(1), reverse = True)
 									food = food[:10]
 									for f in food:
-										print(" %-2s. %s" % (count, f))
+										print(" %-2s. %-16s: %.2f" % (count, f[0], f[1]))
 										count += 1
 									print("\n")
 
@@ -466,7 +507,7 @@ while True:
 									iron = sorted(market.iron_production.items(), key= operator.itemgetter(1), reverse = True)
 									iron = iron[:10]
 									for i in iron:
-										print(" %-2s. %s" % (count, i))
+										print(" %-2s. %-16s: %.2f" % (count, i[0], i[1]))
 										count +=1
 									print("\n")
 
@@ -475,7 +516,7 @@ while True:
 									wood = sorted(market.wood_production.items(), key= operator.itemgetter(1), reverse = True)
 									wood = wood[:10]
 									for w in wood:
-										print(" %-2s. %s" % (count, w))
+										print(" %-2s. %-16s: %.2f" % (count, w[0], w[1]))
 										count +=1
 									print("\n")
 
@@ -484,7 +525,7 @@ while True:
 									cotton = sorted(market.cotton_production.items(), key= operator.itemgetter(1), reverse = True)
 									cotton = cotton[:10]
 									for c in cotton:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-16s: %.2f" % (count, c[0], c[1]))
 										count += 1
 									print("\n")
 
@@ -493,7 +534,7 @@ while True:
 									coal = sorted(market.coal_production.items(), key= operator.itemgetter(1), reverse = True)
 									coal = coal[:10]
 									for c in coal:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-16s: %.2f" % (count, c[0], c[1]))
 										count += 1
 									print("\n")
 
@@ -502,7 +543,7 @@ while True:
 									gold = sorted(market.gold_production.items(), key= operator.itemgetter(1), reverse = True)
 									gold = gold[:10]
 									for g in gold:
-										print(" %-2s. %s" % (count, g))
+										print(" %-2s. %-16s: %.2f" % (count, g[0], g[1]))
 										count +=1
 									print("\n")
 
@@ -511,7 +552,7 @@ while True:
 									spice = sorted(market.spice_production.items(), key= operator.itemgetter(1), reverse = True)
 									spice = spice[:10]
 									for s in spice:
-										print(" %-2s. %s" % (count, s))
+										print(" %-2s. %-16s: %.2f" % (count, s[0], s[1]))
 										count +=1
 									print("\n")
 
@@ -520,7 +561,7 @@ while True:
 									rubber = sorted(market.rubber_production.items(), key= operator.itemgetter(1), reverse = True)
 									rubber = rubber[:10]
 									for r in rubber:
-										print(" %-2s. %s" % (count, r))
+										print(" %-2s. %-16s: %.2f" % (count, r[0], r[1]))
 										count +=1
 									print("\n")
 
@@ -529,7 +570,7 @@ while True:
 									oil = sorted(market.oil_production.items(), key= operator.itemgetter(1), reverse = True)
 									oil = oil[:10]
 									for o in oil:
-										print(" %-2s. %s" % (count, o))
+										print(" %-2s. %-16s: %.2f" % (count, o[0], o[1]))
 										count += 1
 									print("\n")
 
@@ -541,7 +582,7 @@ while True:
 									parts = sorted(parts.items(), key= operator.itemgetter(1), reverse = True)
 									parts = parts[:10]
 									for p in parts:
-										print(" %-2s. %s" % (count, p))
+										print(" %-2s. %-16s: %.2f" % (count, p[0], p[1]))
 										count +=1
 									print("\n")
 
@@ -553,7 +594,7 @@ while True:
 									cannons = sorted(cannons.items(), key= operator.itemgetter(1), reverse = True)
 									cannons = cannons[:10]
 									for c in cannons:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-16s: %.2f" % (count, c[0], c[1]))
 										count +=1
 									print("\n")
 
@@ -566,7 +607,7 @@ while True:
 									clothing = sorted(clothing.items(), key= operator.itemgetter(1), reverse = True)
 									clothing = clothing[:10]
 									for c in clothing:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-16s: %.2f" % (count, c[0], c[1]))
 										count +=1
 									print("\n")
 
@@ -577,8 +618,8 @@ while True:
 										paper[p] = pl.goods_produced["paper"]
 									paper = sorted(paper.items(), key= operator.itemgetter(1), reverse = True)
 									paper = paper[:10]
-									for c in paper:
-										print(" %-2s. %s" % (count, c))
+									for p in paper:
+										print(" %-2s. %-16s: %.2f" % (count, p[0], p[1]))
 										count +=1
 									print("\n")
 
@@ -590,7 +631,7 @@ while True:
 									furniture = sorted(furniture.items(), key= operator.itemgetter(1), reverse = True)
 									furniture = furniture[:10]
 									for f in furniture:
-										print(" %-2s. %s" % (count, f))
+										print(" %-2s. %-16s: %.2f" % (count, f[0], f[1]))
 										count +=1
 									print("\n")
 
@@ -602,7 +643,7 @@ while True:
 									chemicals = sorted(chemicals.items(), key= operator.itemgetter(1), reverse = True)
 									chemicals = chemicals[:10]
 									for c in chemicals:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-16s: %.2f" % (count, c[0], c[1]))
 										count +=1
 									print("\n")
 
@@ -614,7 +655,7 @@ while True:
 									gear = sorted(gear.items(), key= operator.itemgetter(1), reverse = True)
 									gear = gear[:10]
 									for g in gear:
-										print(" %-2s. %s" % (count, g))
+										print(" %-2s. %-16s: %.2f" % (count, g[0], g[1]))
 										count +=1
 									print("\n")
 
@@ -626,7 +667,7 @@ while True:
 									radio = sorted(radio.items(), key= operator.itemgetter(1), reverse = True)
 									radio = radio[:10]
 									for r in radio:
-										print(" %-2s. %s" % (count, r))
+										print(" %-2s. %-16s: %.2f" % (count, r[0], r[1]))
 										count +=1
 									print("\n")
 
@@ -638,7 +679,7 @@ while True:
 									tele = sorted(tele.items(), key= operator.itemgetter(1), reverse = True)
 									tele = tele[:10]
 									for t in tele:
-										print(" %-2s. %s" % (count, t))
+										print(" %-2s. %-16s: %.2f" % (count, t[0], t[1]))
 										count +=1
 									print("\n")
 
@@ -650,7 +691,7 @@ while True:
 									fighter = sorted(fighter.items(), key= operator.itemgetter(1), reverse = True)
 									fighter = fighter[:10]
 									for f in fighter:
-										print(" %-2s. %s" % (count, f))
+										print(" %-2s. %-16s: %.2f" % (count, f[0], f[1]))
 										count +=1
 									print("\n")
 
@@ -662,7 +703,7 @@ while True:
 									tank = sorted(tank.items(), key= operator.itemgetter(1), reverse = True)
 									tank = tank[:10]
 									for t in tank:
-										print(" %-2s. %s" % (count, t))
+										print(" %-2s. %-16s: %.2f" % (count, t[0], t[1]))
 										count +=1
 									print("\n")
 
@@ -674,7 +715,7 @@ while True:
 									auto = sorted(auto.items(), key= operator.itemgetter(1), reverse = True)
 									auto = auto[:10]
 									for a in auto:
-										print(" %-2s. %s" % (count, a))
+										print(" %-2s. %-16s: %.2f" % (count, a[0], a[1]))
 										count +=1
 									print("\n")
 
@@ -687,7 +728,8 @@ while True:
 									infantry = sorted(infantry.items(), key= operator.itemgetter(1), reverse = True)
 									infantry = infantry[:10]
 									for i in infantry:
-										print(" %-2s. %s" % (count, i))
+										print(" %-2s. %-12s %-2.2f" % (count, i[0], i[1]))
+										#print(" %-2s. %s" % (count, i))
 										count += 1
 									print("\n")
 
@@ -699,7 +741,7 @@ while True:
 									cavalry = sorted(cavalry.items(), key= operator.itemgetter(1), reverse = True)
 									cavalry = cavalry[:10]
 									for c in cavalry:
-										print(" %-2s. %s" % (count, c))
+										print(" %-2s. %-12s %-2.2f" % (count, c[0], c[1]))
 										count += 1
 									print("\n")
 
@@ -711,7 +753,7 @@ while True:
 									artillery = sorted(artillery.items(), key= operator.itemgetter(1), reverse = True)
 									artillery = artillery[:10]
 									for a in artillery:
-										print(" %-2s. %s" % (count, a))
+										print(" %-2s. %-12s %-2.2f" % (count, a[0], a[1]))
 										count += 1
 									print("\n")
 
@@ -723,7 +765,7 @@ while True:
 									frigates = sorted(frigates.items(), key= operator.itemgetter(1), reverse = True)
 									frigates = frigates[:10]
 									for f in frigates:
-										print(" %-2s. %s" % (count, f))
+										print(" %-2s. %-12s %-2.2f" % (count, f[0], f[1]))
 										count += 1
 									print("\n")
 
@@ -735,7 +777,7 @@ while True:
 									iron_clad = sorted(iron_clad.items(), key= operator.itemgetter(1), reverse = True)
 									iron_clad = iron_clad[:10]
 									for i in iron_clad:
-										print(" %-2s. %s" % (count, i))
+										print(" %-2s. %-12s %-2.2f" % (count, i[0], i[1]))
 										count += 1
 									print("\n")
 
@@ -747,7 +789,7 @@ while True:
 									fighter = sorted(fighter.items(), key= operator.itemgetter(1), reverse = True)
 									fighter = fighter[:10]
 									for f in fighter:
-										print(" %-2s. %s" % (count, f))
+										print(" %-2s. %-12s %-2.2f" % (count, f[0], f[1]))
 										count += 1
 									print("\n")
 
@@ -759,7 +801,7 @@ while True:
 									tank = sorted(tank.items(), key= operator.itemgetter(1), reverse = True)
 									tank = tank[:10]
 									for t in tank:
-										print(" %-2s. %s" % (count, t))
+										print(" %-2s. %-12s %-2.2f" % (count, t[0], t[1]))
 										count += 1
 									print("\n")
 
@@ -771,7 +813,7 @@ while True:
 									battle_ship = sorted(battle_ship.items(), key= operator.itemgetter(1), reverse = True)
 									battle_ship = battle_ship[:10]
 									for bs in battle_ship:
-										print(" %-2s. %s" % (count, bs))
+										print(" %-2s. %-12s %-2.2f" % (count, bs[0], bs[1]))
 										count += 1
 									print("\n")
 
@@ -784,7 +826,7 @@ while True:
 										army_Astrength[p] = strength
 									army_Astrength = sorted(army_Astrength.items(), key= operator.itemgetter(1), reverse = True)
 									for ast in army_Astrength:
-										print(" %-2s. %s" % (count, ast))
+										print(" %-2s. %-12s %-2.2f" % (count, ast[0], ast[1]))
 										count += 1
 									print("\n")
 
@@ -796,7 +838,7 @@ while True:
 										army_Dstrength[p] = strength
 									army_Dstrength = sorted(army_Dstrength.items(), key= operator.itemgetter(1), reverse = True)
 									for dst in army_Dstrength:
-										print(" %-2s. %s" % (count, dst))
+										print(" %-2s. %-12s %-2.2f" % (count, dst[0], dst[1]))
 										count += 1
 									print("\n")
 
@@ -809,7 +851,7 @@ while True:
 										navy_strength[p] = strength
 									navy_strength = sorted(navy_strength.items(), key= operator.itemgetter(1), reverse = True)
 									for ns in navy_strength:
-										print(" %-2s. %s" % (count, ns))
+										print(" %-2s. %-12s %-2.2f" % (count, dst[0], dst[1]))
 										count += 1
 									print("\n")
 
@@ -828,11 +870,55 @@ while True:
 							print("You have land borders with: ")
 							for b in player.borders:
 								print(b)
-							print("Your Relations with Other Players")
-							for k, v in relations.items():
-								if player.name in v.relata:
+							print("\n")
+							print("Your Relations with Other Players \n")
+
+							p_relations = [r for r in relations.values() if player.name in r.relata]
+							p_relations = deepcopy(p_relations)
+						#	print("P-relations:")
+						#	for pr in p_relations:
+						#		print(pr.relata)
+							for i in range(int(len(p_relations)/4) + 1):
+						#		print(i)
+								k = 0
+								relatas = []
+								while (i*4) + k < len(p_relations) and k < 4:
+									temp = list(p_relations[(i*4)+k].relata)
+									if temp[0] == player.name:
+										 relatas.append(temp[1])
+									else:
+										relatas.append(temp[0])
+									k += 1
+							
+								#a = list(p_relations[i].relata)
+								#b = list(p_relations[i+1].relata)
+								#c = list(p_relations[i+2].relata)
+								#d = list(p_relations[i+3].relata)
+								#e = list(p_relations[i+4].relata)
+								#relatas = [a, b, c, d, e]
+								#things =  []
+								#for r  in relatas:
+									#print("Print r: %s" % (r))
+								#	if r[0] == player.name:
+								#		 things.append(r[1])
+								#	else:
+								#		things.append(r[0])
+								for j in range(len(relatas)):
+									#print("Thing %s" % (things[j]))
+									print("%-2s: %-16s: %-3.2f" % ((i*4)+j, relatas[j], p_relations[(i*4)+j].relationship), end = "   ")
+								#print("%-16s: %.2f    %-16s: %.2f    %-16s: %.2f    %-16s: %.2f" % (e, p_relations[i].relationship, f, \
+								#p_relations[i+1].relationship, g, p_relations[i+2].relationship, h, p_relations[i+3].relationship))
+								print("\n")
+								#print("".join(list(p_relations[i*5:(i+1)*5]) + p_relations[i*5:(i+1)*5].relationship + "\n"))
+
+						#	for k, v in relations.items():
+						#		if player.name in v.relata:
+						#			temp = list(v.relata)
 									#pprint(vars(v))
-									print(v.relata, v.relationship)
+						#			if temp[0] == player.name:
+	#									print(temp[1], v.relationship)
+	#								else:
+	#									print(temp[0], v.relationship)
 					if command == "2":
 						print("How would you like to manage your population? ################################################\n")
 						_choices = list(range(1, 4))
@@ -1048,7 +1134,7 @@ while True:
 											major_keys.append(k)
 									if len(major_keys) == 0:
 										print("It appears that all other Major Powers have already been defeated")
-									elif players[target] not in player.borders:
+									elif players[target].name not in player.borders:
 										print("You do not share a land border with %s, so you will need to send your military by sea" % (target)) 
 										target = players[target]
 										amphib_prelude(player, target, "total", players, market, relations)
@@ -1079,8 +1165,9 @@ while True:
 
 							if dip == "1":
 								print("Please choose a Nation: ########################################################## \n" )
-								for p in players.values():
-									print(p.name)
+								#for p in players.values():
+								for i in range(int(len(players.keys())/5+1)):
+									print("  ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
 								_other = " "
 								while _other not in players.keys():
 									_other = input()
@@ -1093,8 +1180,10 @@ while True:
 							
 							elif dip == "2":
 								print("Please choose a Nation:\n" )
-								for p in players.values():
-									print(p.name)
+								#for p in players.values():
+									#print(p.name)
+								for i in range(int(len(players.keys())/5+1)):
+									print("  ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
 								_other = " "
 								while _other not in players.keys():
 									_other = input()
@@ -1107,8 +1196,8 @@ while True:
 
 							elif dip == "3":
 								print("Please choose a Nation:\n" )
-								for p in players.values():
-									print(p.name)
+								for i in range(int(len(players.keys())/5+1)):
+									print("  ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
 								_other = " "
 								while _other not in players.keys():
 									_other = input()
@@ -1169,9 +1258,11 @@ while True:
 								PA = " "
 								while PA not in players.keys():
 									print("Please choose Nation A:\n" )
-									for p in players.keys():
-										print(p)
+									for i in range(int(len(players.keys())/5+1)):
+										print("  ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
 									print("Please choose Nation A:\n" )
+									for i in range(int(len(players.keys())/5+1)):
+										print("  ".join(list(players.keys())[i*5:(i+1)*5]) + "\n")
 									PA = input()
 
 								PB = " "
@@ -1240,7 +1331,7 @@ while True:
 												print(o)
 											ch = input()
 										other = players[ch]
-										other.embargo.add(player)
+										other.embargo.add(player.name)
 										relata = frozenset([player.name, other.name])
 										relations[relata].relationship -= 0.25
 										player.diplo_action -= 1
@@ -1259,7 +1350,7 @@ while True:
 												print(o)
 											ch = input()
 										other = players[ch]
-										player.embargo.discard(other)
+										player.embargo.discard(other.name)
 										player.diplo_action -= 1
 										print("You have lifed the trade embargo on %s" % (other.name))
 
@@ -1275,7 +1366,7 @@ while True:
 							_type = " "
 							while _type not in market.market.keys():
 								_type = input("What would you like to buy? \n")
-							market.buy_item(_type, player, players, market)
+							market.buy_item(_type, player, players, market, relations)
 						elif choice == "2":
 							player.view_inventory()
 							_type = " "
