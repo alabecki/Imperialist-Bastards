@@ -7,6 +7,7 @@ def england(player, provinces):
 	player.technologies.add("pre_industry_3")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
+	player.technologies.add("high_pressure_steam_engine")
 	#player.technologies.add("high_pressure_steam_engine")
 	player.culture = "English"
 	player.accepted_cultures.add("Scottish")
@@ -42,15 +43,18 @@ def england(player, provinces):
 		player.personality["Navy"] = 0.95
 		player.improve_province_priority["shipyard"] = 99
 		player.personality["Offensive"] = 0.55
-		player.build_factory_priority["parts"] = 1.7
-		player.build_factory_priority["clothing"] = 1.6
-		player.resource_priority["cotton"] = 2.8
-		player.resource_priority["dyes"] = 3.6
+		player.build_factory_priority["parts"] = 1.8
+		player.build_factory_priority["clothing"] = 1.7
+		player.resource_priority["cotton"] = 2.2
+		player.resource_priority["dyes"] = 2.2
 		player.improve_province_priority["cotton"] = 1.3
-		player.improve_province_priority["dyes"] = 1.1
+		player.improve_province_priority["dyes"] = 1
 		player.sphere_targets = {"Netherlands", "Sweden", "Denmark", "Persia", "Portugal"}
 		player.mid_class_priority["bureaucrats"] += 0.15
 		player.resourse_to_keep["dyes"] = 20
+		player.resourse_to_keep["cotton"] = 20
+		player.stability = 1.2
+		player.new_development = 1.5
 
 
 		player.reputation = 1.1
@@ -84,6 +88,7 @@ def france(player, provinces):
 		player.sphere_targets = {"Spain", "Denmark", "Portugal", "Switzerland", "Japan", "Papal States"}
 		player.improve_province_priority["shipyard"] = 99
 		player.mid_class_priority["artists"] += 0.15
+		player.stability = 1
 
 
 	player.objectives = {"Loire", "Champagne", "Brittany", "CentralFrance", "Aquitaine", "Alps", \
@@ -112,7 +117,7 @@ def germany(player, provinces):
 
 	player.colonization = 0
 
-	player.midPOP["officers"]["numbers"] = 0.4
+	player.midPOP["officers"]["number"] = 0.4
 	player.milPOP = 0.6
 
 	player.provinces["EastPrussia"] = provinces["EastPrussia"]
@@ -150,6 +155,7 @@ def germany(player, provinces):
 		"Persia", "India", "Austria"}
 		player.mid_class_priority["officers"] += 0.15
 		player.mid_class_priority["managers"] += 0.1
+		player.stability = 1.5
 
 
 		
@@ -311,7 +317,7 @@ def italy(player, provinces): #major
 	player.culture = "Italian"
 	player.capital = "Piedmont"
 
-	player.stability = 2
+	player.stability = 1.5
 	player.diplo_action = 3
 
 
@@ -384,6 +390,7 @@ def switzerland(player, provinces):
 	player.freePOP = 2.8
 	player.milPOP = 0.6
 	player.numLowerPOP = 3.4
+	player.diplo_action = 25
 
 	player.provinces["_Switzerland"] = provinces["_Switzerland"]
 
@@ -413,7 +420,8 @@ def ottoman(player, provinces):
 	player.diplo_action = 0.0
 
 	player.shipyard = 0
-
+	player.new_development = 0
+	player.stability = 0
 
 	player.colonization = -3 
 	player.POP = 9

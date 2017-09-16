@@ -353,7 +353,7 @@ def historical():
 		borders = set()
 		for p2 in players.values():
 			if p1.check_for_border(p2) == True:
-				borders.add(p2)
+				borders.add(p2.name)
 		p1.borders = borders 
 
 
