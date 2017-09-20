@@ -39,20 +39,20 @@ from BalanceScenario.Scenario import*
 run = True
 while True:
 
-	print("########################################################################################################### \n")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n")
-	print( "_____________________________Welcome to Imperialist Bastards!_______________________________________________ \n")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n")
-	print("########################################################################################################### \n")
-	print(" _____________________________________ Main Menu ___________________________________________ \n")
+	print("####################################################################################################### ")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+	print( "____________________________ Welcome to Imperialist Bastards! ________________________________________ ")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+	print("######################################################################################################## ")
+	print(" _____________________________________ Main Menu ______________________________________________________ ")
 	print("\n")
-	print("______________________________Please select one of the following: ______________________________\n")
-	print("---------------------------------- Start a Random Game ---(N) --------------------------------------	 \n")
-	print("----------------------------- Start a Scenario (S)--------------------------------     \n")
-	print("---------------------------------- Load a Saved Game --(L) --------------------------------------     \n")
-	print("------------------------------------- Options ---------(O) --------------------------------------     \n ")
-	print("--------------------------------------- Exit ----------(E) --------------------------------------     \n" )
-	print("______________________________________________________________________________________________ \n")
+	print("_____________________________ Please select one of the following: _____________________________________")
+	print("------------------------ --------- Start a Random Game (N) --------------------------------------------")
+	print("------------------------------------ Start a Scenario (S)---------------------------------------------- ")
+	print("------------------------------------ Load a Saved Game --(L) ------------------------------------------ "    )
+	print("-------------------------------------- Options ---------(O) ------------------------------------------- ")
+	print("---------------------------------------- Exit ----------(E) ------------------------------------------- " )
+	print("_______________________________________________________________________________________________________")
 
 	initial = dict()
 	selection = " "
@@ -253,12 +253,14 @@ while True:
 						if info_command == "3":
 							print("\n")
 							print(" Population Overview: ####################################################################################### \n")
-							print(" Total Population: %.2f 	    Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Middle Class Pops: %.2f \n" % \
-							(player.POP, player.freePOP, player.numLowerPOP, player.numMidPOP))
+							print(" Total Population: %.2f 	    Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Development Level: %.2f \n" % \
+							(player.POP, player.freePOP, player.numLowerPOP, player.development_level))
 							print(" Urban Worker Pops: %.2f 	Military Pops: %.2f \n" % (player.proPOP, player.milPOP))
-							print(" Middle Class POPs:")
-							for k, v in player.midPOP.items():
-								print(" %-12s: %-12.2f"  % (k, v["number"]))
+							print("Development Levels")
+							for d, dev in player.developments.items():
+								print("%-12s: %-12.2f" % (d, dev))
+							#for k, v in player.midPOP.items():
+							#	print(" %-12s: %-12.2f"  % (k, v["number"]))
 						if info_command == "4" :
 							print("\n")
 							print(" Military Overview: ################################################################################################")
@@ -336,8 +338,10 @@ while True:
 									print("Name: %-16s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %s   Culture: %s \n" % \
 									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 								print("Population Overview: ######################################################################################### \n")
-								for k, v in nation.midPOP.items():
-									print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
+								#for k, v in nation.midPOP.items():
+								#	print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
+								for d, dev in nation.developments.items():
+									print("%s: %.2f" % (d, dev))
 								print("Military Overview: ################################################################################################ \n")
 								print("Infantry -   Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" %  \
 								(nation.military["infantry"], nation.infantry["attack"], nation.infantry["defend"], nation.infantry["manouver"]))
@@ -383,57 +387,57 @@ while True:
 										count += 1
 									print("\n")
 									
-									print(" Top 10 Nations by Middle Class:")
+									print(" Top 10 Nations by Development Level:")
 									count = 1
-									middle = sorted(player_list, key=lambda x: x.numMidPOP, reverse = True)
+									middle = sorted(player_list, key=lambda x: x.development_level, reverse = True)
 									middle = middle[:10]
 									for m in middle:
-										print(" %-2s. %-16s: %.2f" % (count, m.name, m.numMidPOP))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.development_level))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Researchers:")
+									print(" Top 10 Nations by Research:")
 									count = 1
-									research = sorted(player_list, key=lambda x: x.midPOP["researchers"]["number"], reverse = True)
+									research = sorted(player_list, key=lambda x: x.developments["research"], reverse = True)
 									research = research[:10]
 									for r in research:
-										print(" %-2s. %-16s: %.2f" % (count, r.name, r.midPOP["researchers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, r.name, r.developments["researchers"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Officers:")
+									print(" Top 10 Nations by Military:")
 									count = 1
-									officer = sorted(player_list, key=lambda x: x.midPOP["officers"]["number"], reverse = True)
+									officer = sorted(player_list, key=lambda x: x.developments["officers"], reverse = True)
 									officer = officer[:10]
 									for o in officer:
-										print(" %-2s. %-16s: %.2f" % (count, o.name, o.midPOP["officers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, o.name, o.developments["officers"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Artists:")
+									print(" Top 10 Nations by Culture:")
 									count = 1
-									art = sorted(player_list, key=lambda x: x.midPOP["artists"]["number"], reverse = True)
+									art = sorted(player_list, key=lambda x: x.developments["artists"], reverse = True)
 									art = art[:10]
 									for a in art:
-										print(" %-2s. %-16s: %.2f" % (count, a.name, a.midPOP["artists"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, a.name, a.developments["artists"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Bureaucrats:")
+									print(" Top 10 Nations by Government:")
 									count = 1
-									gov = sorted(player_list, key=lambda x: x.midPOP["bureaucrats"]["number"], reverse = True)
+									gov = sorted(player_list, key=lambda x: x.developments["bureaucrats"], reverse = True)
 									gov = gov[:10]
 									for g in gov:
-										print(" %-2s. %-16s: %.2f" % (count, g.name, g.midPOP["bureaucrats"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, g.name, g.developments["bureaucrats"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Managers")
+									print(" Top 10 Nations by Management")
 									count = 1
-									man = sorted(player_list, key=lambda x: x.midPOP["managers"]["number"], reverse = True)
+									man = sorted(player_list, key=lambda x: x.developments["managers"], reverse = True)
 									man = man[:10]
 									for m in man:
-										print(" %-2s. %-16s: %.2f" % (count, m.name, m.midPOP["managers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.developments["managers"]))
 										count += 1
 									print("\n")
 

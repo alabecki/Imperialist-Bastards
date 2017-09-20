@@ -22,8 +22,8 @@ def AI_turn(players, player, market, relations, provinces):
 	for k in player.goods_produced.keys():
 			player.goods_produced[k] = 0
 
-	if player.reputation < 0.65:
-		player.reputation += player.midPOP["artists"]["number"] * 0.1
+	if player.reputation < 0.6:
+		player.reputation += player.developments["culture"] * 0.15
 
 
 	player.AP += 1

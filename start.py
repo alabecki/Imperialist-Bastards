@@ -37,13 +37,14 @@ def initialize_major_power(player):
 	player.stability = 0.5
 	player.government = "absolute monarchy"
 	player.AP = 2
-	player.POP = 8.2
-	player.freePOP = 6.6
+	player.POP = 7.5
+	player.freePOP = 5.7
 	player.milPOP = 0.8
-	player.numLowerPOP = 7.4
+	player.numLowerPOP = 6.5
 	player.type = "major"
 
 	player.shipyard = 1
+
 
 	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies", "flintlock" }
 	#player.technologies.add("pre_industry_3")
@@ -51,13 +52,16 @@ def initialize_major_power(player):
 	#player.technologies.add("flintlock")
 	#player.technologies.add("high_pressure_steam_engine")
 
-	player.midPOP["researchers"]["number"] = 0.2
-	player.midPOP["officers"]["number"] = 0.2
-	player.midPOP["managers"]["number"] = 0.0
-	player.midPOP["bureaucrats"]["number"] = 0.2
-	player.midPOP["artists"]["number"] = 0.2
+	#player.midPOP["researchers"]["number"] = 0.2
+	#player.midPOP["officers"]["number"] = 0.2
+	#player.midPOP["managers"]["number"] = 0.0
+	#player.midPOP["bureaucrats"]["number"] = 0.2
+	#player.midPOP["artists"]["number"] = 0.2
 
-	player.numMidPOP = 0.8
+	#player.numMidPOP = 0.8
+	player.development_level = 2
+	player.developments["research"] = 1
+	player.numMidPOP = 1
 
 	player.resources["gold"] = 12.0
 	

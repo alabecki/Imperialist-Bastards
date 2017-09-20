@@ -19,7 +19,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	if player.type == "old_empire" or player.type =="old_minor":
 		return
 	if player.colonization < 1 + player.num_colonies * 1.5 or player.diplo_action < 1 or transport_limit < 4 or \
-	player.midPOP["bureaucrats"]["number"] < 0.4:
+	player.developments["government"] < 1:
 		return
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	priorities = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True) 
@@ -35,7 +35,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	p_options = set()
 	for k, unciv in uncivilized_minors.items():
 		if unciv.harsh == True and ("medicine" not in player.technologies or "breach_loaded_arms" not in player.technologies) \
-		or player.midPOP["bureaucrats"]["number"] < 0.6:
+		or player.developments["government"] < 2:
 			continue
 		if len(unciv.provinces) >= 1:
 			#print(unciv.name)

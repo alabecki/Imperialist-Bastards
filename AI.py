@@ -60,11 +60,11 @@ class AI(Player):
 		self.sphere_targets = set()
 
 		self.mid_class_priority = {
-			"researchers": 1.0,
-			"officers": 0.9,
-			"bureaucrats": 0.9,
-			"managers": 0.9,
-			"artists": 1.0
+			"research": 1.0,
+			"military": 0.9,
+			"government": 0.9,
+			"management": 0.9,
+			"culture": 1.0
 		}
 
 		self.pro_need = {
@@ -280,15 +280,25 @@ class AI(Player):
 		if per1 == True:
 			return True
 		else: 
-			for r in requirement:
-				if self.goods[r] < 1:
-					decision = self.ai_decide_on_good(r, market, relations, players)
-					self.ai_obtain_good(r, decision, market, relations, players)
-			if self.resources["spice"] < 1:
-				self.ai_buy("spice", 1, market, relations, players)
-			if self.numMidPOP >= 5 and self.goods["paper"] < 2:
-				decision = self.ai_decide_on_good("paper", market, relations, players)
-				self.ai_obtain_good("paper", decision, market, relations, players)
+			check_list = {
+			"paper": 0,
+			"spice": 0,
+			"furniture": 0,
+			"clothing": 0,
+			"telephone": 0,
+			"radio": 0,
+			"auto": 0
+		}
+		for i in requirement:
+			check_list[i] += 1
+			for v, k in check_list.items():
+				if v == "spice":
+					if self.resources["spice"] < k:
+						self.ai_buy("spice", k - self.resources["spice"], market, relations, players) 
+				elif self.goods[v] < k:
+					for i in range(int((k - self.goods[v]) + 1)):
+						decision = self.ai_decide_on_good(v, market, relations, players)
+						self.ai_obtain_good(v, decision, market, relations, players)
 		per2 = self.check_mid_requirement(requirement)
 		if per2 == True:
 			return True
@@ -304,60 +314,74 @@ class AI(Player):
 			if self.POP <= self.numMidPOP *10:
 				return
 		if self.midGrowth == False:
-			print("Cannot incrase midPOP becuase did not pay all food last turnS")
+			print("Cannot incrase development because did not pay all food last turn")
 			return
 		check = self.try_middle_class(market, relations, players)
 		if check == False:
 			print("Cannot increase middle class at this time (tried)")
 			return
-		if self.freePOP < 0.2:
+		if self.freePOP < 0.5:
 			self.proPOP -= 1
 			self.freePOP +1
-		allow = False
-		least_mid = 100
-		for m, mid in self.midPOP.items():
-			if self.midPOP[m]["number"] < least_mid:
-				least_mid = self.midPOP[m]["number"]
-		least_mid = max(0.2, least_mid)
-		m_options = []
-		for m, mid in self.midPOP.items():
-			if self.midPOP[m]["number"] >= 2:
+		least_dev = 100
+		for d, dev in self.developments.items():
+			if self.developments[d] < least_dev:
+				least_dev = self.developments[d]
+		least_dev = max(1, least_dev)
+		d_options = []
+		for d, dev in self.developments.items():
+			if self.developments[d] > 4:
 				continue
-			if self.midPOP[m]["number"] < least_mid * 2:
-				m_options.append(m)
+			if self.developments[d] <= least_dev * 2:
+				d_options.append(d)
+
+		#for m, mid in self.midPOP.items():
+		#	if self.midPOP[m]["number"] < least_mid:
+		#		least_mid = self.midPOP[m]["number"]
+		#least_mid = max(0.2, least_mid)
+		#m_options = []
+		#for m, mid in self.midPOP.items():
+		#	if self.midPOP[m]["number"] >= 2:
+		#		continue
+		#	if self.midPOP[m]["number"] < least_mid * 2:
+		#		m_options.append(m)
 		#for mo in m_options:
 		#	print(mo)
-		m_selection = ""
-		if self.stability < -1.2 and "artists" in m_options:
-			m_selection = "artists"
+		d_selection = ""
+		if self.stability < -1.2 and "culture" in d_options:
+			d_selection = "culture"
 		else:
-			m_preferences = sorted(self.mid_class_priority, key=self.mid_class_priority.get, reverse = True)
-			for mp in m_preferences:
-				if mp in m_options:
-					m_selection = mp
+			d_preferences = sorted(self.mid_class_priority, key=self.mid_class_priority.get, reverse = True)
+			for do in d_preferences:
+				if do in d_options:
+					d_selection = do
 					break 
-		if m_selection == "":
+		if d_selection == "":
 			print("It seems that maximal mid class has been achieved by %s" % (self.name))
 			stop = input()
 			return
 
-
-		if self.numMidPOP < 4.5:
-			self.resources["spice"] -= 1.0
 		requirement = self.determine_middle_class_need()
 		for r in requirement:
-			self.goods[r] -= 1.0
-		self.numLowerPOP -= 0.2
-		self.numMidPOP += 0.2
-		self.midPOP[m_selection]["number"] += 0.2
-		self.freePOP -= 0.2
-		self.mid_class_priority[m_selection] -= 0.1
+			if r == "spice":
+				self.resources["spice"] -= 1
+				print("Pays 1 Spice")
+			else:
+				self.goods[r] -= 1.0
+				print("Pays 1 %s" % (r))
+		self.numLowerPOP -= 0.5
+		self.numMidPOP += 0.5
+		self.development_level += 1
+		#self.midPOP[m_selection]["number"] += 0.2
+		self.developments[d_selection] += 1
+		self.freePOP -= 0.5
+		self.mid_class_priority[d_selection] -= 0.1
 		self.new_development += 0.5
-		if m_selection == "officers":
-			self.milPOP -= 0.2
-			self.freePOP +=  0.2
+		if d_selection == "military":
+			self.milPOP -= 0.4
+			self.freePOP +=  0.4
 			self.ai_choose_doctrine()
-		print("New middle class pop: %s ________________________" % (m_selection))
+		print("New middle class pop: %s ________________________" % (d_selection))
 
 
 	def ai_choose_doctrine(self):
@@ -573,7 +597,7 @@ class AI(Player):
 			if self.type == "major":
 				if number_factories < 2:
 					self.try_factory(market, relations, players)
-				elif number_factories >= self.number_developments and len(self.factories) >= 3:
+				elif number_factories >= self.number_developments and len(self.factories) >= 2:
 					#print("Wants to develop province")
 					self.try_development(market, relations, players)
 				else:
@@ -604,7 +628,8 @@ class AI(Player):
 		get = ""
 		if decision == "manufacture_prepare":
 			for i in manufacture[_type]:
-				material_mod = 1 - (self.midPOP["managers"]["number"] / 3)
+				#material_mod = 1 - (self.midPOP["managers"]["number"] / 3)
+				material_mod = 1 -  (self.developments["management"]/10)
 				material_max = 1000
 				for i in manufacture[_type]:
 					temp = int((manufacture[_type][i] * material_mod)/(self.resources[i] + 0.1))
@@ -767,13 +792,15 @@ class AI(Player):
 
 
 	def view_AI_inventory(self):
-		print("POP: %s, LowPop: %s, MidPop: %s" % (self.POP, self.numLowerPOP, self.numMidPOP))
+		print("POP: %s, LowPop: %s, Development Level: %s" % (self.POP, self.numLowerPOP, self.development_level))
 		print("freePOP: %s, proPOP: %s " % (self.freePOP, self.proPOP))
 		print("Stability: %s, Diplo: %s, Reputation: %s " % (self.stability, self.diplo_action, self.reputation))
 		print("Colonize: %s, Num Colonies: %s" % (self.colonization, self.num_colonies))
 		print("New Development %s, Research Points %s, Culture Points %s" % (self.new_development, self.research, self.culture_points))	
-		for m, mid in self.midPOP.items():
-			print(m, mid)
+		#for m, mid in self.midPOP.items():
+		#	print(m, mid)
+		for d, dev in self.developments.items():
+			print(d, dev)
 		print("\n")
 		print("%s Inventory \n" % (self.name))
 		for r, resource in self.resources.items():
@@ -864,7 +891,8 @@ class AI(Player):
 	#	print("price to craft %s " % (price_to_craft))
 		if self.supply[_type] > 3 and self.resources["gold"] >= market.buy_price(_type, self.supply[_type]):
 			return "buy"
-		material_mod = 1 - (self.midPOP["managers"]["number"] / 5)
+		#material_mod = 1 - (self.midPOP["managers"]["number"] / 5)
+		material_mod = 1 -  (self.developments["management"]/10)
 		price_to_man = 0
 		for i in manufacture[_type]:
 			price_to_man += market.buy_price(i, self.supply[_type]) * int(manufacture[_type][i] * material_mod)
@@ -1005,9 +1033,10 @@ class AI(Player):
 				else:
 					other = pair[0]
 				other = players[other]
-				if other.midPOP["managers"]["number"] > 0:
-					pr.relationship += other.midPOP["managers"]["number"]/4
-
+			#	if other.midPOP["managers"]["number"] > 0:
+				#	pr.relationship += other.midPOP["managers"]["number"]/4
+				if other.developments["management"] > 0:
+					pr.relationship += other.developments["management"]/8
 				#if "quality control" in other.ideas:
 				#	pr.relata += 0.15
 		if kind == "clothing" or kind == "furniture":
@@ -1018,10 +1047,12 @@ class AI(Player):
 				else:
 					other = pair[0]
 				other = players[other]
-				if other.midPOP["artists"]["number"] > 0:
-					pr.relationship += other.midPOP["artists"]["number"]/2
+				#if other.midPOP["artists"]["number"] > 0:
+				#	pr.relationship += other.midPOP["artists"]["number"]/2
 				#if "brand name clothing" in other.ideas:
 				#	pr.relata += 0.5
+				if other.developments["culture"] > 0:
+					pr.relationship += other.developments["culture"]/4
 
 		if kind == "radio" or kind == "telephone" or kind == "auto":
 			for pr in p_relations:
@@ -1031,8 +1062,10 @@ class AI(Player):
 				else:
 					other = pair[0]
 				other = players[other]
-				if other.midPOP["artists"]["number"] > 0:
-					pr.relationship += other.midPOP["artists"]["number"]/4
+				#if other.midPOP["artists"]["number"] > 0:
+				#	pr.relationship += other.midPOP["artists"]["number"]/4
+				if other.developments["culture"] > 0:
+					pr.relationship += other.developments["culture"]/8
 
 
 		p_relations.sort(key=lambda x: x.relationship, reverse=True)
@@ -1218,7 +1251,9 @@ class AI(Player):
 		print('Factory Production++++++++++++++++++++++++++++++++++++++++++++++++++')
 		stab_rounds = round(self.stability* 2) / 2
 		stab_mod = stability_map[stab_rounds]
-		material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+		#material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+		material_mod = 1 -  (self.developments["management"]/10)
+
 		material_max = 1000
 
 		max_amount = (self.factories[_type]["number"] * stab_mod * self.factory_throughput)
@@ -1305,7 +1340,9 @@ class AI(Player):
 
 				return cap
 			else:
-				material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+				#material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+				material_mod = 1 -  (self.developments["management"]/10)
+
 				if k in self.resources.keys():
 					temp = self.resources[k]/ (v * material_mod)
 					if (self.resources[k]/ (v * material_mod)) < cap:

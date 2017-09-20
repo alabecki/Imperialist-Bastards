@@ -75,45 +75,53 @@ class Human(Player):
 		requirement = self.determine_middle_class_need()
 		check = self.check_mid_requirement(requirement)
 		if check == False:
-			print("You cannot increase your middle class at this time")
-			print("To increase your middle class you need 1 splce plus:")
+			print("You cannot increase your development level at this time")
+			print("To increase your middle class you need:")
 			for r in requirement:
 				print(r)
 			return
 		else:
 			#allow = False
-			least_mid = 100
-			for m, mid in self.midPOP.items():
-				if self.midPOP[m]["number"] < least_mid:
-					least_mid = self.midPOP[m]["number"]
-			least_mid = max(0.2, least_mid)
-			m_options = []
-			for m, mid in self.midPOP.items():
-				if self.midPOP[m]["number"] >= 2:
-					continue
-				if self.midPOP[m]["number"] < least_mid * 2:
-					m_options.append(m)
+			least_dev = 100
+		for d, dev in self.developments.items():
+			if self.developments[d] < least_dev:
+				least_dev = self.developments[d]
+		least_dev = max(1, least_dev)
+		d_options = []
+		for d, dev in self.developments.items():
+			if self.development[d] > 4:
+				continue
+			if self.development[d] <= least_dev * 2:
+				d_options.append(d)
+			
+
 			_type = ""
-			while _type not in m_options:
-				print("What kind of middle class POP would you like to create?")
-				for mo in m_options:
+			while _type not in d_options:
+				print("In what area do you seek development?")
+				for do in d_options:
 					print(mo, end = "  ")
 				_type = input()
 
-			self.resources["spice"] -= 1
-			for r in requirement:
-				self.goods[r] -= 1
-				print("Spends 1 %s" % (r))
-			self.numLowerPOP -= 0.20
-			self.numMidPOP += 0.20
-			self.midPOP[_type]["number"] += 0.20
-			self.freePOP -= 0.20
-			self.new_development += 0.5
-			if _type == "officers":
-				self.milPOP -= 0.2
-				self.freePOP +=  0.2
-				self.choose_doctrine()
-			print("You now have %s %s" % (self.midPOP[_type]["number"], _type))
+
+		requirement = self.determine_middle_class_need()
+		for r in requirement:
+			if r == "spice":
+				self.resources["spice"] -= 1
+			else:
+				self.goods[r] -= 1.0
+		self.numLowerPOP -= 0.5
+		self.numMidPOP += 0.5
+		self.development_level += 1
+		#self.midPOP[m_selection]["number"] += 0.2
+		self.developments[_type] += 1
+		self.freePOP -= 0.5
+		self.mid_class_priority[_type] -= 0.1
+		self.new_development += 0.5
+		if _type == "military":
+			self.milPOP -= 0.4
+			self.freePOP +=  0.4
+			self.choose_doctrine()
+			print("Your %s level is now %s" % (_type, self.developments[_type]))
 
 	def choose_doctrine(self):
 		print("Which military doctrine would you like to choose?")
@@ -864,7 +872,7 @@ class Human(Player):
 			stab_rounds = round(self.stability* 2) / 2
 			stab_mod = stability_map[stab_rounds]
 			max_amount = self.factories[_type]["number"] * stab_mod * self.factory_throughput
-			material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+			material_mod = 1 -  (self.developments["management"]/10)
 			max_amount = max_amount/(material_mod + 0.0001)
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
 			amount = int(amount)
