@@ -3,6 +3,8 @@ from AI import*
 from player_class import*
 from AI_foreign_affairs import*
 from copy import deepcopy
+from historical.Scenario import* 
+from BalanceScenario.Scenario import*
 
 
 def AI_turn(players, player, market, relations, provinces):
@@ -22,8 +24,8 @@ def AI_turn(players, player, market, relations, provinces):
 	for k in player.goods_produced.keys():
 			player.goods_produced[k] = 0
 
-	if player.reputation < 0.65:
-		player.reputation += player.midPOP["artists"]["number"] * 0.1
+	if player.reputation < 0.6:
+		player.reputation += player.developments["culture"] * 0.15
 
 
 	player.AP += 1
@@ -43,30 +45,82 @@ def AI_turn(players, player, market, relations, provinces):
 	player.fulfill_needs(market, relations, players)
 	player.view_AI_inventory()
 
+	#POP Increase
 	player.ai_increase_pop(market, relations, players)
 	player.ai_increase_pop(market, relations, players)
-
+	player.assign_priorities_to_provs()
 	player.AI_reset_POP()
 	player.AI_assign_POP()
 
+	player.use_culture(players)
 
-	player.early_game(market, relations, players)
-	player.ai_increase_middle_class(market, relations, players)
-
-
-	player.assign_priorities_to_provs()
-	
 	player.choose_technology()
 
-	player.develop_industry(market, relations, players)
+	AI_values(player)
 
-	player.decide_build_navy(market, relations, players)
+	if player.general_priority == "expansion":
+		player.early_game_expansion(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.build_army(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.develop_industry(market, relations, players)
 
-	print("Decide Factory Production!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:")
-	player.ai_decide_factory_productions(market, relations, players)
-	player.develop_industry(market, relations, players)
 
-	player.build_army(market, relations, players)
+	elif player.general_priority == "army":
+		player.early_game_army(market, relations, players)
+		player.build_army(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.develop_industry(market, relations, players)
+
+	elif player.general_priority == "industrialize":
+		player.early_game_development(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+
+
+	elif player.general_priority == "production":
+		player.ai_decide_factory_productions(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.build_army(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+
+
+	elif player.general_priority == "development":
+		player.ai_increase_middle_class(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+
+	else:
+		player.early_game(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_decide_factory_productions(market, relations, players)
+		player.build_army(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+		player.develop_industry(market, relations, players)
+		player.ai_increase_middle_class(market, relations, players)
+		player.decide_build_navy(market, relations, players)
+
 
 
 	player.use_chemicals(market, relations, players)
@@ -77,8 +131,6 @@ def AI_turn(players, player, market, relations, provinces):
 	attack_target(player, players, relations, provinces, market)
 	ai_bribe(player, players, relations)
 	ai_decide_ally_target(player, players, provinces)
-
-
 
 	count = 0
 	while player.diplo_action >= 2 and count < 12:
@@ -103,16 +155,6 @@ def AI_turn(players, player, market, relations, provinces):
 	ai_embargo(player, players, relations)
 	ai_lift_embargo(player, players, relations)
 
-
-	player.use_culture(players)
-	
-	#player.AI_set_objective(turn, market)
-	player.develop_industry(market, relations, players)
-	#player.attempt_objective(market)
-
-	player.ai_increase_middle_class(market, relations, players)
-	player.develop_industry(market, relations, players)
-	player.decide_build_navy(market, relations, players)
 
 
 	#if player.AP >= 1:

@@ -57,9 +57,11 @@ class Player(object):
 		self.culture = ""
 		self.accepted_cultures = set()
 		self.religion = ""
-		self.capital = ""
+		self.capital = set()
 		self.VP = 0.0
 		self.defeated = False
+		self.development_level = 0
+
 
 		self.stability_mod = 0.0
 		self.AP = 0.0
@@ -75,6 +77,14 @@ class Player(object):
 		self.production_modifier = 1.0
 		self.milPOP = 0.8
 		self.POP_increased = 0
+
+		self.developments = {
+			"research": 0,
+			"military": 0,
+			"government": 0,
+			"culture": 0,
+			"management": 0
+		}
 
 		self.midPOP = {
 		"researchers": {"number": 0.0, "priority": 0.2},
@@ -336,35 +346,119 @@ class Player(object):
 
 	def determine_middle_class_need(self):
 		requirement = ["paper"]
-		if self.numMidPOP >= 1 and self.numMidPOP < 2:
-			requirement = ["paper", "furniture"]
-		if self.numMidPOP >= 2 and self.numMidPOP < 2.5:
-			requirement = ["paper", "clothing", "furniture"]
-		if self.numMidPOP >= 2.5 and self.numMidPOP < 3:
-			requirement = ["paper", "clothing", "furniture"]
-		if self.numMidPOP >= 3 and self.numMidPOP < 3.5:
-			requirement = ["paper", "clothing", "furniture", "chemicals"]
-		if self.numMidPOP >= 3.5 and self.numMidPOP < 4:
-			requirement = ["paper", "clothing", "furniture", "telephone", "telephone"]
-		if self.numMidPOP >= 4 and self.numMidPOP < 4.5:
-			requirement = ["paper", "clothing", "furniture", "telephone", "radio", "radio"]
-		if self.numMidPOP > 4.5:
-			requirement = ["paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
-		#print("Mid class requirments:")
-		#for r in requirement:
-		#	print(r)
+		if self.development_level > 0:
+			requirement.append("furniture")
+		if self.development_level > 1:
+			requirement.append("spice")
+		if self.development_level > 2:
+			requirement.append("clothing")
+		if self.development_level > 3:
+			requirement.append("paper")
+		if self.development_level > 4:
+			requirement.append("furniture")
+		if self.development_level > 5:
+			requirement.append("spice")
+		if self.development_level > 6:
+			requirement.append("clothing")
+		if self.development_level > 7:
+			requirement.append("paper")
+		if self.development_level > 8:
+			requirement.append("telephone")
+			requirement.append("telephone")
+			requirement.append("telephone")
+			requirement.remove("paper")
+			requirement.remove("clothing")
+		if self.development_level > 9:
+			requirement.remove("telephone")
+			requirement.append("paper")
+			requirement.append("clothing")
+			requirement.remove("furniture")
+		if self.development_level > 10:
+			requirement.append("furniture")
+		if self.development_level > 11:
+			requirement.append("radio")
+			requirement.append("radio")
+			requirement.append("radio")
+			requirement.remove("paper")
+			requirement.remove("clothing")
+		if self.development_level > 12:
+			requirement.remove("radio")
+			requirement.append("paper")
+			requirement.append("clothing")
+			requirement.remove("furniture")
+		if self.development_level > 13:
+			requirement.append("furniture")
+		if self.development_level > 14:
+			requirement.append("auto")
+			requirement.append("auto")
+			requirement.append("auto")
+			requirement.remove("paper")
+			requirement.remove("clothing")
+			requirement.remove("furniture")
+		if self.development_level > 15:
+			requirement.append("paper")
+		if self.development_level > 16:
+			requirement.append("furniture")
+			requirement.append("clothing")
 		return requirement
 
 
+	
+
+	#	requirement = ["paper"]
+	#	if self.numMidPOP >= 1 and self.numMidPOP < 2:
+	#		requirement = ["paper", "furniture"]
+	#	if self.numMidPOP >= 2 and self.numMidPOP < 2.5:
+	#		requirement = ["paper", "clothing", "furniture"]
+	#	if self.numMidPOP >= 2.5 and self.numMidPOP < 3:
+	#		requirement = ["paper", "clothing", "furniture"]
+	#	if self.numMidPOP >= 3 and self.numMidPOP < 3.5:
+	#		requirement = ["paper", "clothing", "furniture", "chemicals"]
+	#	if self.numMidPOP >= 3.5 and self.numMidPOP < 4:
+	#		requirement = ["paper", "clothing", "furniture", "telephone", "telephone"]
+	#	if self.numMidPOP >= 4 and self.numMidPOP < 4.5:
+	#		requirement = ["paper", "clothing", "furniture", "telephone", "radio", "radio"]
+	#	if self.numMidPOP > 4.5:
+	#		requirement = ["paper", "clothing", "furniture", "auto", "radio", "telephone", "auto"]
+		#print("Mid class requirments:")
+		#for r in requirement:
+		#	print(r)
+	#	return requirement
+
+
 	def check_mid_requirement(self, requirement):
-		if self.resources["spice"] < 1 and self.numMidPOP < 4.5:
-			return False
-		for r in requirement:
-			if self.goods[r] < 1: 
-				return False
+		check_list = {
+			"paper": 0,
+			"spice": 0,
+			"furniture": 0,
+			"clothing": 0,
+			"telephone": 0,
+			"radio": 0,
+			"auto": 0
+		}
+		print("Requirements:")
+		for i in requirement:
+			print(i)
+			check_list[i] += 1
+		print("Spice required: %s" % (check_list["spice"]))
+
+		for k, v in check_list.items():
+			if k == "spice":
+				print("Spice need: %s" % (v))
+				if self.resources["spice"] < v:
+					return False
+			else:
+				if self.goods[k] < v:
+					return False 
+
+		#if self.resources["spice"] < 1 and self.numMidPOP < 4.5:
+		#	return False
+		#for r in requirement:
+		#	if self.goods[r] < 1: 
+		#		return False
 		#if self.numMidPOP >= 3 and self.goods["paper"] < 2:
 		#	return False
-		if self.freePOP < 0.3 and self.proPOP < 2:
+		if self.freePOP < 0.5 and self.proPOP < 2:
 			return False
 		return True
 
@@ -477,6 +571,7 @@ class Player(object):
 			self.resources["food"] -= mFood
 			self.midGrowth = True
 
+
 		if(self.resources["coal"] < 0.1 * self.number_developments):
 			print("You do not have enough coal to run all your railroads this turn, only some will be powered \n")
 
@@ -492,14 +587,16 @@ class Player(object):
 			for k, prov in self.provinces.items():
 				self.provinces[k].powered = True
 		oil_need = 0
-		if self.numMidPOP - 4.4 > 0:
-			oil_need = (self.numMidPOP - 4.4)/2
+		if self.development_level > 14:
+			oil_need = (self.development_level - 15) * 0.2
 		if self.resources["oil"] < oil_need:
 			penality = self.resources["oil"] - oil_need
 			self.stability += penality
 			if self.stability < -3:
 				self.stability = -3
 			self.resources["oil"] = 0
+			self.midGrowth = False
+
 		else:
 			self.resources["oil"] -= oil_need
 
@@ -541,25 +638,30 @@ class Player(object):
 
 		if self.stability < -3.0:
 			self.stability = -3.0
-		culture_gain = 0.2 + self.midPOP["artists"]["number"]
+		culture_gain = 0.2 + self.developments["culture"]/3
+		#culture_gain = 0.2 + self.midPOP["artists"]["number"]
 		self.culture_points+= culture_gain
 		##for g in globe.culture:
 			#print(g)
 		#globe.culture.append([self.name, cps])
 		print("Culture points gained: %s " % (culture_gain))
-		self.can_train = 1 + self.midPOP["officers"]["number"] * 5
+		#self.can_train = 1 + self.midPOP["officers"]["number"] * 5
+		self.can_train = 1 + self.developments["military"]
 		self.AP = int(self.proPOP) * self.production_modifier
-		research_gain = (0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
-		(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.33)) * government_map[self.government]
+		#research_gain = (0.25 + (self.midPOP["researchers"]["number"] * stability_map[stab_rounds]) * 2 + \
+		#(self.midPOP["managers"]["number"] * stability_map[stab_rounds] * 0.33)) * government_map[self.government]
+		research_gain = 0.24 + ((self.developments["research"] + self.developments["management"]/6) * \
+		government_map[self.government] * stability_map[stab_rounds])
 		print("Research points gained: %s " % (research_gain))
 		self.research += research_gain
 		#globe.research.append([self.name, research_gain])
-		diplo_gain = 0.2 + (self.midPOP["bureaucrats"]["number"] * self.reputation * 2)
+		#diplo_gain = 0.2 + (self.midPOP["bureaucrats"]["number"] * self.reputation * 2)
+		diplo_gain = 0.2 + (self.developments["government"] * self.reputation * 0.5)
 		self.diplo_action += diplo_gain
 		#globe.diplomacy.append([self.name, diplo_gain])
 		print("Diplo_action gain: %s " % (diplo_gain))
 		col_gain =  self.military["frigates"]/10 +  self.military["iron_clad"]/6 + self.military["battle_ship"]/3 \
-		+ self.midPOP["bureaucrats"]["number"]/4
+		+  self.developments["government"]/6
 		self.colonization += col_gain
 		#globe.colonization.append([self.name, col_gain])
 		print("Colonization point gain: %s" % (col_gain))
@@ -590,7 +692,7 @@ class Player(object):
 
 	def check_for_border(self, p2):
 		self_core = self.core_provinces()
-		#print("Core Provs Self:")
+		#print("Core Provs %s:" % (self.name))
 		#for p in self_core:
 		#	print(p.name)
 
@@ -616,24 +718,28 @@ class Player(object):
 		#	print(k, v)
 		core = set()
 		consider = Queue(100)
-		if self.capital == "":
+		if len(self.capital) == 0:
+			#print("No capital?")
 			return core
 		else:
-			first = self.provinces[self.capital]
-			consider.put(first)
-			while consider.qsize() >= 1:
-				thing = consider.get()
-				if type(thing) != Province:
-					continue
-				for p in self.provinces.values():
-					if p != thing:
-						if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:
-							#print("Yes")
-							if p not in core and p != thing:
-								consider.put(p)
-					
-				if thing not in core:
-					core.add(thing)
+			for c in self.capital:
+			#	print(self.name)
+			#	print("Capital: %s" %(c))
+				first = self.provinces[c]
+				consider.put(first)
+				while consider.qsize() >= 1:
+					thing = consider.get()
+					if type(thing) != Province:
+						continue
+					for p in self.provinces.values():
+						if p != thing:
+							if abs(thing.x - p.x) <= 1 and abs(thing.y - p.y) <= 1:
+								#print("Yes")
+								if p not in core and p != thing:
+									consider.put(p)
+						
+					if thing not in core:
+						core.add(thing)
 		#print("%s cores:" % (self.name))
 		#for c in core:
 		#	print(c.name)
