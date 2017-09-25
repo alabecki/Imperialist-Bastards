@@ -5,6 +5,8 @@ from technologies import*
 from start import*
 from historical.ScenarioNations import*
 
+from random import*
+
 
 def get_name_from_major_choice(choice):
 	name = ""
@@ -339,10 +341,10 @@ def historical():
 	#		print(p, prov.name)
 
 	for p, play in players.items():
-		if play.capital == "":
-			#x = choice(play.provinces.keys())
-			for k, v in play.provinces.items():
-				play.capital = play.provinces[k]
+		if len(play.capital) == 0:
+			x = choice(list(play.provinces.keys()))
+			#for k, v in play.provinces.items():
+			play.capital.add(play.provinces[k])
 
 	for p, play in players.items():
 		for p, prov in play.provinces.items():
@@ -354,7 +356,13 @@ def historical():
 		for p2 in players.values():
 			if p1.check_for_border(p2) == True:
 				borders.add(p2.name)
-		p1.borders = borders 
+		p1.borders = borders
+
+#	for p1 in players.values():
+	#	print(p1.name)
+	#	for b in p1.borders:
+	#		print(b)
+	#	print("\n") 
 
 
 	keys = set()
@@ -487,6 +495,32 @@ def historical():
 
 		
 
+
+def AI_values(player):
+	if player.type != "major":
+		return
+	if player.name in ["Germany", "Italy", "Austria", "Russia"]:
+		player.general_priority = "army"
+	else:
+		player.general_priority = "expansion"
+
+
+		player.general_priority = "expansion"
+	if "power_loom" in player.technologies or "bessemer_process" in player.technologies:
+		if player.name != "Netherlands":
+			player.general_priority = "industrialize"
+	if "chemistry" in player.technologies:
+		player.general_priority = "production"
+	if "iron_clad" in player.technologies:
+		player.general_priority = "expansion"
+	if "compound_steam_engine" in player.technologies:
+		player.general_priority = "industrialize"
+	if "combustion" in player.technologies:
+		player.general_priority = "development"
+	if "oil_powered_ships" in player.technologies:
+		player.general_priority = "expansion"
+	if "mobile_warfare" in player.technologies:
+		player.general_priority = "army"
 
 
 

@@ -4,14 +4,15 @@ from AI import*
 
 def england(player, provinces):
 
+	player.developments["government"] = 1
+
 	player.technologies.add("pre_industry_3")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
-	player.technologies.add("high_pressure_steam_engine")
 	#player.technologies.add("high_pressure_steam_engine")
 	player.culture = "English"
 	player.accepted_cultures.add("Scottish")
-	player.capital = "SouthEastEngland"
+	player.capital.add("SouthEastEngland")
 	player.military["artillery"] = 0
 	player.military["frigates"] = 2.0
 	player.colonization = 1
@@ -26,11 +27,6 @@ def england(player, provinces):
 	player.provinces["Scotland"] = provinces["Scotland"]
 	player.provinces["Ireland"] = provinces["Ireland"]
 
-	player.doctrines = {"Sea_Doctrine1"}
-	player.frigates["attack"] += 0.3
-	player.iron_clad["attack"] += 0.32
-	player.battle_ship["attack"] += 1
-
 
 	player.objectives = {"SouthEastEngland", "SouthEastEngland", "Midlands", "Whales", "NorthEngland", \
 	"Scotland", "Ireland", "Bombay", "_Bengal", "_Hyderabad", "UpperEgypt", "MiddleEgypt", 
@@ -43,28 +39,25 @@ def england(player, provinces):
 		player.personality["Navy"] = 0.95
 		player.improve_province_priority["shipyard"] = 99
 		player.personality["Offensive"] = 0.55
-		player.build_factory_priority["parts"] = 1.8
+		player.build_factory_priority["parts"] = 2
 		player.build_factory_priority["clothing"] = 1.7
-		player.resource_priority["cotton"] = 2.2
-		player.resource_priority["dyes"] = 2.2
+		player.resource_priority["cotton"] = 1.7
+		player.resource_priority["dyes"] = 1.7
 		player.improve_province_priority["cotton"] = 1.3
 		player.improve_province_priority["dyes"] = 1
 		player.sphere_targets = {"Netherlands", "Sweden", "Denmark", "Persia", "Portugal"}
-		player.mid_class_priority["bureaucrats"] += 0.15
+		player.mid_class_priority["government"] += 0.1
 		player.resourse_to_keep["dyes"] = 20
 		player.resourse_to_keep["cotton"] = 20
-		player.stability = 1.2
-		player.new_development = 1.5
-
-
-		player.reputation = 1.1
 
 
 
 def france(player, provinces):
 
+	player.developments["culture"] = 1
+
 	player.culture = "French"
-	player.capital = "CentralFrance"
+	player.capital.add("CentralFrance")
 	player.technologies.add("pre_industry_3")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
@@ -77,47 +70,49 @@ def france(player, provinces):
 	player.provinces["Alps"] = provinces["Alps"]
 	player.provinces["Normandy"] = provinces["Normandy"]
 
+	player.resources["gold"] = 18
 
-	player.doctrines = {"Artillery_Offense"}
-	player.artillery["attack"] += 0.4
 
 	if type(player) == AI:
-		player.personality["Army"] = 1.2
-		player.personality["Navy"] = 0.78
-		player.personality["Offensive"] = 0.38
+		player.personality["Army"] = 1.28
+		player.personality["Navy"] = 0.8
+		player.personality["Offensive"] = 0.4
 		player.sphere_targets = {"Spain", "Denmark", "Portugal", "Switzerland", "Japan", "Papal States"}
 		player.improve_province_priority["shipyard"] = 99
-		player.mid_class_priority["artists"] += 0.15
-		player.stability = 1
+		player.mid_class_priority["culture"] += 0.15
+		player.stability = 1.5
+
 
 
 	player.objectives = {"Loire", "Champagne", "Brittany", "CentralFrance", "Aquitaine", "Alps", \
 	"Normandy", "Piedmont", "Wallonie", "Algiers", "Constantine", "_Burma",\
 	"Syria", "_Morocco", "South_Morocco", "Laos", "North_Dai_Nam", "South_Dai_Nam", "_Cambodia", "Bombay", \
-	"Khuzestan", "Tunis", "Rajputana"} 
+	"Khuzestan", "Tunis", "_Bengal"} 
 
 	player.sphere = {"Bavaria", "Lazio"}
 
 
 def germany(player, provinces):
 
+	player.developments["military"] = 1
+
 	player.culture = "German"
-	player.capital = "Brandenburg"
+	player.capital.add("Brandenburg")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
 	player.technologies.add("flintlock")
 	player.stability = 2
 
-	player.POP = 5.4
+	player.POP = 5.2
 	player.freePOP = 3.6
-	player.numLowerPOP = 4.6
+	player.numLowerPOP = 4.2
 
 	player.military["frigates"] = 0
 	player.military["cavalry"] = 2
 
 	player.colonization = 0
 
-	player.midPOP["officers"]["number"] = 0.4
+	player.numMidPOP = 1.0
 	player.milPOP = 0.6
 
 	player.provinces["EastPrussia"] = provinces["EastPrussia"]
@@ -128,9 +123,7 @@ def germany(player, provinces):
 	#player.provinces["NorthGermany"] = provinces["NorthGermany"]
 	#player.provinces["Bavaria"] = provinces["Bavaria"]
 
-	player.doctrines = {"Mobile_Offense", "Army_Discipline"}
-	player.cavalry["attack"] += 0.3
-	player.tank["attack"] += 0.5
+	player.doctrines = {"Army_Discipline"}
 	player.infantry["attack"] += 0.1
 	player.infantry["defend"] += 0.1
 	player.cavalry["attack"] += 0.1
@@ -153,11 +146,10 @@ def germany(player, provinces):
 		player.improve_province_priority["shipyard"] = 28
 		player.sphere_targets = {"Denmark", "Switzerland", "Sweden", "Japan", "Ottoman", \
 		"Persia", "India", "Austria"}
-		player.mid_class_priority["officers"] += 0.15
-		player.mid_class_priority["managers"] += 0.1
+		player.mid_class_priority["military"] += 0.2
+		player.mid_class_priority["management"] += 0.1
 		player.stability = 1.5
-
-
+ 
 		
 
 	player.objectives = {"EastPrussia", "Brandenburg", "_NorthGermany", "_Bavaria", "Rhineland", \
@@ -167,7 +159,7 @@ def germany(player, provinces):
 
 def saxony(player, provinces):
 	player.culture = "German"
-	player.capital = "_Saxony"
+	player.capital.add("_Saxony")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
 	player.provinces["_Saxony"] = provinces["_Saxony"]
@@ -179,7 +171,7 @@ def saxony(player, provinces):
 
 def northgermany(player, provinces):
 	player.culture = "German"
-	player.capital = "_NorthGermany"
+	player.capital.add("_NorthGermany")
 	player.provinces["_NorthGermany"] = provinces["_NorthGermany"]
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
@@ -187,7 +179,7 @@ def northgermany(player, provinces):
 
 def bavaria(player, provinces):
 	player.culture = "German"
-	player.capital = "_Bavaria"
+	player.capital.add("_Bavaria")
 	player.provinces["_Bavaria"] = provinces["_Bavaria"]
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
@@ -199,15 +191,18 @@ def bavaria(player, provinces):
 
 def austria(player, provinces):
 
+	player.developments["culture"] = 1
+
 	player.culture = "German"
-	player.accepted_cultures = {"Check", "Hungarian" }
-	player.capital = "_Austria"
+	player.accepted_cultures = {"Check"}
+	player.capital.add("_Austria")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
 
 	player.resources["food"] = 2
 
 	player.military["frigates"] = 0
+	player.military["infantry"] += 1
 	
 	player.colonization = 0
 
@@ -218,8 +213,6 @@ def austria(player, provinces):
 	player.shipyard = 0
 	player.stability = 1.5
 
-	player.doctrines = {"Infantry_Offense"}
-	player.infantry["attack"] += 0.25
 
 	player.provinces["Bohemia"] = provinces["Bohemia"]
 	player.provinces["Slovakia"] = provinces["Slovakia"]
@@ -241,16 +234,13 @@ def austria(player, provinces):
 		player.improve_province_priority["shipyard"] = 7
 		player.build_factory_priority["paper"] = 1.2
 		player.sphere_targets = {"Spain", "Denmark", "Portugal", "Switzerland", "Egypt", "India", "Persia"}
-		player.mid_class_priority["artists"] += 0.15
-
-
 
 
 
 def russia(player, provinces):
 
 	player.culture = "Russian"
-	player.capital = "Novgorod"
+	player.capital.add("Novgorod")
 
 	player.sprawl = True
 
@@ -263,15 +253,14 @@ def russia(player, provinces):
 	player.military["irregulars"] = 1
 	player.colonization = -1 
 
-	player.midPOP["bureaucrats"]["number"] = 0
-	player.midPOP["officers"]["number"] = 0
-	player.midPOP["artists"]["number"] = 0
-	player.midPOP["researchers"]["number"] = 0.2
+	player.numMidPOP = 0
+	player.development_level = 0
+	player.developments["research"] = 0
 
 	player.diplo_action = 0
 
-	player.POP = 10.2
-	player.numMidPOP = 0.2
+	player.POP = 10
+	#player.numMidPOP = 0.2
 	player.numLowerPOP = 10
 	player.freePOP = 9
 
@@ -315,7 +304,7 @@ def russia(player, provinces):
 def italy(player, provinces): #major
 
 	player.culture = "Italian"
-	player.capital = "Piedmont"
+	player.capital.add("Piedmont")
 
 	player.stability = 1.5
 	player.diplo_action = 3
@@ -334,11 +323,8 @@ def italy(player, provinces): #major
 	player.midPOP["researchers"]["number"] = 0.0
 	player.midPOP["bureaucrats"]["number"] = 0.0
 
-	player.numMidPOP = 0.4
-
-	player.doctrines = {"Infantry_Offense"}
-	player.infantry["attack"] += 0.25
-
+	player.numMidPOP = 0.5
+	player.development_level = 1
 
 	#player.provinces["Naples"] = provinces["Naples"]
 	#player.provinces["Sicily"] = provinces["Sicily"]
@@ -360,37 +346,37 @@ def italy(player, provinces): #major
 
 
 	player.objectives = {"Naples", "Lazio", "Venezia", "Piedmont", "Sicily", "_Libya", "Croatia", \
-	"Greece", "UpperEgypt", "MiddleEgypt", "Sudan", "Tunis", "Alps", "_Nejd"}
+	"Greece", "UpperEgypt", "MiddleEgypt", "Sudan", "Tunis", "Alps"}
 
 
 def two_sicilies(player, provinces):
 	player.culture = "Italian"
-	player.capital = "Naples"
+	player.capital.add("Naples")
 	player.provinces["Naples"] = provinces["Naples"]
 	player.provinces["Sicily"] = provinces["Sicily"]
 
 def papal_state(player, provinces):
 	player.culture = "Italian"
-	player.capital = "Lazio"
+	player.capital.add("Lazio")
 	player.provinces["Lazio"] = provinces["Lazio"]
 
 
 
 def switzerland(player, provinces):
 	player.culture = "Swiss"
-	player.capital = "_Switzerland"
+	player.capital.add("_Switzerland")
 	player.resources["gold"] = 12
 	player.resources["food"] = 2
 
 	player.military["infantry"] = 3
 	player.number_units = 3
-	player.midPOP["researchers"]["number"] = 0.2
-
-	player.POP = 3.6
-	player.freePOP = 2.8
+	player.developments["research"] = 1
+	player.development_level = 1
+	player.numMidPOP = 0.5
+	player.POP = 3.5
+	player.freePOP = 2.4
 	player.milPOP = 0.6
-	player.numLowerPOP = 3.4
-	player.diplo_action = 25
+	player.numLowerPOP = 3
 
 	player.provinces["_Switzerland"] = provinces["_Switzerland"]
 
@@ -407,7 +393,7 @@ def switzerland(player, provinces):
 def ottoman(player, provinces):  
 
 	player.culture = "Turkish"
-	player.capital = "WestTurky"
+	player.capital.add("WestTurky")
 	player.resources["gold"] = 3
 
 	player.military["irregulars"] = 2
@@ -422,6 +408,8 @@ def ottoman(player, provinces):
 	player.shipyard = 0
 	player.new_development = 0
 	player.stability = 0
+	player.development_level = 0
+	player.developments["research"] = 0
 
 	player.colonization = -3 
 	player.POP = 9
@@ -429,17 +417,9 @@ def ottoman(player, provinces):
 	player.freePOP = 8
 	player.numMidPOP = 0
 
-	player.midPOP["researchers"]["number"] = 0
-	player.midPOP["officers"]["number"] = 0
-	player.midPOP["artists"]["number"] = 0
-	player.midPOP["bureaucrats"]["number"] = 0
-	player.midPOP["managers"]["number"] = 0
-
 	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.6
-
-
 	
 	player.borders.add("Austria")
 	player.borders.add("Russia")
@@ -475,7 +455,7 @@ def ottoman(player, provinces):
 def spain(player, provinces): 
 
 	player.culture = "Spanish"
-	player.capital = "Leon"
+	player.capital.add("Leon")
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
@@ -490,11 +470,10 @@ def spain(player, provinces):
 	player.freePOP = 6
 	player.numMidPOP = 0
 
-	player.midPOP["researchers"]["number"] = 0
-	player.midPOP["officers"]["number"] = 0
-	player.midPOP["artists"]["number"] = 0
-	player.midPOP["bureaucrats"]["number"] = 0
-	player.midPOP["managers"]["number"] = 0
+	player.resources["gold"] = 6
+
+	player.developments["research"] = 0
+	player.development_level = 0
 
 	player.provinces["Andalusia"] = provinces["Andalusia"]
 	player.provinces["Leon"] = provinces["Leon"]
@@ -508,8 +487,6 @@ def spain(player, provinces):
 		player.personality["Offensive"] = 0.60
 		player.improve_province_priority["shipyard"] = 32
 		player.sphere_targets = {"Spain", "Sweden", "Denmark", "Portugal", "Switzerland", "Japan"}
-		player.mid_class_priority["researchers"] += 0.1
-
 
 
 	player.objectives = {"Andalusia", "Leon", "Aragon", "Galicia", "La_Mancha", "_Morocco", "South_Morocco", \
@@ -520,7 +497,7 @@ def spain(player, provinces):
 def netherlands(player, provinces): # major power
 
 	player.culture = "Dutch"
-	player.capital = "Holland"
+	player.capital.add("Holland")
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
 	player.technologies.add("flintlock")
@@ -531,22 +508,23 @@ def netherlands(player, provinces): # major power
 
 	player.military["artillery"] = 0
 	player.military["frigates"] = 2
-	player.midPOP["officers"]["number"] = 0
+	player.development_level = 1
+	player.numMidPOP = 1
 
 	player.POP = 7
-	player.freePOP = 5.4
-	player.numLowerPOP = 6.4
-	player.numMidPOP = 0.6
+	player.freePOP = 5.5
+	player.numLowerPOP = 6.5
+	player.numMidPOP = 0.5
 
 	player.provinces["Holland"] = provinces["Holland"]
-	player.provinces["Gelderland"] = provinces["Gelderland"]
+	#player.provinces["Gelderland"] = provinces["Gelderland"]
 	player.provinces["Wallonie"] = provinces["Wallonie"]
 
 	if type(player) == AI:
 		player.personality["Army"] = 1.2
 		player.personality["Navy"] = 0.9
 		player.improve_province_priority["shipyard"] = 99
-		player.personality["Offensive"] = 0.4
+		player.personality["Offensive"] = 0.35
 		player.resource_priority["spice"] = 2.2
 		player.sphere_targets = {"Denmark", "Portugal", "Switzerland", "Ottoman", "Persia", "China"}
 		#player.mid_class_priority["researchers"] += 0.1
@@ -554,7 +532,7 @@ def netherlands(player, provinces): # major power
 
 
 
-	player.objectives = {"Holland", "Gelderland", "Wallonie", "Rhineland", "Sumatra", "_Brunei",  \
+	player.objectives = {"Holland", "Wallonie", "Rhineland", "Sumatra", "_Brunei",  \
 	"_Sulawesi", "_Java", "Madres", "Bombay"}
 
 
@@ -576,21 +554,19 @@ def portugal(player, provinces): # old_minor
 		player.improve_province_priority["shipyard"] = 99
 
 
-	player.midPOP["researchers"]["number"] = 0.2
 
 	player.military["calvary"] = 1
 	player.military["frigates"] = 2
 
 	player.POP = 3.8
-	player.freePOP = 2.6
+	player.freePOP = 2.8
 	player.milPOP = 1.0
-	player.numLowerPOP = 3.6
-	player.numMidPOP = 0.2
-	player.colonization = 0
+	player.numLowerPOP = 3.8
+	player.colonization = 0.5
 
 	player.shipyard = 1
 
-	player.capital = "_Portugal"
+	player.capital.add("_Portugal")
 
 	player.borders.add("Spain")
 	player.provinces["_Portugal"] = provinces["_Portugal"]
@@ -624,7 +600,7 @@ def portugal(player, provinces): # old_minor
 
 def sweden(player, provinces): # adv minor
 	#Sweden
-	player.capital = "Ostlandet"
+	player.capital.add("Ostlandet")
 	player.culture = "Swedish"
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
@@ -634,12 +610,12 @@ def sweden(player, provinces): # adv minor
 	player.milPOP = 0.6
 	player.number_units = 3
 
-
-	player.midPOP["researchers"]["number"] = 0.2
-	player.numMidPOP = 0.2
+	player.development_level = 1
+	player.developments["research"] = 1
+	player.numMidPOP = 0.5
 	player.POP = 4.8
-	player.numLowerPOP = 4.6
-	player.freePOP = 4
+	player.numLowerPOP = 4.3
+	player.freePOP = 3.7
 
 	
 	player.provinces["Svealand"] = provinces["Svealand"]
@@ -666,7 +642,7 @@ def sweden(player, provinces): # adv minor
 def denmark(player, provinces): #adv minor
 	player.culture = "Danish"
 	player.technologies.add("pre_industry_2")
-	player.capital = "_Denmark"
+	player.capital.add("_Denmark")
 	player.technologies.add("flintlock")
 
 
@@ -677,7 +653,7 @@ def denmark(player, provinces): #adv minor
 def egypt(player, provinces): # Old minor
 	#Egypt
 	player.culture = "Arab"
-	player.capital = "UpperEgypt"
+	player.capital.add("UpperEgypt")
 	player.POP = 4.8
 	player.numLowerPOP = 4.8
 	player.freePOP = 4
@@ -694,7 +670,7 @@ def egypt(player, provinces): # Old minor
 
 def algeria(player, provinces): #old minor
 
-	player.capital = "Algiers"
+	player.capital.add("Algiers")
 	player.culture = "Arab"
 
 	player.provinces["Algiers"] = provinces["Algiers"]
@@ -704,31 +680,31 @@ def algeria(player, provinces): #old minor
 def morocco(player, provinces): # old minor
 	#Morocco
 	player.culture = "Arab"
-	player.capital = "_Morocco"
+	player.capital.add("_Morocco")
 	player.provinces["_Morocco"] = provinces["_Morocco"]
 	player.provinces["South_Morocco"] = provinces["South_Morocco"]
 
 
 def tunisia(player, provinces): #old minor
 	player.culture = "Arab"
-	player.capital = "Tunis"
+	player.capital.add("Tunis")
 	player.provinces["Tunis"] = provinces["Tunis"]
 
 def libya(player, provinces): #old minor
 	player.culture = "Arab"
-	player.capital = "_Libya"
+	player.capital.add("_Libya")
 	player.provinces["_Libya"] = provinces["_Libya"]
 
 def kazakhstan (player, provinces): #old minor
 	player.culture = "Kazak"
-	player.capital =  "WestKazakhstan"
+	player.capital.add("WestKazakhstan")
 	player.provinces["WestKazakhstan"] = provinces["WestKazakhstan"]
 	player.provinces["EastKazakhstan"] = provinces["EastKazakhstan"]
 
 
 def persia(player, provinces): # Old Empire
 	player.culture = "Persian"
-	player.capital = "Tehran"
+	player.capital.add("Tehran")
 
 	player.POP = 7
 	player.numLowerPOP = 7
@@ -746,6 +722,8 @@ def persia(player, provinces): # Old Empire
 	if type(player) == "AI":
 		player.personality["Navy"] = 0.3
 		player.sphere_targets = {"Afghanistan", "Nejd"}
+		player.personality["Offensive"] = 0.35
+
 
 	player.objectives = {"Khorasan", "Khuzestan", "Fars", "Isfahan", "Khorasan", "Iraq", "Syria", \
 	"_Afghanistan", "Caucasia", "Punjab", "UpperEgypt", "_Nejd"}
@@ -753,13 +731,13 @@ def persia(player, provinces): # Old Empire
 
 def nejd(player, provinces): #old minor
 	player.culture = "Arab"
-	player.capital = "_Nejd"
+	player.capital.add("_Nejd")
 	player.provinces["_Nejd"] = provinces["_Nejd"]
 
 
 def afghanistan(player, provinces):
 	player.culture = "Afghan"
-	player.capital = "_Afghanistan"
+	player.capital.add("_Afghanistan")
 	player.provinces["_Afghanistan"] = provinces["_Afghanistan"]
 	player.fortification = 1.1
 
@@ -767,14 +745,13 @@ def afghanistan(player, provinces):
 def india(player, provinces): # Old Empire
 
 	player.culture = "Indian"
-	player.capital = "Central_India"
+	player.capital.add("Central_India")
 	player.colonization = -3 
 	player.POP = 10
 	player.numLowerPOP = 10
 	player.freePOP = 9
 	player.numMidPOP = 0
 	player.research = -1.0
-	player.stability = - 1.0
 
 	player.sprawl = True
 
@@ -797,6 +774,10 @@ def india(player, provinces): # Old Empire
 		player.personality["Navy"] = 0.25
 		player.improve_province_priority["shipyard"] = 3
 		player.sphere_targets = {"Burma", "Cambodia"}
+		player.personality["Offensive"] = 0.3
+		player.build_factory_priority["clothing"] = 1.7
+
+
 
 
 	player.objectives = {"Punjab", "United_Provinces", "Rajputana", "Central_India", "Bombay", \
@@ -805,24 +786,24 @@ def india(player, provinces): # Old Empire
 
 def bengal(player, provinces):
 	player.culture = "Indian"
-	player.capital = "_Bengal"
+	player.capital.add("_Bengal")
 
 	player.provinces["_Bengal"] = provinces["_Bengal"]
 
 def hyderabad(player, provinces):
 	player.culture = "Indian"
-	player.capital = "_Hyderabad" 
+	player.capital.add("_Hyderabad") 
 	player.provinces["_Hyderabad"] = provinces["_Hyderabad"]
 	#Burma 
 def burma(player, provinces):
 	player.culture = "Bamar"
-	player.capital  = "_Burma"
+	player.capital.add("_Burma")
 	player.fortification = 1.1
 
 	player.provinces["_Burma"] = provinces["_Burma"]
 
 def siam(player, provinces): 
-	player.capital = "Bangkok"
+	player.capital.add("Bangkok")
 	player.culture = "Thai"
 
 
@@ -830,7 +811,7 @@ def siam(player, provinces):
 	player.provinces["Laos"] = provinces["Laos"]
 	
 def dai_nam(player, provinces):
-	player.capital = "North_Dai_Nam"
+	player.capital.add("North_Dai_Nam")
 	player.culture = "Vietnamese"
 
 	player.provinces["North_Dai_Nam"] = provinces["North_Dai_Nam"]
@@ -839,26 +820,26 @@ def dai_nam(player, provinces):
 
 def cambodia(player, provinces):
 	player.culture = "Cambodian"
-	player.capital = "_Cambodia" 
+	player.capital.add("_Cambodia") 
 	player.provinces["_Cambodia"] = provinces["_Cambodia"]
 
 	#Singapore
 	#Singapore = Province("Singapore", "rubber", 1.1, "Singapore")
 def brunei(player, provinces):
 	culture = "Brunei"
-	player.capital = "_Brunei" 
+	player.capital.add("_Brunei") 
 	player.provinces["_Brunei"] = provinces["_Brunei"]
 
 def java(player, provinces):
 	player.culture = "Javanese"
-	player.capital = "_Java"
+	player.capital.add("_Java")
 	player.provinces["_Java"] = provinces["_Java"]
 	player.resources["spice"] = 1
 
 
 def malaysia(player, provinces): 
 	player.culture = "Malaysian"
-	player.capital = "_Malaysia"
+	player.capital.add("_Malaysia")
 	
 	player.provinces["_Malaysia"] = provinces["_Malaysia"]
 	
@@ -870,7 +851,7 @@ def malaysia(player, provinces):
 
 def	sulawesi(player, provinces):
 	player.culture = "Sulawesi"
-	player.capital = "_Sulawesi"
+	player.capital.add("_Sulawesi")
 	player.provinces["_Sulawesi"] = provinces["_Sulawesi"]
 	player.resources["spice"] = 1
 
@@ -878,14 +859,14 @@ def	sulawesi(player, provinces):
 
 def philippines(player, provinces):
 	player.culture = "Filipino"
-	player.capital = "NorthPhilippines"
+	player.capital.add("NorthPhilippines")
 	
 	player.provinces["NorthPhilippines"] = provinces["NorthPhilippines"]
 	player.provinces["SouthPhilippines"] = provinces["SouthPhilippines"]
 
 
 def china(player, provinces):
-	player.capital = "Liaoning"
+	player.capital.add("Liaoning")
 	player.culture = "Chinese"
 
 	player.military["irregulars"] = 5
@@ -893,6 +874,7 @@ def china(player, provinces):
 	player.POP = 11.2
 	player.numLowerPOP = 11.2
 	player.freePOP = 10
+	player.research = -2
 
 	player.sprawl = True
 
@@ -929,7 +911,7 @@ def china(player, provinces):
 
 def korea(player, provinces):
 	player.culture = "Korean"
-	player.capital = "Pyongyang"
+	player.capital.add("Pyongyang")
 	
 	player.provinces["Pyongyang"] = provinces["Pyongyang"]
 	player.provinces["Sariwon"] = provinces["Sariwon"]
@@ -937,24 +919,28 @@ def korea(player, provinces):
 
 def japan(player, provinces): 
 
-	player.POP = 7.2
-	player.freePOP = 6
-	player.numLowerPOP = 7
+	player.POP = 7
+	player.freePOP = 6.1
+	player.numLowerPOP = 6.5
 	player.government = "absolute monarchy"
 
-	player.numMidPOP = 0.2
-	player.midPOP["researchers"]["number"] = 0.2
-	player.midPOP["officers"]["number"] = 0.2
+	player.numMidPOP = 0.5
+	player.milPOP = 0.4
+	
+	player.developments["military"] = 1
+	player.development_level = 1
 
 
 
 	player.military["irregulars"] = 2.0
 	player.military["infantry"] = 1.0
+	
+	player.infantry["attack"] += 0.25
 
 
 	player.resources["gold"] = 10
 
-	player.capital = "Kansai"
+	player.capital.add("Kansai")
 	
 	player.provinces["Kansai"] = provinces["Kansai"]
 	
@@ -971,6 +957,8 @@ def japan(player, provinces):
 		player.personality["Army"] = 1.5
 		player.personality["Navy"] = 1
 		player.improve_province_priority["shipyard"] = 65
+		player.personality["Offensive"] = 0.6
+
 
 
 	player.objectives = {"Kansai", "Tohoku", "Chugoku", "Kanto", "Kyushu", "Pyongyang", "Sariwon", \

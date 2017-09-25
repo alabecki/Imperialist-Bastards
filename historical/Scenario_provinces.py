@@ -20,18 +20,18 @@ def create_provinces():
 	Midlands.y = 5
 	provinces["Midlands"] = Midlands
 
-	Whales = Province("Whales", "England", "iron", 1.0,  "civilized", "English" )
+	Whales = Province("Whales", "England", "iron", 1.1,  "civilized", "English" )
 	Whales.x = 2
 	Whales.y = 4
 	provinces["Whales"] = Whales
 	
-	NorthEngland = Province("NorthEngland", "England", "coal", 1.1, "civilized", "English")
+	NorthEngland = Province("NorthEngland", "England", "coal", 1.2, "civilized", "English")
 	NorthEngland.x = 1
 	NorthEngland.y = 5
 	provinces["NorthEngland"] = NorthEngland
 
 
-	Scotland = Province("Scotland", "England", "coal", 1.0, "civilized", "Scottish")
+	Scotland = Province("Scotland", "England", "coal", 1.1, "civilized", "Scottish")
 	Scotland.x = 1
 	Scotland.y = 4
 	provinces["Scotland"] = Scotland
@@ -70,7 +70,7 @@ def create_provinces():
 	Alps.y = 6
 	provinces["Alps"] = Alps
 	
-	Normandy = Province("Normandy", "France", "food", 1.0, "civilized", "French")
+	Normandy = Province("Normandy", "France", "food", 1.2, "civilized", "French")
 	Normandy.x = 6
 	Normandy.y =5
 	provinces["Normandy"] = Normandy
@@ -104,7 +104,7 @@ def create_provinces():
 	WestPoland.ocean = False
 	provinces["WestPoland"] = WestPoland
 	
-	Saxony = Province("_Saxony", "Saxony", "coal", 1.1, "civilized", "German")
+	Saxony = Province("_Saxony", "Saxony", "coal", 1.2, "civilized", "German")
 	Saxony.x = 6
 	Saxony.y = 8
 	Saxony.ocean = False
@@ -122,13 +122,13 @@ def create_provinces():
 	provinces["_Bavaria"] = Bavaria
 
 
-	Bohemia = Province("Bohemia", "Austria", "iron", 1.25, "civilized", "Check")
+	Bohemia = Province("Bohemia", "Austria", "iron", 1.2, "civilized", "Check")
 	Bohemia.x = 7
 	Bohemia.y = 9
 	Bohemia.ocean = False
 	provinces["Bohemia"] = Bohemia
 
-	Slovakia  = Province("Slovakia", "Austria", "coal", 1.1, "civilized", "Slovakian")
+	Slovakia  = Province("Slovakia", "Austria", "coal", 1.2, "civilized", "Slovakian")
 	Slovakia.x = 7
 	Slovakia.y = 10
 	Slovakia.ocean = False
@@ -148,7 +148,7 @@ def create_provinces():
 	Hungary.ocean = False
 	provinces["Hungary"] = Hungary
 	
-	Romania = Province("Romania", "Ottoman", "oil", 0.75, "civilized", "Romanian")
+	Romania = Province("Romania", "Ottoman", "oil", 0.9, "civilized", "Romanian")
 	Romania.x = 8
 	Romania.y = 12
 	Romania.ocean = False
@@ -160,7 +160,7 @@ def create_provinces():
 	Croatia.y = 10
 	provinces["Croatia"] = Croatia
 
-	WestUkraine = Province("WestUkraine", "Austria", "food", 1.1, "civilized", "Ukrainian")
+	WestUkraine = Province("WestUkraine", "Austria", "food", 1.2, "civilized", "Ukrainian")
 	WestUkraine.x = 7
 	WestUkraine.y = 11
 	WestUkraine.ocean = False
@@ -185,7 +185,7 @@ def create_provinces():
 	Ukraine.ocean = False
 	provinces["Ukraine"] = Ukraine
 
-	Crimea  = Province("Crimea", "Russia", "coal", 1.1, "civilized", "Russian")
+	Crimea  = Province("Crimea", "Russia", "coal", 1.2, "civilized", "Russian")
 	Crimea.x = 6
 	Crimea.y =12  
 	provinces["Crimea"] = Crimea 
@@ -207,13 +207,13 @@ def create_provinces():
 	Galich.ocean = False
 	provinces["Galich"] = Galich
 	
-	Caucasia = Province("Caucasia", "Russia", "oil", 1.3, "civilized", "Russian")
+	Caucasia = Province("Caucasia", "Russia", "oil", 1.5, "civilized", "Russian")
 	Caucasia.x = 8
 	Caucasia.y = 15
 	Caucasia.ocean = False
 	provinces["Caucasia"] = Caucasia
 	
-	Tartaria = Province("Tartaria", "Russia", "food", 0.55, "civilized", "Russian")
+	Tartaria = Province("Tartaria", "Russia", "food", 0.6, "civilized", "Russian")
 	Tartaria.x = 9
 	Tartaria.y = 16
 	Tartaria.ocean = False
@@ -237,7 +237,7 @@ def create_provinces():
 	Perm.ocean = False
 	provinces["Perm"] = Perm
 
-	Ural = Province("Ural", "Russia", "iron", 1.25, "civilized", "Russian")
+	Ural = Province("Ural", "Russia", "iron", 1.3, "civilized", "Russian")
 	Ural.x = 8
 	Ural.y = 20
 	Ural.ocean = False
@@ -279,7 +279,7 @@ def create_provinces():
 	Finland.y = 11
 	provinces["Finland"] = Finland
 
-	Naples = Province("Naples", "Two Sicilies", "food", 1.1, "civilized", "Italian")
+	Naples = Province("Naples", "Two Sicilies", "food", 1.2, "civilized", "Italian")
 	Naples.x = 10
 	Naples.y = 8
 	provinces["Naples"] = Naples
@@ -295,7 +295,7 @@ def create_provinces():
 	Venezia.x = 8
 	Venezia.y = 8
 	provinces["Venezia"] = Venezia
-	Sicily = Province("Sicily",  "Two Sicilies", "coal", 1.0, "civilized", "Italian")
+	Sicily = Province("Sicily",  "Two Sicilies", "coal", 1.1, "civilized", "Italian")
 	Sicily.x = 11
 	Sicily.y = 7
 	provinces["Sicily"] = Sicily
@@ -326,7 +326,7 @@ def create_provinces():
 	Greece.x =11
 	Greece.y = 11
 	provinces["Greece"] = Greece
-	WestTurky = Province("WestTurky", "Ottoman", "iron", 1.0, "civilized", "Turkish")
+	WestTurky = Province("WestTurky", "Ottoman", "iron", 0.9, "civilized", "Turkish")
 	WestTurky.x = 10
 	WestTurky.y =13
 	provinces["WestTurky"] = WestTurky
@@ -344,7 +344,7 @@ def create_provinces():
 	Syria.x = 11
 	Syria.y = 14
 	provinces["Syria"] = Syria
-	Iraq = Province("Iraq", "Ottoman", "oil", 1.0, "old", "Arab")
+	Iraq = Province("Iraq", "Ottoman", "oil", 1.2, "old", "Arab")
 	Iraq.x = 12
 	Iraq.y = 14
 	Iraq.ocean = False
@@ -356,7 +356,7 @@ def create_provinces():
 	Andalusia.y = 5
 	provinces["Andalusia"] = Andalusia
 
-	Leon = Province("Leon", "Spain", "iron", 1.2, "civilized", "Spanish")
+	Leon = Province("Leon", "Spain", "iron", 1.0, "civilized", "Spanish")
 	Leon.x = 10
 	Leon.y = 4
 	Leon.ocean = False
@@ -378,15 +378,15 @@ def create_provinces():
 	provinces["La_Mancha"] = La_Mancha
 
 
-	Holland = Province("Holland", "Netherlands", "food", 1.2, "civilized", "Dutch")
+	Holland = Province("Holland", "Netherlands", "food", 1.3, "civilized", "Dutch")
 	Holland.x = 4
 	Holland.y = 7
 	provinces["Holland"] = Holland
-	Gelderland = Province("Gelderland", "Netherlands", "coal", 1.1, "civilized", "Dutch")
-	Gelderland.x = 5
-	Gelderland.y = 7
-	provinces["Gelderland"] = Gelderland
-	Wallonie = Province("Wallonie", "Netherlands", "iron", 1.1, "civilized", "Dutch")
+	#Gelderland = Province("Gelderland", "Netherlands", "coal", 1.2, "civilized", "Dutch")
+	#Gelderland.x = 5
+	#Gelderland.y = 7
+	#provinces["Gelderland"] = Gelderland
+	Wallonie = Province("Wallonie", "Netherlands", "iron", 1.0, "civilized", "Dutch")
 	Wallonie.x = 5
 	Wallonie.y = 6
 	Wallonie.ocean = False
@@ -398,7 +398,7 @@ def create_provinces():
 	Portugal.y = 4
 	provinces["_Portugal"] = Portugal
 
-	Svealand = Province("Svealand", "Sweden", "iron", 1.6, "civilized", "Swedish")
+	Svealand = Province("Svealand", "Sweden", "iron", 1.5, "civilized", "Swedish")
 	Svealand.x = 2
 	Svealand.y = 10
 	provinces["Svealand"] = Svealand
@@ -425,7 +425,7 @@ def create_provinces():
 	UpperEgypt.x = 13
 	UpperEgypt.y = 13
 	provinces["UpperEgypt"] = UpperEgypt
-	MiddleEgypt = Province("MiddleEgypt", "Egypt", "food", 1.0, "old", "Arab")
+	MiddleEgypt = Province("MiddleEgypt", "Egypt", "food", 1.1, "old", "Arab")
 	MiddleEgypt.x = 14
 	MiddleEgypt.y = 13
 	MiddleEgypt.ocean = False
@@ -465,7 +465,7 @@ def create_provinces():
 	provinces["Tunis"] = Tunis
 
 
-	Libya = Province("_Libya", "Libya", "food", 0.8, "old", "Arab")
+	Libya = Province("_Libya", "Libya", "oil", 0.9, "old", "Arab")
 	Libya.x = 13
 	Libya.y = 12
 	provinces["_Libya"] = Libya
@@ -482,11 +482,11 @@ def create_provinces():
 	EastKazakhstan.ocean = False 
 	provinces["EastKazakhstan"] = EastKazakhstan
 
-	Khuzestan = Province("Khuzestan", "Persia", "oil", 1.0, "old", "Persian")
+	Khuzestan = Province("Khuzestan", "Persia", "oil", 1.2, "old", "Persian")
 	Khuzestan.x = 12
 	Khuzestan.y = 15
 	provinces["Khuzestan"] = Khuzestan
-	Fars = Province("Fars", "Persia", "food", 1.0, "old", "Persian")
+	Fars = Province("Fars", "Persia", "food", 1.1, "old", "Persian")
 	Fars.x = 11
 	Fars.y = 15
 	provinces["Fars"] = Fars
@@ -495,17 +495,17 @@ def create_provinces():
 	Tehran.y = 16
 	Tehran.ocean = False
 	provinces["Tehran"] = Tehran
-	Isfahan = Province("Isfahan", "Persia", "iron", 1.0, "old",  "Persian")
+	Isfahan = Province("Isfahan", "Persia", "iron", 0.9, "old",  "Persian")
 	Isfahan.x = 11
 	Isfahan.y = 15
 	provinces["Isfahan"] = Isfahan
-	Khorasan = Province("Khorasan", "Persia", "coal", 0.9, "old", "Persian")
+	Khorasan = Province("Khorasan", "Persia", "coal", 1.0, "old", "Persian")
 	Khorasan.x = 11
 	Khorasan.y = 16	
 	Khorasan.ocean = False
 	provinces["Khorasan"] = Khorasan
 
-	Nejd = Province("_Nejd", "Nejd", "oil", 1.1, "old", "Arab")
+	Nejd = Province("_Nejd", "Nejd", "oil", 1.4, "old", "Arab")
 	Nejd.x = 13
 	Nejd.y = 14
 	provinces["_Nejd"] = Nejd
@@ -575,7 +575,7 @@ def create_provinces():
 	Laos.ocean = False
 	provinces["Laos"] = Laos
 
-	North_Dai_Nam = Province("North_Dai_Nam", "Dai Nam", "food", 1.2, "old",  "Vietnamese")
+	North_Dai_Nam = Province("North_Dai_Nam", "Dai Nam", "food", 1.3, "old",  "Vietnamese")
 	North_Dai_Nam.x = 10
 	North_Dai_Nam.y = 23
 	provinces["North_Dai_Nam"] = North_Dai_Nam
@@ -628,7 +628,7 @@ def create_provinces():
 	provinces["SouthPhilippines"] = SouthPhilippines
 
 
-	Manchuria = Province("Manchuria", "China", "coal", 1.0, "old", "Manchurian")
+	Manchuria = Province("Manchuria", "China", "coal", 1.2, "old", "Manchurian")
 	Manchuria.x = 6
 	Manchuria.y = 26
 	provinces["Manchuria"] = Manchuria
@@ -655,7 +655,7 @@ def create_provinces():
 	Mongolia.ocean = False
 	provinces["Mongolia"] = Mongolia
 
-	Jiangsu = Province("Jiangsu", "China", "food", 1.2, "old", "Chinese")
+	Jiangsu = Province("Jiangsu", "China", "food", 1.3, "old", "Chinese")
 	Jiangsu.x = 7
 	Jiangsu.y = 24
 	provinces["Jiangsu"] = Jiangsu
