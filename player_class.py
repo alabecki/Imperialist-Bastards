@@ -112,7 +112,7 @@ class Player(object):
 			"oil": 0.0,
 			"/": 0.0,
 			"//": 0.0,
-			"///": 0.0
+			#"///": 0.0
 		}
 
 		self.goods = {
@@ -444,7 +444,6 @@ class Player(object):
 
 		for k, v in check_list.items():
 			if k == "spice":
-				print("Spice need: %s" % (v))
 				if self.resources["spice"] < v:
 					return False
 			else:
@@ -461,6 +460,7 @@ class Player(object):
 		if self.freePOP < 0.5 and self.proPOP < 2:
 			return False
 		return True
+
 
 
 	def collect_resources(self, market):
@@ -545,9 +545,10 @@ class Player(object):
 
 
 	def collect_goods(self):
-		#print("%s collects: " % (self.name))
+
+		print("%s collects: " % (self.name))
 		for k, p in self.goods_produced.items():
-			#print("%s: %s " % (k, p))
+			print("%s: %s " % (k, p))
 			self.goods[k] += p
 		
 		for k, v in self.military_produced.items():

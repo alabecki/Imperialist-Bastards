@@ -12,7 +12,7 @@ pro_input = {
 	"4": "paper",
 	"5": "furniture",
 	"6": "chemicals",
-	"7": "gears",
+	"7": "gear",
 	"8": "telephone",
 	"9": "radio",
 	"10": "auto",
@@ -75,45 +75,52 @@ class Human(Player):
 		requirement = self.determine_middle_class_need()
 		check = self.check_mid_requirement(requirement)
 		if check == False:
-			print("You cannot increase your middle class at this time")
-			print("To increase your middle class you need 1 splce plus:")
+			print("You cannot increase your development level at this time")
+			print("To increase your middle class you need:")
 			for r in requirement:
 				print(r)
 			return
 		else:
-			#allow = False
-			least_mid = 100
-			for m, mid in self.midPOP.items():
-				if self.midPOP[m]["number"] < least_mid:
-					least_mid = self.midPOP[m]["number"]
-			least_mid = max(0.2, least_mid)
-			m_options = []
-			for m, mid in self.midPOP.items():
-				if self.midPOP[m]["number"] >= 2:
+
+			least_dev = 100
+			for d, dev in self.developments.items():
+				if self.developments[d] < least_dev:
+					least_dev = self.developments[d]
+			least_dev = max(1, least_dev)
+			d_options = []
+			for d, dev in self.developments.items():
+				if self.developments[d] > 4:
 					continue
-				if self.midPOP[m]["number"] < least_mid * 2:
-					m_options.append(m)
+				if self.developments[d] < least_dev * 2:
+					d_options.append(d)
+			
+
 			_type = ""
-			while _type not in m_options:
-				print("What kind of middle class POP would you like to create?")
-				for mo in m_options:
-					print(mo, end = "  ")
+			while _type not in d_options:
+				print("In what area do you seek development?")
+				for do in d_options:
+					print(do)
 				_type = input()
 
-			self.resources["spice"] -= 1
-			for r in requirement:
-				self.goods[r] -= 1
-				print("Spends 1 %s" % (r))
-			self.numLowerPOP -= 0.20
-			self.numMidPOP += 0.20
-			self.midPOP[_type]["number"] += 0.20
-			self.freePOP -= 0.20
-			self.new_development += 0.5
-			if _type == "officers":
-				self.milPOP -= 0.2
-				self.freePOP +=  0.2
-				self.choose_doctrine()
-			print("You now have %s %s" % (self.midPOP[_type]["number"], _type))
+		requirement = self.determine_middle_class_need()
+		for r in requirement:
+			if r == "spice":
+				self.resources["spice"] -= 1
+			else:
+				self.goods[r] -= 1.0
+		self.numLowerPOP -= 0.5
+		self.numMidPOP += 0.5
+		self.development_level += 1
+		#self.midPOP[m_selection]["number"] += 0.2
+		self.developments[_type] += 1
+		self.freePOP -= 0.5
+		if _type == "management" or _type == "government": 
+			self.new_development += 1
+		if _type == "military":
+			self.milPOP -= 0.4
+			self.freePOP +=  0.4
+			self.choose_doctrine()
+			print("Your %s level is now %s" % (_type, self.developments[_type]))
 
 	def choose_doctrine(self):
 		print("Which military doctrine would you like to choose?")
@@ -161,7 +168,7 @@ class Human(Player):
 			options = []
 			for k, t in technology_dict.items():
 				if k not in self.technologies and t["requirement"] <= self.technologies \
-				and self.research >= t["cost"] and self.numMidPOP >= t["min_mid"]:
+				and self.research >= t["cost"] and self.development_level >= t["min_mid"]:
 					print(k, t)
 					options.append(k)
 			if len(options) == 0:
@@ -808,6 +815,7 @@ class Human(Player):
 			_type = input("1: parts,  2: cannons, 3: clothing, 4: paper, 5: furniture \n")
 		
 		_type = pro_input[_type]
+		print("Type after conversion: %s" % (_type))
 		for i in craft[_type]:
 			if i in self.resources.keys():
 				if(craft[_type][i] > self.resources[i]):
@@ -816,10 +824,13 @@ class Human(Player):
 		else:
 			for i in craft[_type]:
 				self.resources[i] -= craft[_type][i]
+
 			self.goods_produced[_type] += 1.0
 			self.AP -= 1
 			#self.new_development -= 0.05
 			print("The  %s will be ready next turn \n" % (_type))
+			for k, p in self.goods_produced.items():
+				print("%s: %s " % (k, p))
 			return
 
 
@@ -854,7 +865,7 @@ class Human(Player):
 			print("7: gears, 8: telephones, 9: radio, 10: auto, 11: fighter, 12: tank")
 			_type = input()
 		
-
+		_type = pro_input[_type]
 		if self.factories[_type]["number"] == 0:
 			print("You do not have a %s factory \n" % (_type))
 			return
@@ -864,7 +875,7 @@ class Human(Player):
 			stab_rounds = round(self.stability* 2) / 2
 			stab_mod = stability_map[stab_rounds]
 			max_amount = self.factories[_type]["number"] * stab_mod * self.factory_throughput
-			material_mod = 1 - (self.midPOP["managers"]["number"] / 4)
+			material_mod = 1 -  (self.developments["management"]/10)
 			max_amount = max_amount/(material_mod + 0.0001)
 			amount = input("How many %s do you want to produce? (max: %s) \n" % (_type, max_amount))
 			amount = int(amount)

@@ -31,7 +31,7 @@ information = [
 
 manage_pops = {
 	"1": "Increase Population",
-	"2": "Increase Middle Class",
+	"2": "Human Development",
 	"3": "Assign POPs",
 	"4": "Use Spice for Happiness"
 }

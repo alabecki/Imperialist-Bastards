@@ -207,7 +207,7 @@ def calculate_oil_def(p):
 
 
 def distribute_losses(player, losses, num_units):
-	while(losses > 0.5 and num_units >= 0.5):
+	while(losses >= 0.5 and num_units >= 0.5):
 		#print("Losses %s , num_units %s \n" % (losses, num_units))
 		if(player.military["irregulars"] >= 0.5):
 			player.military["irregulars"] -= 0.5
@@ -490,13 +490,14 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 	
 			for k, v in market.market.items():
 				for i in v:
-					if i.owner == p2:
+					if i.owner == p2.name:
 						if k in p1.resources.keys():
 							p1.resources[k] += 1
 						if k in p1.goods.keys():
 							p1.goods[k] +=1
 						market.market[k].remove(i)
 						del i
+			pause = input()
 			relkeys = list(relations.keys())
 			for r in relkeys:
 				if p2.name in relations[r].relata:
@@ -693,6 +694,7 @@ def gain_province(p1, p2, prov, players, market, relations):
 					market.market[k].remove(i)
 					print("removed %s %s"% (i.owner, i.kind))
 					del i
+		pause = input()
 		relkeys = list(relations.keys())
 		for r in relkeys:
 			if p2.name in relations[r].relata:

@@ -39,20 +39,20 @@ from BalanceScenario.Scenario import*
 run = True
 while True:
 
-	print("########################################################################################################### \n")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n")
-	print( "_____________________________Welcome to Imperialist Bastards!_______________________________________________ \n")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n")
-	print("########################################################################################################### \n")
-	print(" _____________________________________ Main Menu ___________________________________________ \n")
+	print("####################################################################################################### ")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+	print( "____________________________ Welcome to Imperialist Bastards! ________________________________________ ")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ")
+	print("######################################################################################################## ")
+	print(" _____________________________________ Main Menu ______________________________________________________ ")
 	print("\n")
-	print("______________________________Please select one of the following: ______________________________\n")
-	print("---------------------------------- Start a Random Game ---(N) --------------------------------------	 \n")
-	print("----------------------------- Start a Scenario (S)--------------------------------     \n")
-	print("---------------------------------- Load a Saved Game --(L) --------------------------------------     \n")
-	print("------------------------------------- Options ---------(O) --------------------------------------     \n ")
-	print("--------------------------------------- Exit ----------(E) --------------------------------------     \n" )
-	print("______________________________________________________________________________________________ \n")
+	print("_____________________________ Please select one of the following: _____________________________________")
+	print("------------------------ --------- Start a Random Game (N) --------------------------------------------")
+	print("------------------------------------ Start a Scenario (S)---------------------------------------------- ")
+	print("------------------------------------ Load a Saved Game --(L) ------------------------------------------ "    )
+	print("-------------------------------------- Options ---------(O) ------------------------------------------- ")
+	print("---------------------------------------- Exit ----------(E) ------------------------------------------- " )
+	print("_______________________________________________________________________________________________________")
 
 	initial = dict()
 	selection = " "
@@ -156,6 +156,11 @@ while True:
 		order = list(players.keys())
 		print("order len %s" % (len(order)))
 		shuffle(order)
+		for k, v in market.market.items():
+			for i in v:
+				if i.owner not in players.keys():
+					market.market[k].remove(i)
+					del i
 		for o in order:
 			if o not in players.keys():
 				continue
@@ -163,6 +168,7 @@ while True:
 				AI_turn(players, players[o], market, relations, provinces)
 			else:
 				player = players[o]
+
 	
 
 		#for player in players.values():
@@ -170,8 +176,9 @@ while True:
 		#		AI_turn(players, player, market, turn)
 		#	if type(player) == Human:
 
-		#		for k, v in player.goods_produced.items():
-		#			v = 0
+				for k in player.goods_produced.keys():
+					player.goods_produced[k] = 0
+
 
 				print("############################################################################################################### \n ")
 				print("%s, it is your turn to exploit the globe for the greatness of your nation! \n" % (player.name))
@@ -179,20 +186,24 @@ while True:
 					print(" ######################################################################################################## \n")
 					
 
-					for k in player.goods_produced.keys():
-						player.goods_produced[k] = 0
+					#count = 1
+					#if count > 1:
+				#		for k in player.goods_produced.keys():
+				#			player.goods_produced[k] = 0
+				#	count +=1
 					print("Turn: %s" %(market.turn))
 					player.calculate_access_to_goods(market)
 					print("%s, what is your imperial decree? \n" % (player.name))
 					print("AP: %s    " % (player.AP))
 					for i in commands:
 						print(i)
+					print("help: (h)")
 				
 					#for key, value in commands.items():
 					#	print(key, value)
 					command = ""
 					#while (command not in commands.keys()):
-					while command not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
+					while command not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "h"]:
 						command = input()
 					if command == "1":
 						print("What would you like to know? ################################################################################\n")
@@ -253,12 +264,14 @@ while True:
 						if info_command == "3":
 							print("\n")
 							print(" Population Overview: ####################################################################################### \n")
-							print(" Total Population: %.2f 	    Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Middle Class Pops: %.2f \n" % \
-							(player.POP, player.freePOP, player.numLowerPOP, player.numMidPOP))
+							print(" Total Population: %.2f 	    Unassigned Pops: %.2f 	Lower Class Pops: %.2f 	Development Level: %.2f \n" % \
+							(player.POP, player.freePOP, player.numLowerPOP, player.development_level))
 							print(" Urban Worker Pops: %.2f 	Military Pops: %.2f \n" % (player.proPOP, player.milPOP))
-							print(" Middle Class POPs:")
-							for k, v in player.midPOP.items():
-								print(" %-12s: %-12.2f"  % (k, v["number"]))
+							print("Development Levels")
+							for d, dev in player.developments.items():
+								print("%-12s: %-12.2f" % (d, dev))
+							#for k, v in player.midPOP.items():
+							#	print(" %-12s: %-12.2f"  % (k, v["number"]))
 						if info_command == "4" :
 							print("\n")
 							print(" Military Overview: ################################################################################################")
@@ -336,8 +349,10 @@ while True:
 									print("Name: %-16s 	Resource: %-10s 	Development Level: %s 	Worked?: %s 	Quality: %s   Culture: %s \n" % \
 									(province.name, province.resource, province.development_level, province.worked, province.quality, province.culture))
 								print("Population Overview: ######################################################################################### \n")
-								for k, v in nation.midPOP.items():
-									print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
+								#for k, v in nation.midPOP.items():
+								#	print("%s: %.2f, priority: %.2f \n"  % (k, v["number"], v["priority"]))
+								for d, dev in nation.developments.items():
+									print("%s: %.2f" % (d, dev))
 								print("Military Overview: ################################################################################################ \n")
 								print("Infantry -   Num: %.2f   Att: %.2f   Def: %.2f   Man: %s" %  \
 								(nation.military["infantry"], nation.infantry["attack"], nation.infantry["defend"], nation.infantry["manouver"]))
@@ -383,57 +398,57 @@ while True:
 										count += 1
 									print("\n")
 									
-									print(" Top 10 Nations by Middle Class:")
+									print(" Top 10 Nations by Development Level:")
 									count = 1
-									middle = sorted(player_list, key=lambda x: x.numMidPOP, reverse = True)
+									middle = sorted(player_list, key=lambda x: x.development_level, reverse = True)
 									middle = middle[:10]
 									for m in middle:
-										print(" %-2s. %-16s: %.2f" % (count, m.name, m.numMidPOP))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.development_level))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Researchers:")
+									print(" Top 10 Nations by Research:")
 									count = 1
-									research = sorted(player_list, key=lambda x: x.midPOP["researchers"]["number"], reverse = True)
+									research = sorted(player_list, key=lambda x: x.developments["research"], reverse = True)
 									research = research[:10]
 									for r in research:
-										print(" %-2s. %-16s: %.2f" % (count, r.name, r.midPOP["researchers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, r.name, r.developments["research"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Officers:")
+									print(" Top 10 Nations by Military:")
 									count = 1
-									officer = sorted(player_list, key=lambda x: x.midPOP["officers"]["number"], reverse = True)
+									officer = sorted(player_list, key=lambda x: x.developments["military"], reverse = True)
 									officer = officer[:10]
 									for o in officer:
-										print(" %-2s. %-16s: %.2f" % (count, o.name, o.midPOP["officers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, o.name, o.developments["military"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Artists:")
+									print(" Top 10 Nations by Culture:")
 									count = 1
-									art = sorted(player_list, key=lambda x: x.midPOP["artists"]["number"], reverse = True)
+									art = sorted(player_list, key=lambda x: x.developments["culture"], reverse = True)
 									art = art[:10]
 									for a in art:
-										print(" %-2s. %-16s: %.2f" % (count, a.name, a.midPOP["artists"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, a.name, a.developments["culture"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Bureaucrats:")
+									print(" Top 10 Nations by Government:")
 									count = 1
-									gov = sorted(player_list, key=lambda x: x.midPOP["bureaucrats"]["number"], reverse = True)
+									gov = sorted(player_list, key=lambda x: x.developments["government"], reverse = True)
 									gov = gov[:10]
 									for g in gov:
-										print(" %-2s. %-16s: %.2f" % (count, g.name, g.midPOP["bureaucrats"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, g.name, g.developments["government"]))
 										count += 1
 									print("\n")
 
-									print(" Top 10 Nations by Managers")
+									print(" Top 10 Nations by Management")
 									count = 1
-									man = sorted(player_list, key=lambda x: x.midPOP["managers"]["number"], reverse = True)
+									man = sorted(player_list, key=lambda x: x.developments["management"], reverse = True)
 									man = man[:10]
 									for m in man:
-										print(" %-2s. %-16s: %.2f" % (count, m.name, m.midPOP["managers"]["number"]))
+										print(" %-2s. %-16s: %.2f" % (count, m.name, m.developments["management"]))
 										count += 1
 									print("\n")
 
@@ -851,7 +866,7 @@ while True:
 										navy_strength[p] = strength
 									navy_strength = sorted(navy_strength.items(), key= operator.itemgetter(1), reverse = True)
 									for ns in navy_strength:
-										print(" %-2s. %-12s %-2.2f" % (count, dst[0], dst[1]))
+										print(" %-2s. %-12s %-2.2f" % (count, ns[0], ns[1]))
 										count += 1
 									print("\n")
 
@@ -984,18 +999,14 @@ while True:
 										if v.resource == "food":
 											num_farms += 1
 									print("You have %s farming provinces and %s chemicals \n" % (num_farms, player.goods["chemicals"]))
-									amount = input("How many farms would you like to improve? \n")
+									_max = min(num_farms, player.goods["chemicals"])
+									amount = input("How much food would you like to produce? (max: %s)\n" % (_max) )
+
 									amount = int(amount)
-									if(amount > num_farms or amount > player.goods["chemicals"]):
+									if(amount > _max):
 										print("What is wrong with you anyway? \n")
 									else:
-										while amount > 0:
-											for k, v in player.provinces.items():
-												if v.resource == "food":
-													v.quality += 0.1
-													player.goods["chemicals"] -= 1
-													print("%s now has a quality rating of: %s \n" % (v.name, v.quality))
-													amount -= 1
+										self.resources["food"] += amount
 							if chem == "3":
 								if "synthetic_rubber" not in player.technologies:
 									print ("You need the synthetic rubber technology to do this")
@@ -1335,7 +1346,7 @@ while True:
 										relata = frozenset([player.name, other.name])
 										relations[relata].relationship -= 0.25
 										player.diplo_action -= 1
-										print("%s is no longer able to purchse your resources or goods on the world market" % (other.name))
+										print("%s is no longer able to purchase your resources or goods on the world market" % (other.name))
 								if dec == "2":
 									for k, v in players.items():
 										if player in v.embargo:
@@ -1400,6 +1411,87 @@ while True:
 						#save_game(auto_name, players, relations, uncivilized_minors, market, provinces)
 						_continue = False
 						break
+
+					if command == "h":
+						print("\n")
+						_help = ""
+						while _help not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "r"]:
+							print("On what command would you like information?")
+							for c in commands:
+								print(c)
+							print("Return: (r)")
+							_help = input()
+
+						if _help == "1":
+							print("\n")
+							print("Selecting 'Get Information on...' will provide you with a number of options,")
+							print("each one providing a category of information on the state of your Empire or the")
+							print("state of the Globe")
+						if _help == "2":
+							print("\n")
+							print("Selecting 'Manage POPs' will take you to a few options on managing your Empire's")
+							print("population. These include: increasing your population, human development, assigning")
+							print("population to gather resources from your provinces or produce goods and giving your")
+							print("thankless people spice to keep them happy.")
+						if _help == "3":
+							print("\n")
+
+							print("Selecting 'Manufacture Goods' will take you to three manufacturing options")
+							print("The first it to manufacture goods the old fashioned way, with artisans (not efficient.")
+							print("The second is to manufacture goods like civilized people, in a factory.")
+							print("The third allows you to convert chemicals into other resources that you may need.")
+						if _help == "4":
+							print("\n")
+							print("Selecting 'Build' takes you to some options on building Empire improvements")
+							print("These include, developing provinces (for better resource output),")
+							print("building or upgrading factories (for mass production of finished goods),")
+							print("improving your fortification (for improved defense strength),")
+							print("building/upgrading your shipyard (for producing the most modern ships),")
+							print("building military units (for exploiting the globe and keeping the other powers in line),")
+							print("and disbanding outdated units.")
+						if _help == "5":
+							print("\n")
+							print("Selecting 'Military Action' will take you to one of two options")
+							print("The first is to fight a 'minor' war for a single province")
+							print("A cause of war (casus belli) is required to wage a minor war (see Diplomacy)")
+							print("The second is to fight a 'Total' war to conquer all the core provinces")
+							print("of one of the Major powers.")
+							print("Total war be declared on any Major power if you have at least 4 fighters and")
+							print("4 tank units (end game).")
+						if _help == "6":
+							print("\n")
+							print("Selecting 'Diplomatic Actions' presents a number of diplomatic actions")
+							print("These include improving and damaging relations with other nations,")
+							print("gaining a casus belli on an other nation, sabotaging relations between other nations,")
+							print("destabilizing other nations, and placing trade embargoes on other nations.")
+						if _help == "7":
+							print("\n")
+
+							print("Selecting 'Research Technology' will present you with a list of all (if any)")
+							print("technologies you can presently research.")
+						if _help == "8":
+							print("\n")
+
+							print("Selecting 'Trade' will present you with the option to either buy goods")
+							print("and resources from the market or place goods and resources onto the market")
+						if _help == "9":
+							print("\n")
+							print("Selecting 'Culture' will present you with various options for spending")
+							print("your culture points.")
+						if _help == "10":
+							print("\n")
+
+							print("I am going to let you figure this one out on your own.")
+						if _help == "11":
+							print("\n")
+ 
+							print("You will be asked if you wish to make a new save.")
+							print("If 'yes', you will be prompted to provide a name for the save file.")
+							print("If 'no', your current save file will be used to save the game.")
+						if _help == "12":
+							print("\n")
+
+							print("Do you really need 'End Game' explained to you?")
 		gc.collect()
 		
 		if AUTO_SAVE == True:

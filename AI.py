@@ -362,7 +362,6 @@ class AI(Player):
 		if check == False:
 			print("Cannot increase middle class at this time (tried)")
 			return
-		print("SHould increase middle calss")
 		if self.freePOP < 0.5:
 			self.proPOP -= 1
 			self.freePOP +1
@@ -1179,7 +1178,7 @@ class AI(Player):
 				if other.developments["culture"] > 0:
 					pr.relationship += other.developments["culture"]/8
 
-
+		print("Are we still there?")
 		p_relations.sort(key=lambda x: x.relationship, reverse=True)
 		#print("P_relations:_____________________________________________________________________________")
 		#for pr in p_relations:
@@ -1191,7 +1190,7 @@ class AI(Player):
 		#print("STOCK_____________")
 		#for s in stock:
 		#	print(s.owner)
-		#print("Stock amount %s" % (len(stock)))
+		print("Stock amount %s" % (len(stock)))
 		if len(stock) < 1:
 			return "fail"
 		#while self.resources["gold"] > price and amount >= 1 and self.supply[kind] >= 1:
@@ -1227,7 +1226,7 @@ class AI(Player):
 					self.supply[kind] -= 1
 					price = market.buy_price(kind, self.supply[kind])
 					if amount < 1:
-						return "sucess"
+						return "success"
 					if self.supply[kind] < 1:
 						return "fail"
 					
@@ -1427,9 +1426,13 @@ class AI(Player):
 					return
 				if len(market.market[p]) < 20:
 					cap = self.calculate_how_much_can_produce(p)
+					if cap > 3 and (p == "tank" or p == "fighter"):
+						self.ai_factory_production(p)
 					if cap < 4:
 						self.supply_factory_with_material(p, market, relations, players)
 						cap = self.calculate_how_much_can_produce(p)
+						if cap > 3 and (p == "tank" or p == "fighter"):
+							self.ai_factory_production(p)
 						if cap < 4:
 							continue
 						else:

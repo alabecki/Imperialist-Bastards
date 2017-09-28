@@ -19,7 +19,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	if player.type == "old_empire" or player.type =="old_minor":
 		return
 	if player.colonization < 1 + player.num_colonies * 1.5 or player.diplo_action < 1 or transport_limit < 4 or \
-	player.midPOP["bureaucrats"]["number"] < 0.4:
+	player.developments["government"] < 1:
 		return
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	priorities = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True) 
@@ -35,7 +35,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	p_options = set()
 	for k, unciv in uncivilized_minors.items():
 		if unciv.harsh == True and ("medicine" not in player.technologies or "breach_loaded_arms" not in player.technologies) \
-		or player.midPOP["bureaucrats"]["number"] < 0.6:
+		or player.developments["government"] < 2:
 			continue
 		if len(unciv.provinces) >= 1:
 			#print(unciv.name)
@@ -230,7 +230,7 @@ def total_war(player, target, players, market, relations):
 
 				
 def try_total_war(player,players, market, relations,provinces):
-	#print("Are you even trying?")
+	print("Are you even trying?")
 	self_strength = player.calculate_base_attack_strength()
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	self_navy_str = player.calculate_naval_strength()
@@ -241,30 +241,25 @@ def try_total_war(player,players, market, relations,provinces):
 		
 	
 			if(size >= 6):
+				print("Player with more than 5 provs: %s" % (pl.name))
 				other_strength = pl.calculate_base_defense_strength()
+				print("%s Strength: %s" % (pl.name, other_strength))
 				other_naval_strength = pl.calculate_naval_strength()
+				print("%s Naval Str: %s" % (pl.name, other_naval_strength))
 				self_naval_projection_strength = player.ai_naval_projection(pl)
-				print("Naval Strength Projection: %s ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" % (self_naval_projection_strength))
+				print("Sekf Naval Strength Projection: %s" % (self_naval_projection_strength))
 
 			
 				if pl.name in player.borders and self_strength > (other_strength * 1.2) and relations[frozenset({player.name, pl.name})].relationship < 2:
 					options.append(pl)
+					print("Border - Add %s" % (pl.name))
 				if self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 8 and relations[frozenset({player.name, pl.name})].relationship < 2:
 					options.append(pl)
+					print("Naval - Add %s" % (pl.name))
 						
 	if len(options) < 1:
 		print("No options?")
 		return
-
-	ammo_needed	= player.calculate_army_ammo_needed()
-	if player.goods["cannons"] < (ammo_needed + 2):
-		return
-
-	oil_needed = player.calculate_army_oil_needed()
-
-	if player.resources["oil"] < (oil_needed + 2):
-		return
-	player.ai_buy("oil", 6, market, relations, players)
 
 	target = choice(options)
 
@@ -507,23 +502,32 @@ def ai_select_ground_forces(player, target):
 def attack_target(player, players, relations, provinces, market):
 	print("AAAAAAAAAAAAAAAAAAAATACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-	if player.colonization < player.num_colonies * 1.5:
-		return
-	ammo_needed	= player.calculate_army_ammo_needed()
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
+	ammo_needed	= player.calculate_army_ammo_needed()
 
-	if player.goods["cannons"] < ammo_needed * 2:
+	if player.goods["cannons"] < (ammo_needed * 2):
+		player.ai_buy("oil", 6, market, relations, players)
+
+	if player.goods["cannons"] < (ammo_needed * 2):
+		print("Not enough ammo")
 		return
 
 	oil_needed = player.calculate_army_oil_needed()
 
-	if player.resources["oil"] < oil_needed * 2:
+	if player.resources["oil"] < (oil_needed * 2):
+		print("Not enough oil")
+		player.ai_buy("oil", 6, market, relations, players)
+
+	if player.resources["oil"] < (oil_needed * 2):
+		print("Not enough oil")
 		return
+
 
 	if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
 		try_total_war(player, players, market, relations, provinces)
 		return
-
+	if player.colonization < player.num_colonies * 1.5:
+		return
 
 	if player.colonization < player.num_colonies * 1.5:
 		return
