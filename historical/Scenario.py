@@ -6,6 +6,8 @@ from start import*
 from historical.ScenarioNations import*
 
 from random import*
+from appJar import gui
+
 
 
 def get_name_from_major_choice(choice):
@@ -66,6 +68,8 @@ def historical():
 	#"Congo", "Madagascar"] 
 
 	print("How many nations are to be controlled by human players? \n")
+	
+	
 	num_humans = input()
 	num_humans = int(num_humans)
 	human_choices = []
@@ -151,11 +155,9 @@ def historical():
 	i = num_humans
 	for m in modern_major:
 		if m not in human_choices:
-			print("Human Choices %s" % (human_choices))
 			new = AI(m, "major", i)
 			players[m] = new
 			player = players[m]
-			print("Initialize %s" % (m))
 			initialize_major_power(player)
 			if player.name == "England":
 				england(player, provinces)

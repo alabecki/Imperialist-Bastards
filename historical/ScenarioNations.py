@@ -206,9 +206,6 @@ def austria(player, provinces):
 	
 	player.colonization = 0
 
-	player.number_units = 4
-	player.freePOP = 6.8
-	player.milPOP = 0.8
 
 	player.shipyard = 0
 	player.stability = 1.5
@@ -253,16 +250,16 @@ def russia(player, provinces):
 	player.military["irregulars"] = 1
 	player.colonization = -1 
 
-	player.numMidPOP = 0
-	player.development_level = 0
-	player.developments["research"] = 0
+	player.numMidPOP = 0.5
+	player.development_level = 1
+	player.developments["research"] = 1
 
 	player.diplo_action = 0
 
 	player.POP = 10
 	#player.numMidPOP = 0.2
-	player.numLowerPOP = 10
-	player.freePOP = 9
+	player.numLowerPOP = 9.5
+	player.freePOP = 8.7
 
 	player.provinces["_Poland"] = provinces["_Poland"]
 	player.provinces["Ukraine"] = provinces["Ukraine"]
@@ -306,19 +303,18 @@ def italy(player, provinces): #major
 	player.culture = "Italian"
 	player.capital.add("Piedmont")
 
-	player.stability = 1.5
-	player.diplo_action = 3
+	player.diplo_action = 2
 
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("flintlock")
 
-	player.POP = 4.8
-	player.numLowerPOP = 5
-	player.freePOP = 3.4
+	player.POP = 3.8
+	player.numLowerPOP = 4
+	player.freePOP = 2.4
 
 	
-	player.resources["gold"] = 10.0
+	player.resources["gold"] = 8.0
 
 	player.midPOP["researchers"]["number"] = 0.0
 	player.midPOP["bureaucrats"]["number"] = 0.0
@@ -378,6 +374,7 @@ def switzerland(player, provinces):
 	player.milPOP = 0.6
 	player.numLowerPOP = 3
 
+ 
 	player.provinces["_Switzerland"] = provinces["_Switzerland"]
 
 	player.technologies.add("pre_industry_2")
@@ -751,7 +748,7 @@ def india(player, provinces): # Old Empire
 	player.numLowerPOP = 10
 	player.freePOP = 9
 	player.numMidPOP = 0
-	player.research = -1.0
+	player.research = -3
 
 	player.sprawl = True
 
@@ -874,7 +871,7 @@ def china(player, provinces):
 	player.POP = 11.2
 	player.numLowerPOP = 11.2
 	player.freePOP = 10
-	player.research = -2
+	player.research = -3
 
 	player.sprawl = True
 
@@ -956,7 +953,7 @@ def japan(player, provinces):
 		player.build_factory_priority["cannons"] += 0.15
 		player.personality["Army"] = 1.5
 		player.personality["Navy"] = 1
-		player.improve_province_priority["shipyard"] = 65
+		player.improve_province_priority["shipyard"] = 80
 		player.personality["Offensive"] = 0.6
 
 
