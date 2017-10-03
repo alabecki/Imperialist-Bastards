@@ -125,12 +125,16 @@ def AI_turn(players, player, market, relations, provinces):
 
 	player.use_chemicals(market, relations, players)
 	#attack_target(player, players, relations, provinces, market)
-	decide_target(player, players, market, provinces, relations)
+	if "England" in players.keys() or "Germany" in players.keys() or "France" in players.keys():		
+		decide_target(player, players, market, provinces, relations)
+	else:
+		decide_rival_target(player, players, market, provinces, relations)
 	worsen_relations(player, players, relations, provinces)
 	gain_cb(player, players, relations)
 	attack_target(player, players, relations, provinces, market)
 	ai_bribe(player, players, relations)
 	ai_decide_ally_target(player, players, provinces)
+
 
 	count = 0
 	while player.diplo_action >= 2 and count < 12:

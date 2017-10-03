@@ -554,7 +554,6 @@ def combat_outcome(winner, p1, p2, prov, players, market, relations):
 
 	for cb in cb_keys:
 		if cb.province == prov.name:
-			print("CB discharged: %s %s" % (cb.province, cb.opponent))
 			p1.CB.remove(cb)
 			del cb
 
@@ -1200,21 +1199,6 @@ def naval_transport(player, target):
 
 
 
-		#for v in range(int(transport_limit)):
-		#	tries = 0
-		#	while tries < 52:
-		#		_type = choice(["infantry", "cavalry", "artillery", "tank", "fighter"])
-		#		if (player.military[_type] - forces[_type]) >= 1:
-		#			print("Load %s " % (_type))
-		#			forces[_type] += 1
-		#			break
-		#		tries += 1
-	print("forces:")
-	for j, k in forces.items():
-		print(j, k)
-	return forces
-
-
 def ai_transport_units(player, target):
 	target_strength = target.calculate_base_defense_strength()
 #	print("Target strength: %s" % (target_strength))
@@ -1248,7 +1232,6 @@ def ai_transport_units(player, target):
 				self_strength += player.fighter["attack"]
 			tries += 1
 			number_units -= 1
-			print("Tries: %s" % (tries))
 			number += 1
 		else:
 			tries += 1

@@ -149,7 +149,6 @@ class Market(object):
 
 
 	def total_buy_price(self, _type, amount, supply):
-		print("Check")
 		total = 0
 		for i in range(amount):
 			total += self.buy_price(_type, supply)
@@ -250,7 +249,6 @@ class Market(object):
 			if kind == "clothing":
 				mod = 1.2
 			if kind == "radio" or kind == "telephone":
-				print("Type is radio or telephone")
 				mod = 1.25
 			if kind == "fighter":
 				mod = 4.75

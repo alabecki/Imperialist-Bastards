@@ -106,7 +106,6 @@ def decide_target(player, players, market, provinces, relations):
 			if owner.culture == _object.culture:
 				continue
 			elif owner.name in player.borders and self_strength > owner.calculate_base_defense_strength() * 1.2:
-				print("obj 103: %s" % (obj))
 				options.add(obj)
 			else:
 				if transport_limit < 4 or player.government == "despotism":
@@ -116,7 +115,6 @@ def decide_target(player, players, market, provinces, relations):
 				print("Owner Defense: %s" % (owner.calculate_base_defense_strength()))
 
 				if self_navy_str > owner_navy_str * 1.2 and self_naval_projection_strength > owner.calculate_base_defense_strength() * 1.2:
-					print("obj 110: %s" % (obj))
 					options.add(obj)
 				else:
 					continue
@@ -230,7 +228,6 @@ def total_war(player, target, players, market, relations):
 
 				
 def try_total_war(player,players, market, relations,provinces):
-	print("Are you even trying?")
 	self_strength = player.calculate_base_attack_strength()
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	self_navy_str = player.calculate_naval_strength()
@@ -247,7 +244,7 @@ def try_total_war(player,players, market, relations,provinces):
 				other_naval_strength = pl.calculate_naval_strength()
 				print("%s Naval Str: %s" % (pl.name, other_naval_strength))
 				self_naval_projection_strength = player.ai_naval_projection(pl)
-				print("Sekf Naval Strength Projection: %s" % (self_naval_projection_strength))
+				print("Self Naval Strength Projection: %s" % (self_naval_projection_strength))
 
 			
 				if pl.name in player.borders and self_strength > (other_strength * 1.2) and relations[frozenset({player.name, pl.name})].relationship < 2:
@@ -272,7 +269,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 	if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
 		try_total_war(player, players, market, relations, provinces)
 		return
-
+	self_strength = player.calculate_base_attack_strength()
 	if len(player.rival_target) > 0 and player.rival_target[0].name not in players.keys():
 		player.rival_target = []
 	if len(player.rival_target) > 0 and (len(player.rival_target[0].provinces.keys()) == 0 \
@@ -282,7 +279,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 		player.rival_target = []
 	if len(player.rival_target) > 0:
 		return
-	self_naval_projection_strength = player.ai_naval_projection()
+	self_naval_projection_strength = player.ai_naval_projection(player)
 
 	#if "mobile_warfare" in player.technologies and player.military["tank"] >= 1:
 	if False:
@@ -338,7 +335,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 					or (self_naval_projection_strength > other_strength * 1.3 and transport_limit >= 4):
 						if v.type == "major" and pr.culture == v.culture:
 							continue
-						if v.type == "major" and pr.colony == False and player.check_for_ground_invasion(pr, provinces) == False:
+						if v.type == "major" and pr.colony == False and player.check_for_ground_invasion(pr.name, provinces) == False:
 							continue
 						elif relations[relata].relationship < 1.5:
 							player.rival_target = [v,  pr]
@@ -353,7 +350,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 				for p, pr in other.provinces.items():
 					if other.type == "major" and pr.culture == other.culture:
 						continue
-					if other.type == "major" and pr.colony == False and player.check_for_ground_invasion(pr, provinces) == False:
+					if other.type == "major" and pr.colony == False and player.check_for_ground_invasion(pr.name, provinces) == False:
 						continue
 					elif relations[relata].relationship < 1.5:
 						player.rival_target = [other,  pr]
@@ -490,10 +487,6 @@ def ai_select_ground_forces(player, target):
 			#print("Tries: %s" % (tries))
 		else:
 			tries += 1
-
-	print("forces:")
-	for j, k in forces.items():
-		print(j, k)
 	return forces
 
 
@@ -569,9 +562,7 @@ def attack_target(player, players, relations, provinces, market):
 		target = cb.opponent
 		target = players[target]
 		if target.just_attacked > 0 or (cb.action == "annex" and player.reputation <= 0.2):
-		#	print(target.just_attacked)
-			#print("Check 489")
-
+	
 			count += 1
 			continue
 		else:
@@ -581,14 +572,8 @@ def attack_target(player, players, relations, provinces, market):
 	target = players[target]
 
 	if target.just_attacked > 0 or (cb.action == "annex" and player.reputation <= 0.2):
-		#print(target.just_attacked)
-		#print("Check 500")
 		return
-	#print(player.rival_target[0])
-	#prov = player.rival_target[1]
-	#print("Target nation: %s" % (target.name))
-	#print("Target prov: %s" % (prov.name))
-	print("Check 506")
+
 	if (target.type == "old_empire" or target.type == "old_minor" or  prov.colony == True)  \
 	and player.check_for_ground_invasion(cb.province, provinces) == False \
 	and player.colonization < (1 + player.num_colonies *1.5):
@@ -602,10 +587,9 @@ def attack_target(player, players, relations, provinces, market):
 	other_strength = target.calculate_base_defense_strength()
 	self_naval_projection_strength = player.ai_naval_projection(target)
 	if target.type == "old_minor" or target.type == "old_empire" or target.type == "minor":
-		print("Check 522")
 
 		if target.name not in player.borders:
-			print("Not border")
+			print("No border")
 			if player.colonization < 1.5 * player.num_colonies * 1.5:
 				return
 			if self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 4:

@@ -253,7 +253,7 @@ class Human(Player):
 
 	def spice_to_stability(self):
 		if self.resources["spice"] > 2:
-			print("You do not have enough spice raise your stability")
+			print("You do not have enough spice to raise your stability")
 			return
 		if self.stability >= 3:
 			print("Your stability cannot be further increased")

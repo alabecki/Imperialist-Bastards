@@ -436,12 +436,8 @@ class Player(object):
 			"radio": 0,
 			"auto": 0
 		}
-		print("Requirements:")
 		for i in requirement:
-			print(i)
 			check_list[i] += 1
-		print("Spice required: %s" % (check_list["spice"]))
-
 		for k, v in check_list.items():
 			if k == "spice":
 				if self.resources["spice"] < v:
@@ -464,7 +460,6 @@ class Player(object):
 
 
 	def collect_resources(self, market):
-		print("%s collects resources: \n" % (self.name))
 		stab_rounds = round(self.stability * 2) / 2
 		res_dict = {
 			
@@ -546,9 +541,7 @@ class Player(object):
 
 	def collect_goods(self):
 
-		print("%s collects: " % (self.name))
 		for k, p in self.goods_produced.items():
-			print("%s: %s " % (k, p))
 			self.goods[k] += p
 		
 		for k, v in self.military_produced.items():
@@ -810,7 +803,6 @@ class Player(object):
 		self_strength = 0
 		number_units = self.num_army_units()
 		transport_limit = ((self.military["frigates"] + self.military["iron_clad"]) * 2 + self.military["battle_ship"] * 3) 
-		print("Transport Limit: %s" % (transport_limit))
 		forces = {
 			"infantry": 0,
 			"cavalry": 0,

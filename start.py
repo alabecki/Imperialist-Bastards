@@ -61,7 +61,7 @@ def initialize_major_power(player):
 	#player.numMidPOP = 0.8
 	player.development_level = 2
 	player.developments["research"] = 1
-	player.numMidPOP = 1
+	player.numMidPOP = 0.5
 
 	player.resources["gold"] = 12.0
 	
