@@ -21,6 +21,7 @@ class Province(object):
 		self.borders = set()
 		self.x = 0
 		self.y = 0
+		self.position = ""
 		#self.fortress_level = 0
 		#self.factories = set()
 		#self.desirability =_desirability

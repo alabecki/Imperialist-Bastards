@@ -26,6 +26,83 @@ class Human(Player):
 		super(Human, self).__init__(_name, _type, number, *args, **kwargs)
 
 
+	def can_improve_prov(self, prov):
+		if self.number_developments < 1 or self.AP < 1 or self.goods["parts"] < 1 or self.resources["wood"] < 1:
+			return False
+
+
+		if(self.provinces[prov].development_level == 2):
+			return False
+
+		elif(self.provinces[prov].resource == "food"):
+			max_dev = 0
+			if("steel_plows" in self.technologies):
+				max_dev = 1
+			if("mechanical_reaper" in self.technologies):
+				max_dev = 2
+		elif(self.provinces[prov].resource == "iron" or self.provinces[prov].resource == "coal"):
+			max_dev = 0
+			if("square_timbering" in self.technologies):
+				max_dev = 1
+			if("dynamite" in self.technologies):
+				max_dev = 2
+		elif(self.provinces[prov].resource == "cotton"):
+			max_dev = 0
+			if("cotton_gin" in self.technologies):
+				max_dev = 1
+			if("compound_steam_engine" in self.technologies):
+				max_dev = 2
+		elif(self.provinces[prov].resource == "wood"):
+			max_dev = 0
+			if("saw_mill" in self.technologies):
+				max_dev = 1
+			if("compound_steam_engine" in self.technologies):
+				max_dev = 2
+		elif(self.provinces[prov].resource == "spice"):
+			max_dev = 0
+			if("steel_plows" in self.technologies):
+				max_dev = 1
+		elif(self.provinces[prov].resource == "gold"):
+			max_dev = 0
+			if("dynamite" in self.technologies):
+				max_dev = 1
+		elif(self.provinces[prov].resource == "dyes"):
+			max_dev = 0
+			if("compound_steam_engine" in self.technologies):
+				max_dev = 1
+		elif(self.provinces[prov].resource == "oil"):
+			max_dev = 0
+			if("oil_drilling" in self.technologies):
+				max_dev = 1
+			if "rotary_drilling" in self.technologies:
+				max_dev = 2
+
+		elif(self.provinces[prov].resource == "rubber"):
+			max_dev = 0
+			if("chemistry" in self.technologies):
+				max_dev = 1
+			if "synthetic_dyes" in self.technologies:
+				max_dev = 2
+		if self.provinces[prov].development_level >= max_dev:
+			return False
+		else:
+			return True
+
+	def work_p(self, prov):
+		self.provinces[prov].worked = True
+		self.freePOP -= 1
+
+	def free_p(self, prov):
+		self.provinces[prov].worked = False
+		self.freePOP += 1
+
+	def dev_p(self, prov):
+		self.provinces[prov].development_level += 1
+		self.AP -= 1
+		self.goods["parts"] -= 1
+		self.resources["wood"] -=1
+		self.new_development -=1
+
 	def increase_pop(self):
 		med = False
 		if(self.POP_increased > 1):

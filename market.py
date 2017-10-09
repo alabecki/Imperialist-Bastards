@@ -146,6 +146,8 @@ class Market(object):
 	rubber_production = dict()
 	oil_production = dict()
 
+	report = []
+
 
 
 	def total_buy_price(self, _type, amount, supply):

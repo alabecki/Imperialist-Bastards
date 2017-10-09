@@ -63,7 +63,7 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 							p_target.append(prov)
 							c_target.append(c)
 
-							print("Combat against Unciv!")
+						#	print("Combat against Unciv!")
 							stop = input()
 							combat_against_uncivilized(player, c_target[0], p_target[0])				
 							player.diplo_action -= 1
@@ -111,8 +111,8 @@ def decide_target(player, players, market, provinces, relations):
 				if transport_limit < 4 or player.government == "despotism":
 					continue
 				owner_navy_str = calculate_naval_strength(owner)
-				print("Naval Projection: %s" % (self_naval_projection_strength))
-				print("Owner Defense: %s" % (owner.calculate_base_defense_strength()))
+			#	print("Naval Projection: %s" % (self_naval_projection_strength))
+			#	print("Owner Defense: %s" % (owner.calculate_base_defense_strength()))
 
 				if self_navy_str > owner_navy_str * 1.2 and self_naval_projection_strength > owner.calculate_base_defense_strength() * 1.2:
 					options.add(obj)
@@ -195,7 +195,7 @@ def decide_target(player, players, market, provinces, relations):
 			rival = selection.owner
 			rival = players[rival]
 			player.rival_target = [rival, selection]
-			print("Rival with %s" % (rival.name))
+		#	print("Rival with %s" % (rival.name))
 			return
 
 	res_priority = sorted(player.resource_priority, key= player.resource_priority.get, reverse = True)
@@ -206,19 +206,19 @@ def decide_target(player, players, market, provinces, relations):
 				owner = _opt.owner
 				_owner = players[owner]
 				player.rival_target = [_owner, _opt]
-				print("Rival with %s" % (_owner.name))
+				#print("Rival with %s" % (_owner.name))
 				return
 
 
 def total_war(player, target, players, market, relations):
 		print("A total war is about to begin between %s and %s?" % (player.name, target.name))
 		if target.name not in player.borders:
-			print("No border") 
+		#	print("No border") 
 			amphib_prelude(player, target, "total", players, market, relations)
 			return
 			
 		else:
-			print("Border")
+		#	print("Border")
 			forces = ai_select_ground_forces(player, target)
 			if forces["infantry"] == 0:
 				return
@@ -238,24 +238,24 @@ def try_total_war(player,players, market, relations,provinces):
 		
 	
 			if(size >= 6):
-				print("Player with more than 5 provs: %s" % (pl.name))
+				#print("Player with more than 5 provs: %s" % (pl.name))
 				other_strength = pl.calculate_base_defense_strength()
-				print("%s Strength: %s" % (pl.name, other_strength))
+				#print("%s Strength: %s" % (pl.name, other_strength))
 				other_naval_strength = pl.calculate_naval_strength()
-				print("%s Naval Str: %s" % (pl.name, other_naval_strength))
+			#	print("%s Naval Str: %s" % (pl.name, other_naval_strength))
 				self_naval_projection_strength = player.ai_naval_projection(pl)
-				print("Self Naval Strength Projection: %s" % (self_naval_projection_strength))
+			#	print("Self Naval Strength Projection: %s" % (self_naval_projection_strength))
 
 			
 				if pl.name in player.borders and self_strength > (other_strength * 1.2) and relations[frozenset({player.name, pl.name})].relationship < 2:
 					options.append(pl)
-					print("Border - Add %s" % (pl.name))
+					#print("Border - Add %s" % (pl.name))
 				if self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 8 and relations[frozenset({player.name, pl.name})].relationship < 2:
 					options.append(pl)
-					print("Naval - Add %s" % (pl.name))
+				##	print("Naval - Add %s" % (pl.name))
 						
 	if len(options) < 1:
-		print("No options?")
+	#	print("No options?")
 		return
 
 	target = choice(options)
@@ -404,8 +404,8 @@ def worsen_relations(player, players, relations, provinces):
 		player.diplo_action -=1
 		amount = min(1, 10/(target.POP + 0.001))
 		relations[relata].relationship -= amount
-		print("Worsens relations with %s by %s" % (target.name, amount))
-		print("Relations with %s are now: %s" % (target.name, relations[relata].relationship))
+		#print("Worsens relations with %s by %s" % (target.name, amount))
+		#print("Relations with %s are now: %s" % (target.name, relations[relata].relationship))
 
 def damage_relations(player, players, relations):
 	if player.diplo_action < 1:
@@ -434,7 +434,7 @@ def gain_cb(player, players, relations):
 	prov = player.rival_target[1]
 	relata = frozenset({player.name, target.name})
 	if relations[relata].relationship > -2.5 and target.type != "old_minor":
-		print("Relations too good to gain CB")
+	#	print("Relations too good to gain CB")
 		return
 	annex_key = []
 	for cb in player.CB:
@@ -447,7 +447,7 @@ def gain_cb(player, players, relations):
 		player.diplo_action -= 1
 		new = CB(player.name, target.name, "annex", prov.name, 5)
 		player.CB.add(new)
-		print("Gain a CB against %s !!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
+	#	print("Gain a CB against %s !!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
 
 
 def ai_select_ground_forces(player, target):
@@ -493,7 +493,7 @@ def ai_select_ground_forces(player, target):
 
 
 def attack_target(player, players, relations, provinces, market):
-	print("AAAAAAAAAAAAAAAAAAAATACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	#print("AAAAAAAAAAAAAAAAAAAATACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	ammo_needed	= player.calculate_army_ammo_needed()
@@ -502,17 +502,17 @@ def attack_target(player, players, relations, provinces, market):
 		player.ai_buy("oil", 6, market, relations, players)
 
 	if player.goods["cannons"] < (ammo_needed * 2):
-		print("Not enough ammo")
+	#	print("Not enough ammo")
 		return
 
 	oil_needed = player.calculate_army_oil_needed()
 
 	if player.resources["oil"] < (oil_needed * 2):
-		print("Not enough oil")
+	#	print("Not enough oil")
 		player.ai_buy("oil", 6, market, relations, players)
 
 	if player.resources["oil"] < (oil_needed * 2):
-		print("Not enough oil")
+	#	print("Not enough oil")
 		return
 
 
@@ -589,7 +589,7 @@ def attack_target(player, players, relations, provinces, market):
 	if target.type == "old_minor" or target.type == "old_empire" or target.type == "minor":
 
 		if target.name not in player.borders:
-			print("No border")
+			#print("No border")
 			if player.colonization < 1.5 * player.num_colonies * 1.5:
 				return
 			if self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 4:
@@ -598,7 +598,7 @@ def attack_target(player, players, relations, provinces, market):
 			else:
 				player.rival_target = []
 		else:
-			print("Border")
+			#print("Border")
 			if self_strength > other_strength * 1.2:
 				forces = ai_select_ground_forces(player, target)
 				if forces["infantry"] == 0:
@@ -695,7 +695,7 @@ def ai_decide_ally_target(player, players, provinces):
 	if len(options) > 0:
 		pick = choice(options)
 		player.allied_target.append(pick)
-		print("Adds %s as Ally Target !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (pick.name))
+	#	print("Adds %s as Ally Target !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (pick.name))
 
 	return
 
@@ -710,7 +710,7 @@ def ai_improve_relations(player, players, relations):
 		player.diplo_action -=1
 		relations[relata].relationship += min(1, 5/(pick[0].POP + 0.001))
 		player.reputation += 0.02
-		print("Improves relations with %s by %s" % (pick[0].name, min(1, 5/(pick[0].POP + 0.001))))
+	#	print("Improves relations with %s by %s" % (pick[0].name, min(1, 5/(pick[0].POP + 0.001))))
 
 def ai_bribe(player, players, relations):
 	if player.type != "major":
@@ -729,7 +729,7 @@ def ai_bribe(player, players, relations):
 				continue
 			relations[relata].relationship += 0.5
 			player.resources["gold"] -= pay
-			print("Bribes %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (st.name))
+		#	print("Bribes %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (st.name))
 			return
 
 
@@ -784,7 +784,7 @@ def ai_destablize(player, players, relations):
 	player.diplo_action -=1
 	relata = frozenset([player.name, target.name])
 	relations[relata].relationship -= 0.2
-	print("Destablizes %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
+#	print("Destablizes %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
 
 
 def ai_embargo(player, players, relations):
@@ -803,7 +803,7 @@ def ai_embargo(player, players, relations):
 				other.embargo.add(player.name)
 				relata = frozenset([player.name, other.name])
 				relations[relata].relationship -= 0.25
-				print("Places embargo on %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (other.name))
+				print("%s places embargo on %s" % (player.name, other.name))
 				if type(other) == Player:
 					pause = input()
 				return
@@ -817,7 +817,7 @@ def ai_lift_embargo(player, players, relations):
 				other.embargo.discard(player.name)
 				relata = frozenset([player.name, other.name])
 				relations[relata].relationship += 0.1
-				print("Lifts embargo on %s !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % (other.name))
+				print("%s lifts embargo on %s" % (player.name, other.name))
 				if type(other) == Player:
 					pause = input()
 

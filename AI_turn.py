@@ -3,23 +3,22 @@ from AI import*
 from player_class import*
 from AI_foreign_affairs import*
 from copy import deepcopy
-from historical.Scenario import* 
-from BalanceScenario.Scenario import*
+
+from Scenarios.historical.Scenario import* 
+from Scenarios.BalanceScenario.Scenario import*
 
 
 def AI_turn(players, player, market, relations, provinces):
 	
 	if len(player.provinces.keys()) < 1:
-		print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		print("%s has only one province!!!" % (player.name))
 		return
 
 	if type(player) == Human:
 		return
-	print("___________________________________________________________________")
-	print("It is now %s's turn \n" % (player.name))
+	#print("___________________________________________________________________")
+	#print("It is now %s's turn \n" % (player.name))
 
-	print("___________________________________________________________________")
+	#print("___________________________________________________________________")
 
 	for k in player.goods_produced.keys():
 			player.goods_produced[k] = 0
@@ -29,7 +28,7 @@ def AI_turn(players, player, market, relations, provinces):
 
 
 	player.AP += 1
-	print("AP = %s" % (player.AP))
+	#print("AP = %s" % (player.AP))
 
 
 	player.calculate_access_to_goods(market)
@@ -43,7 +42,7 @@ def AI_turn(players, player, market, relations, provinces):
 	player.calculate_resource_need()
 	player.calculate_resource_forecast()
 	player.fulfill_needs(market, relations, players)
-	player.view_AI_inventory()
+	#player.view_AI_inventory()
 
 	#POP Increase
 	player.ai_increase_pop(market, relations, players)
@@ -54,7 +53,7 @@ def AI_turn(players, player, market, relations, provinces):
 
 	player.use_culture(players)
 
-	player.choose_technology()
+	player.choose_technology(market)
 
 	AI_values(player)
 
@@ -108,6 +107,7 @@ def AI_turn(players, player, market, relations, provinces):
 		player.ai_increase_middle_class(market, relations, players)
 		player.ai_decide_factory_productions(market, relations, players)
 		player.develop_industry(market, relations, players)
+		player.build_army(market, relations, players)
 		player.decide_build_navy(market, relations, players)
 
 	else:

@@ -8,6 +8,7 @@ from queue import*
 from copy import deepcopy
 
 
+
 stability_map = {
 	-3.0: 0.67,
 	-2.5: 0.75,
@@ -49,6 +50,7 @@ class Player(object):
 
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
+		self.colour = "white"
 		self.type = _type				# major, old_empire, old_minor, civ_minor
 		self.name = _name	
 		self.number = number
@@ -538,6 +540,8 @@ class Player(object):
 			if r == "oil":
 				market.oil_production[self.name] = res
 
+		return res_dict
+
 
 	def collect_goods(self):
 
@@ -555,7 +559,7 @@ class Player(object):
 	def payMaintenance(self):
 		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.3) + self.military["cavalry"] * 0.1
 		if(self.resources["food"] < mFood ):
-			self.freePOP -= (self.resources["food"] - mFood)
+			self.freePOP += (self.resources["food"] - mFood)
 			self.stability -= 0.5
 			if self.stability < -3.0:
 				self.stability = -3.0
@@ -674,6 +678,8 @@ class Player(object):
 			if cb.time < 0:
 				self.CB.discard(cb)
 				del cb
+		return [research_gain, culture_gain, col_gain, diplo_gain]
+	
 
 	def b_borders_a(self, p2):
 		bBa = set()
