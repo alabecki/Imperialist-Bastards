@@ -561,6 +561,8 @@ class Player(object):
 		if(self.resources["food"] < mFood ):
 			self.freePOP += (self.resources["food"] - mFood)
 			self.stability -= 0.5
+			if self.freePOP < 0:
+				self.freePOP = 0
 			if self.stability < -3.0:
 				self.stability = -3.0
 			self.resources["food"] = 0.0

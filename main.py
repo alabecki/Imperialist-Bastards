@@ -134,6 +134,7 @@ while True:
 		save_game(auto_name, players, relations, market, provinces)
 
 
+
 	def AI_turnS(auto_save, players, relations, market, provinces):
 		market.turn +=1
 		order = list(players.keys())

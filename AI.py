@@ -2144,7 +2144,7 @@ class AI(Player):
                     market.report.append("%s has developed province the %s producing province of %s" % (self.name, self.provinces[p], _type))
                     return
 
-    def ai_improve_fortifications(self):
+    def ai_improve_fortifications(self, market):
         self.AP -= 1
         self.goods["cannons"] -= 1
         self.fortification += 0.1
@@ -2164,7 +2164,7 @@ class AI(Player):
         if self.shipyard == 3:
             blank = "oil powered"
         print("%s has completed a shipyard for %s ships" % (self.name, blank))
-        market.report.append("%s has completed a shipyard for %s ships" % (blank))
+        market.report.append("%s has completed a shipyard for %s ships" % (self.name, blank))
 
 
     def build_army(self, market, relations, players):
