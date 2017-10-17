@@ -237,7 +237,7 @@ def show_player_gains(gains):
 
 def start_main_screen():
 	global auto_save, players, human_player, market
-	load_basic_widgets()
+	#load_basic_widgets()
 	nation = human_player
 	player = players[nation]
 	#app.hideSubWindow("auto_save_name")
@@ -440,11 +440,83 @@ def start_main_screen():
 	app.stopTab()
 
 	app.startTab("Market")
+	app.setBg("khaki")
 
-	app.addLabelFrame("Inventory")
 
-	
+	app.startLabelFrame("Inventory")
+	i = 1
+	for k, v in player.resources.items():
+		if k in ["gold", "/", "//"]:
+			continue
+		app.addLabel("i_" + k, " ",  i, 0)
+		app.addImage("i_" + k, k+".gif", i, 0)
+		app.setImageTooltip("i_" + k, k.title())
+		app.shrinkImage("i_" + k, 2)
+		app.addLabel("i_" + k + "_value", "%.2f" % round(player.resources[k], 2), i, 1)
+		app.setLabelRelief(sz, "ridge")
+		app.setLabelAlign(sz, "left")
+		i = i + 1
+	i = 1
+	for k, v in player.goods.items():
+		app.addLabel("i_" + k, " ", i, 2)
+		app.addImage("i_" + k, k +".gif", i, 2)
+		app.setImageTooltip("i_" + k, k.title())
+		app.shrinkImage("i_" + k, 2)
+		app.addLabel("i_" + k + "_value", "%.2f" % round(player.goods[k], 2), i, 3)
+		app.setLabelRelief(sz, "ridge")
+		app.setLabelAlign(sz, "left")
+		i = i + 1
+	app.endLabelFrame()
 
+	app.startLabelFrame("Market")
+	i = 1
+	for r in market.resources:
+		if r in ["/", "//", "///"]:
+			continue
+		app.addLabel(r + "_market", "  supply: %-6.1f (%-6.1f)  price: %-6.1f (%-6.1f)" % \
+			(len(market.market[r]), player.supply[r], market.buy_price(r, len(market.market[r])), market.buy_price(r, player.supply[r])), i, 1)
+		app.addImage(r + "_market_img", r + ".gif", i, 0)
+		app.shrinkImage(r + "_market_img", 2)
+		app.addNamedButton("Buy", r + "_buy", buy, i, 4)
+		app.setButtonBg(r + "_buy", "red")
+		stock = player.supply[r]
+		price = market.buy_price(r, stock)
+		if player.supply[r] < 1 or (player.resources["gold"] < price):
+			app.disableButton(r + "_buy")
+		else:
+			app.enableButton(r + "_buy")
+		app.addNamedButton("Sell", r + "_sell", sell, i, 5)
+		app.setButtonBg(r + "_sell", "green")
+		if player.resources[r] < 1:
+			app.disableButton(r + "_sell")
+		else:
+			app.enableButton(r + "_sell")
+		i = i + 1
+	i = 0
+	for g in market.goods:
+		app.addLabel(g + "_market", "  supply: %-6.1f (%-6.1f)  price: %-6.1f (%-6.1f)" % \
+			(len(market.market[g]), player.supply[g], market.buy_price(g, len(market.market[g])), market.buy_price(g, player.supply[g])), i, 8)
+		app.addImage(g + "_market_img", g + ".gif", i, 7)
+		app.shrinkImage(g + "_market_img", 2)
+		app.addNamedButton("Buy", g + "_buy", buy, i, 11)
+		app.setButtonBg(g + "_buy", "red")
+		stock = player.supply[g]
+		price = market.buy_price(g, stock)
+		if player.supply[g] < 1 or (player.resources["gold"] < price):
+			app.disableButton(g + "_buy")
+		else:
+			app.enableButton(g + "_buy")
+		app.addNamedButton("Sell", g + "_sell", sell, i, 12)
+		app.setButtonBg(g + "_sell", "green")
+		if player.goods[g] < 1:
+			app.disableButton(g + "_sell")
+		else:
+			app.enableButton(g + "_sell")
+		i = i + 1
+
+
+	app.stopLabelFrame()
+	app.stopTab()
 
 	app.stopTabbedFrame()
 
@@ -463,7 +535,6 @@ def work_prov(btn):
 	app.setLabel("l12", player.freePOP)
 	app.disableButton("Work "+p.name + "?")
 	app.enableButton("Free "+p.name + " Pop?")
-
 
 
 
@@ -554,10 +625,30 @@ def show_prov(nm):
 
 def hide_prov(nm):
 	app.hideSubWindow("sub" + nm)
+
+def buy(btn):
+	btn = btn[:-5]
+	seller_list = getSellers(btn)
+	app.changeOptionBox("Sellers", seller_list)
+	app.setLabel("item_to_buy", btn)
+	app.showSubWindow("chose_seller")
+
+def _buy(btn):
+	other = getOptionBox("Sellers")
+	_type = getLabel("item_to_buy")
+	global human_player, market, players, relations
+	buy_item(market, other, _type, human_player, players, relations)
+	app.setLabel("i_" + _type + "_value", " %.2f" % round(player.resources[k], 2))
+
+
+
+def sell(btn):
+	btn = btn[:-6]
 	
 
 
 def new_game(btn):
+	load_basic_widgets()
 	app.showSubWindow("Scenario_Choice")
 
 
@@ -725,6 +816,13 @@ def load_basic_widgets():
 	app.addLabel("saveing label", "Saving Game ...")
 	app.stopSubWindow()
 
+	app.startSubWindow("chose_seller", modal = True)
+	app.startLabelFrame("From whom you would like to buy?")
+	app.addLabel("item_to_buy", "")
+	app.addLabelOptionBox("Sellers", [""])
+	app.addNamedButton("Select", "seller_select", _buy)
+	app.stopLabelFrame()
+	app.stopSubWindow()
 
 
 app = gui("Imperialist Bastards", "960x600")

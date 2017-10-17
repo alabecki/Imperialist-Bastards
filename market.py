@@ -157,73 +157,36 @@ class Market(object):
 			supply -= 1
 		return total
 
+	def getSellers(self, _type):
+		seller_list = []
+		for i in self.market[_type]:
+			pl = i.owner
+			if i.owner in player.embargo:
+				continue
+			seller_list.append(i.owner)
+		return seller_list
 
-
-	def buy_item(self, _type, player, players, market, relations):
-		#amount = int(input("How many %s do you wish to buy? \n" % (_type)))
-		stock = player.supply[_type]
-		if(stock < 1):
-			print("There are currently only %s %s available to you on the market\n " % (stock, _type))
-			return
+	def buy_item(self, other, _type, player, players, relations):			
+		for i in self.market[_type]:
+			#print("Owner: %s, Other: %s" % (i.owner.name, buy_from))
+			if i.owner == buy_from:
+				#print("Removing item...%s" % (i.owner))
+				self.market[_type].remove(i)
+				del i
+				break
+		player.resources["gold"] -= price
+		other.resources["gold"] += price
+		other.new_development +=  0.2
+		#self.market[_type].remove(s)
+		player.supply[_type] -= 1
+		relations[frozenset({other.name, player.name})].relationship + 0.015
+		if _type in self.resources:
+			player.resources[_type] += 1
 		else:
-			#price = self.total_buy_price(_type, amount, stock)
-			price = self.buy_price(_type, stock)
-			ok = input(" A %s will cost %s gold, is this okay? (y/n) \n" % (_type, price ))
-			if ok == "n":
-				#self.market[_type] += amount
-				return
-			else:
-				if(player.resources["gold"] < price):
-					print("You only have %s gold but %s costs %s gold \n" % (player.resources["gold"], _type, price))
-					return
-				else:
-					temp = []
-					#count = 1
-					#for o in player.embargo:
-					#	print(o)
-					for i in self.market[_type]:
-						#print("i owner: %s" % (i.owner))
-						pl = i.owner
-						if i.owner in player.embargo:
-							#print("Embarged by %s" % (i.owner))
-							continue
-						#print("Appending item from %s" % (i.owner))
-						temp.append(i.owner)
-					buy_from = " "
-					while buy_from not in temp:
-						print("From whom would you like to buy %s?" % (_type))
-					#	for t in temp:
-					#		print(t)
-						for i in range(int(len(temp)/5+1)):
-							print("    ".join(temp[i*5:(i+1)*5]) + "\n")
-						buy_from = input()
-					
-					for i in self.market[_type]:
-						#print("Owner: %s, Other: %s" % (i.owner.name, buy_from))
-						if i.owner == buy_from:
-							#print("Removing item...%s" % (i.owner))
-							self.market[_type].remove(i)
-							del i
-							break
-					other = players[buy_from]
-					player.resources["gold"] -= price
-					other.resources["gold"] += price
-					other.new_development +=  0.2
-					#self.market[_type].remove(s)
-					player.supply[_type] -= 1
-					relations[frozenset({other.name, player.name})].relationship + 0.015
-					if _type in self.resources:
-						player.resources[_type] += 1
-						print("You now have %s %s" % (player.resources[_type], _type))
-					else:
-						player.goods[_type] +=1
-						print("You now have %s %s" % (player.goods[_type], _type))
-						other.new_development +=  0.2
+			player.goods[_type] +=1
+			other.new_development +=  0.2
 
-					player.calculate_access_to_goods(market)
-
-
-					#price = self.buy_price(_type, player.supply[_type])
+		player.calculate_access_to_goods(market)
 
 
 	def buy_price(self, kind, supply):
