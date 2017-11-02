@@ -8,6 +8,7 @@ from queue import*
 from copy import deepcopy
 
 
+
 stability_map = {
 	-3.0: 0.67,
 	-2.5: 0.75,
@@ -42,6 +43,33 @@ military_doctrines = ["Infantry_Offense", "Infantry_Defense", "Mobile_Offense", 
 "Army_Discipline"]
 
 
+manufacture = {
+	"parts": {"iron": 0.67, "coal": 0.33},
+	"cannons": {"iron": 0.67, "coal": 0.33},
+	"paper": {"wood": 1.0},
+	"clothing": {"cotton": 0.9, "dyes": 0.3},
+	"furniture": {"wood": 0.67, "cotton": 0.33},
+	"chemicals": {"coal": 1},
+	"gear": {"rubber": 0.6, "iron": 0.2, "coal": 0.2},
+	"radio": {"gear": 0.85, "wood": 0.15},
+	"telephone": {"gear": 0.85, "wood": 0.15},
+	"fighter": {"wood": 1, "gear": 1, "parts": 1, "cannons": 1.0},   # 2.5 
+	"auto": {"rubber": 0.5, "gear": 1.0, "parts": 1.0, "iron": 0.5},		#2
+	"tank": {"iron": 1.5, "cannons": 1.5, "rubber": 0.5, "gear": 1, "parts": 1},  #4 
+	#"frigates": {"cannons": 1.0, "wood": 1.0, "cotton": 1.0},
+	#"iron_clad": {"cannons": 1.0, "iron": 1.0, "parts": 1.0},
+	#"battle_ship": {"cannons": 3.0, "iron": 3.0, "parts": 1.0, "gear": 1.0 }  #8 
+		}
+
+craft = {
+	"parts": {"iron": 0.67, "coal": 0.33},
+	"cannons": {"iron": 0.67, "coal": 0.33},
+	"paper": {"wood": 1.0},
+	"clothing": {"cotton": 0.9, "dyes": 0.3},
+	"furniture": {"wood": 0.67, "cotton": 0.33},
+			}
+
+
 class Player(object):
 
 	player_count = 0
@@ -49,6 +77,7 @@ class Player(object):
 
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
+		self.colour = "white"
 		self.type = _type				# major, old_empire, old_minor, civ_minor
 		self.name = _name	
 		self.number = number
@@ -457,8 +486,14 @@ class Player(object):
 			return False
 		return True
 
+	def check_development(self):
+		requirement = self.determine_middle_class_need()
+		if self.check_mid_requirement(requirement) == True:
+			return True
+		else:
+			return False
 
-
+			
 	def collect_resources(self, market):
 		stab_rounds = round(self.stability * 2) / 2
 		res_dict = {
@@ -538,6 +573,8 @@ class Player(object):
 			if r == "oil":
 				market.oil_production[self.name] = res
 
+		return res_dict
+
 
 	def collect_goods(self):
 
@@ -555,8 +592,10 @@ class Player(object):
 	def payMaintenance(self):
 		mFood = (self.numLowerPOP * 0.2) + (self.numMidPOP * 0.3) + self.military["cavalry"] * 0.1
 		if(self.resources["food"] < mFood ):
-			self.freePOP -= (self.resources["food"] - mFood)
+			self.freePOP += (self.resources["food"] - mFood)
 			self.stability -= 0.5
+			if self.freePOP < 0:
+				self.freePOP = 0
 			if self.stability < -3.0:
 				self.stability = -3.0
 			self.resources["food"] = 0.0
@@ -604,11 +643,11 @@ class Player(object):
 		for k, v in self.supply.items():
 			self.supply[k] = 0
 		for k, v in self.supply.items():
-		#	print("Market Supply: %s" % (len(market.market[k])))
+			#print("Market Supply: %s" % (len(market.market[k])))
 			for i in market.market[k]:
-				#print(i.owner)
+				print(i.owner)
 				if i.owner in self.embargo:
-					#print("Blocked by %s" % (i))
+			#		print("Blocked by %s" % (i))
 					continue
 				self.supply[k] += 1
 			#print("Your supply: %s" % (self.supply[k]))
@@ -674,6 +713,8 @@ class Player(object):
 			if cb.time < 0:
 				self.CB.discard(cb)
 				del cb
+		return [research_gain, culture_gain, col_gain, diplo_gain]
+	
 
 	def b_borders_a(self, p2):
 		bBa = set()
@@ -932,3 +973,128 @@ class Player(object):
 		oil_needed += self.military["fighter"] * self.fighter["oil_use"]
 		#print("Oil Needed for %s: %s" % (self.name, oil_needed))
 		return oil_needed
+
+
+	def amount_can_manif(self, _type):
+		if self.AP < 1:
+			return 0
+		if self.factories[_type]["number"] == 0:
+			if _type in craft.keys():
+				for i in craft[_type]:
+					if i in self.resources.keys():
+						if(craft[_type][i] > self.resources[i]):
+							return 0
+				return 1
+			else: 
+				return 0
+			
+		else:
+			stab_rounds = round(self.stability* 2) / 2
+			stab_mod = stability_map[stab_rounds]
+			max_amount = self.factories[_type]["number"] * stab_mod * self.factory_throughput
+			material_mod = 1 - (self.developments["management"]/10)
+			#max_amount = max_amount/(material_mod + 0.0001)
+			material_max = 1000
+			for i in manufacture[_type]:
+				if i in self.resources.keys():
+					temp = int(self.resources[i] / (manufacture[_type][i] * material_mod))
+					if temp < material_max:
+						material_max = temp
+				if i in self.goods.keys():
+					temp = int(self.goods[i] / (manufacture[_type][i] * material_mod))
+					if temp < material_max:
+						material_max = temp
+		amount = min([material_max, max_amount])
+		return amount
+
+
+	def factory_optons(self):
+		options = []
+		if(self.new_development < 1):
+			return options
+		if("high_pressure_steam_engine" not in self.technologies):
+			return options
+		if(self.AP < 1):
+			return options
+		if(self.resources["iron"] < 1.0):
+			return options
+		elif(self.goods["parts"] < 1.0):
+			return options
+
+		if self.factories["parts"]["number"] == 0:
+			options.append("parts")
+		if self.factories["parts"]["number"] == 1 and "bessemer_process" in self.technologies: 
+			options.append("parts")
+		if self.factories["clothing"]["number"] == 0:
+			options.append("clothing")
+		if self.factories["clothing"]["number"] == 1 and "power_loom" in self.technologies:
+			options.append("clothing")
+		if self.factories["furniture"]["number"] == 0:
+			options.append("furniture")
+		if self.factories["furniture"]["number"] == 1 and "electricity" in self.technologies:
+			options.append("furniture")
+		if self.factories["paper"]["number"] == 0:
+			options.append("paper")
+		if self.factories["paper"]["number"] == 1 and "pulping" in self.technologies:
+			options.append("paper")
+		if self.factories["cannons"]["number"] == 0:
+			options.append("cannons")
+		if self.factories["cannons"]["number"] == 1 and "bessemer_process" in self.technologies:
+			options.append("cannons")
+		if self.factories["chemicals"]["number"] == 0 and "chemistry" in self.technologies:
+			options.append("chemicals")
+		if self.factories["chemicals"]["number"] == 1 and "dyes" in self.technologies:
+			options.append("chemicals")
+		if self.factories["gear"]["number"] < 2 and "electricity" in self.technologies:
+			options.append("gear")
+		if self.factories["radio"]["number"] < 2 and "radio" in self.technologies:
+			options.append("radio")
+		if self.factories["telephone"]["number"] < 2 and "telephone" in self.technologies:
+			options.append("telephone")
+		if self.factories["fighter"]["number"] < 2 and "flight" in self.technologies:
+			options.append("fighter")
+		if self.factories["auto"]["number"] < 2 and "automobile" in self.technologies:
+			options.append("auto")
+		if self.factories["tank"]["number"] < 2 and "mobile_warfare" in self.technologies:
+			options.append("tank")
+		return options
+
+
+	def build_factory(self, _type, market):
+		self.AP -= 1
+		self.resources["iron"] -= 1.0
+		self.goods["parts"] -= 1.0
+		self.factories[_type]["number"] += 1
+		market.global_factories[_type] += 1
+		self.stability -= 0.3
+		self.new_development -= 1
+		return
+
+
+	def manifacture_good(self, _type, amount):
+		self.AP -= 1
+		if self.factories[_type]["number"] == 0:
+			for i in craft[_type]:
+				self.resources[i] -= craft[_type][i]
+			self.goods_produced[_type] += 1
+
+		else:
+			material_mod = 1 - (self.developments["management"]/10)
+			for i in manufacture[_type]:
+				if i in self.resources.keys():
+					self.resources[i] -= manufacture[_type][i] * amount * material_mod
+				else:
+					self.goods[i] -= manufacture[_type][i] * amount * material_mod
+			self.goods_produced[_type] += amount
+			self.AP -= 1
+			self.factories[_type]["used"] = True
+			return
+
+	def pro_POP_add(self):
+		self.proPOP += 1
+		self.freePOP -= 1
+
+
+	def pro_POP_subtract(self):
+		self.proPOP -= 1
+		self.freePOP + 1
