@@ -405,47 +405,8 @@ class Human(Player):
 		print("Your stability is now %s " % (self.stability))
 
 
-	def build_unit(self):
-		if(self.freePOP < 0.2):
-			print("You do not have enugh free POPs to build a unit \n")
-			return
-			if(self.goods["cannons"] < 1):
-				print("You do not have enough cannons to build any military unites \n")
-			return
-		print("What kind of unit would you like to build? \n")
-		for k, v in self.military.items():
-			print(k, v)
-		print("1: Infantry,  2: Cavalry,  3: Artillery,  4:  Tank,  5: fighter")
-		print("6: Frigates,  7: Ironclad,  8:  Battleship")
-		choice = " "
-		while choice not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-			choice = input()
-		if(choice == "1"):
-			self.build_infantry()
-		elif(choice == "2"):
-			self.build_cavalry ()
-		elif(choice == "3"):
-			self.build_artillery()
-		elif(choice == "4"):
-			self.build_tank()
-		elif(choice == "5"):
-			self.build_fighter()
-		elif(choice == "6"):
-			self.build_frigates()
-		elif(choice == "7"):
-			self.build_ironclad()
-		elif(choice == "8"):
-			self.build_battleship()
 
-
-	def disband_unit(self):
-		kind = " "
-		while kind not in self.military.keys():
-			print("What kind of unit would you like to disband?")
-			for k, v in self.military.items():
-				if v >= 1:
-					print(k, v)
-			kind = input()
+	def disband_unit(self, kind):
 		self.milPOP -= 0.2
 		self.freePOP += 0.2
 		self.number_units -= 1
@@ -476,175 +437,95 @@ class Human(Player):
 			self.military["battle_ship"] -= 1
 			self.resources["iron"] += 7
 
+	def build_army_unit(self, _type):
+		if _type == "infantry":
+			self.build_infantry()
+		if _type == "artillery":
+			self.build_artillery()
+		if _type == "cavalry":
+			self.build_cavalry()
+		if _type == "tank":
+			self.build_tank()
+		if _type == "fighter":
+			self.build_fighter()
 
 
 	def build_infantry(self):
-		if self.can_train < 1:
-			print("You cannon train any more land units this turn")
-			return
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.goods["cannons"] -= 1.0
 		self.military_produced["infantry"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("Infantry will be ready at the start of next turn")
 
 	def build_cavalry(self):
-		if(self.resources["food"] < 1):
-			print("You do not have enough Food to build cavalry \n")
-			return
-		if self.can_train < 1:
-			print("You cannon train any more land units this turn")
-			return
-		else:
-			self.resources["food"] -= 1
-			self.freePOP -= 0.2
-			self.milPOP += 0.2
-			self.goods["cannons"] -= 1.0
-			self.military_produced["cavalry"] += 1.0
-			self.number_units += 1.0
-			self.can_train -= 1.0
-			print("Cavalry will be ready at the start of next turn")
+		self.resources["food"] -= 1
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.goods["cannons"] -= 1.0
+		self.military_produced["cavalry"] += 1.0
+		self.number_units += 1.0
+		self.can_train -= 1.0
 
 	def build_artillery(self):
-		if(self.goods["cannons"] < 2.0):
-			print("You do not have enough cannons to build artillery \n")
-			return
-		if self.can_train < 1:
-			print("You cannon train any more land units this turn")
-			return
 		self.goods["cannons"] -= 2.0
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.military_produced["artillery"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("Artillery will be ready at the start of next turn")
 
 	def build_tank(self):
-		if self.goods["tank"] < 1:
-			print("You do not have any tanks to turn into units")
-			return
-		if self.can_train < 1:
-			print("You cannon train any more land units this turn")
-			return
 		self.goods["tank"] -= 1
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.military_produced["tank"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("Tank will be ready at the start of next turn")
 
 
 	def build_fighter(self):
-		if self.goods["fighter"] < 1:
-			print("You do not have any fighters to turn into units")
-			return
-		if self.can_train < 1:
-			print("You cannon train any more land units this turn")
-			return
 		self.goods["fighter"] -= 1
 		self.freePOP -= 0.2
 		self.milPOP += 0.2
 		self.military_produced["fighter"] += 1.0
 		self.number_units += 1.0
 		self.can_train -= 1.0
-		print("Fighter will be ready at the start of next turn")
 
 
 	def build_frigates(self):
-		if self.AP < 1:
-			print("You do not have enough action points")
-			return
-		if self.resources["wood"] < 1:
-			print("You do not have enough wood")
-			return
-		if self.goods["cannons"] < 1:
-			print("You do not have enough cannons")
-			return
-		if self.resources["cotton"] < 1:
-			print("You do not have enough cotton")
-			return
-		if self.freePOP < 0.2:
-			print("You do not have any freePOPs")
-			return
-		else:
-			self.goods["cannons"] -= 1.0
-			self.resources["cotton"] -= 1.0
-			self.resources["wood"] -= 1.0
-			self.military_produced["frigates"] += 1.0
-			self.freePOP -= 0.2
-			self.milPOP += 0.2
-			self.number_units +=1
-			print("Frigates will be ready at the start of next turn")
-			return
+		self.AP -= 1
+		self.goods["cannons"] -= 1.0
+		self.resources["cotton"] -= 1.0
+		self.resources["wood"] -= 1.0
+		self.military_produced["frigates"] += 1.0
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.number_units +=1
+		
 
 	def build_ironclad(self):
-		if self.shipyard < 2:
-			print("You need a level 2 shipyard before you may build Iron Clad")
-			print("(Building a level 2 shipyard required that you research the 'iron_clad' technology.)")
-			return
-		if self.AP < 1:
-			print("You do not have enough action points")
-			return
-		if self.goods["parts"] < 1:
-			print("You do not have enough parts")
-			return
-		if self.goods["cannons"] < 1:
-			print("You do not have enough cannons")
-			return
-		if self.resources["iron"] < 1:
-			print("You do not have enough iron")
-		if self.freePOP < 0.2:
-			print("You do not have any freePOPs")
-			return
-		else:
-			self.goods["cannons"] -= 1.0
-			self.goods["parts"] -= 1.0
-			self.resources["iron"] -= 1.0
-			self.military_produced["iron_clad"] += 1.0
-			self.freePOP -= 0.2
-			self.milPOP += 0.2
-			self.number_units += 1
-			print("Ironclad will be ready at the start of next turn")
-			return
+		self.AP -= 1
+		self.goods["cannons"] -= 1.0
+		self.goods["parts"] -= 1.0
+		self.resources["iron"] -= 1.0
+		self.military_produced["iron_clad"] += 1.0
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.number_units += 1
+		
 
-	def build_battleship(self):
-		if self.shipyard < 3:
-			print("You need a level 3 shipyard before you may build Battleship")
-			print("(Building a level 3 shipyard required that you research the 'oil_powered_ships' technology.)")
-			return
-		if self.AP < 2:
-			print("You do not have enough action points")
-			return
-		if self.goods["cannons"] < 3:
-			print("You do not have enough cannons")
-			return
-		if self.resources["iron"] < 3:
-			print("You do not have enough iron")
-			return
-		if self.goods["parts"] < 1:
-			print('You do not have enough parts')
-			return
-		if self.goods["gear"] < 1:
-			print("You do not have enough gear")
-			return
-		if self.freePOP < 0.2:
-			print("You do not have any freePOPs")
-			return
-		else:
-			self.goods["cannons"] -= 3
-			self.resources["iron"] -= 3
-			self.goods["parts"] -= 1
-			self.goods["gear"] -= 1
-			self.military_produced["battle_ship"] += 1.0
-			self.freePOP -= 0.2
-			self.milPOP += 0.2
-			self.number_units += 1
-			print("Battleship will be ready at the start of next turn")
-			return
+	def build_battleship(self):	
+		self.AP -= 1
+		self.goods["cannons"] -= 3
+		self.resources["iron"] -= 3
+		self.goods["parts"] -= 1
+		self.goods["gear"] -= 1
+		self.military_produced["battle_ship"] += 1.0
+		self.freePOP -= 0.2
+		self.milPOP += 0.2
+		self.number_units += 1
+		
 
 
 
