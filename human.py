@@ -227,26 +227,9 @@ class Human(Player):
 			self.fighter["manouver"] + 1
 	
 
-	def research_tech(self):
-			print("Which Technology would you like to develop? (Print entire name) \n")
-			print("You currently have %s Research Points \n" % (self.research))
-			options = []
-			for k, t in technology_dict.items():
-				if k not in self.technologies and t["requirement"] <= self.technologies \
-				and self.research >= t["cost"] and self.development_level >= t["min_mid"]:
-					print(k, t)
-					options.append(k)
-			if len(options) == 0:
-				print("You cannot research any technologies at this time")
-				return
-			choice = " "
-			while choice not in options:
-				choice = input()
-			
+	def research_tech(self, choice):
 			self.research -= technology_dict[choice]["cost"]
 			self.technologies.add(choice)
-			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n ")
-			print("Your ingenius researches have discovered %s \n " % (choice))
 			if choice == "flint_lock":
 				self.irregulars["attack"] += 0.15
 				self.irregulars["defend"] += 0.1
@@ -312,7 +295,6 @@ class Human(Player):
 				self.production_modifier += 1.5
 			if choice == "atomic_bomb":
 				print("Holy Shit!")
-				pause = input()
 
 
 

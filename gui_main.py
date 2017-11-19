@@ -87,6 +87,18 @@ def update_gui():
 	update_production_gui()
 	update_military_gui()
 
+	for k, v in technology_dict.items():
+		if k in player.technologies:
+			app.setLabelBg("tech_"+ k, "dark orange")
+			app.disableButton("res_" + k)
+		if k not in player.technologies:
+			app.setLabelBg("tech_"+ k, "gold3")
+			tech = btn[4:]
+			if player.research < technology_dict[tech]["cost"]:
+				app.enableButton("res_" + k)
+			else:
+				app.disableButton("res_" + k)
+
 
 
 def AI_turnS(auto_save):
@@ -578,7 +590,7 @@ def start_main_screen():
 	app.stopTab()
 
 	app.startTab("Production")
-	app.setBg("khaki")
+	app.setBg("light steel blue")
 	app.startScrollPane("Production")
 
 
@@ -719,6 +731,7 @@ def start_main_screen():
 	app.stopLabelFrame()
 
 
+
 	app.startLabelFrame("Navy")
 	row = 1
 	app.addLabel("navy_breakdown", "  Type  Number  Att.   HP   AmmoUse   OilUse", 0, 0, 8, 1)
@@ -734,16 +747,16 @@ def start_main_screen():
 			app.addLabel("num_" + k, player.military[k], row, 1, 1, 1)
 			app.setLabelRelief("num_" + k, "sunken")
 		if k == "frigates":
-			app.addLabel("att_" + k, player.frigate["attack"], row, 2, 1, 1)
-			app.addLabel("HP_" + k, player.frigate["HP"], row, 3, 1, 1)
-			app.addLabel("ammo_use_" + k, player.frigate["ammo_use"], row, 4, 1, 1)
-			app.addLabel("oil_use_" + k, player.fighter["oil_use"], row, 5, 1, 1)
+			app.addLabel("att_" + k, player.frigates["attack"], row, 2, 1, 1)
+			app.addLabel("HP_" + k, player.frigates["HP"], row, 3, 1, 1)
+			app.addLabel("ammo_use_" + k, player.frigates["ammo_use"], row, 4, 1, 1)
+			app.addLabel("oil_use_" + k, player.frigates["oil_use"], row, 5, 1, 1)
 			app.addNamedButton("Build", "build_" + k, build_army, row, 6, 1, 1)
 
 			if player.shipyard < 1 or player.AP < 1 or player.resources["wood"] < 1 or player.goods["cannons"] < 1.5:
 				app.disableButton("build_" + k)
 			else:
-				enableButton("build_" + k)
+				app.enableButton("build_" + k)
 		if k == "iron_clad":
 			app.addLabel("att_" + k, player.iron_clad["attack"], row, 2, 1, 1)
 			app.addLabel("HP_" + k, player.iron_clad["HP"], row, 3, 1, 1)
@@ -776,12 +789,70 @@ def start_main_screen():
 		row += 1
 	app.stopLabelFrame()
 	app.stopScrollPane()
+	app.stopTab()
 
+	app.startTab("Technology")
+	app.setBg("chartreuse")
+	app.startPanedFrame("tech_divider")
+	app.startScrollPane("technologies")
+	app.startLabelFrame("Research Status")
+	stab_rounds = round(player.stability * 2) / 2
+	research_per_turn = 0.25 + ((player.developments["research"] + player.developments["management"]/6) * \
+		government_map[player.government] * stability_map[stab_rounds])
+	app.addLabel("research_status", "Current Research Points: %s    Research Points Per Turn: %s" % (player.research, research_per_turn), 1, 1, 4)
+	app.stopLabelFrame()
+
+	app.startLabelFrame("Technology List")
+	app.setLabelWidth()
+	#app.addImage()
+	app.add
+	row = 1
+	for k, v in technology_dict.items():
+		app.addLabel("tech_" + k, "%s: requirements: %s, cost: %s, min dev: %s" % \
+		 (k, v["requirement"], v["cost"], v["min_mid"]), row, 0, 3, 1)
+		app.addNamedButton("Research", "res_" + k, research_technology,  row, 3, 1, 1)
+		if k not in player.technologies:
+			app.setLabelBg("tech_"+ k, "gold3")
+			if player.research < technology_dict[k]["cost"]:
+				app.disableButton("res_" + k)
+			else:
+				app.enableButton("res_" + k)
+		else:
+			app.setLabelBg("tech_"+ k, "dark orange")
+			app.disableButton("res_" + k)
+		row += 1
+	app.stopLabelFrame()
+	app.stopScrollPane()
+
+
+	app.startPanedFrame("Tech Descriptions")
+	#app.addImage("Tech Picture")
+	#app.addMessage("Tech_Description", "Description")
 
 	app.stopTab()
 
 	app.stopTabbedFrame()
 	app.hideSubWindow("loading new game")
+
+def research_technology(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	tech = btn[4:]
+	player.research_tech(tech)
+	app.setLabelBg("tech_" + tech, "dark orange")
+
+	for k, v in technology_dict.items():
+		if k in player.technologies:
+			app.setLabelBg("tech_"+ k, "dark orange")
+			app.disableButton("res_" + k)
+		if k not in player.technologies:
+			app.setLabelBg("tech_"+ k, "gold3")
+			tech = btn[4:]
+			if player.research < technology_dict[tech]["cost"]:
+				app.enableButton("res_" + k)
+			else:
+				app.disableButton("res_" + k)
+
 
 
 def build_army(btn):
@@ -887,17 +958,19 @@ def update_production_gui():
 def update_military_gui():
 	global players, human_player, market, PRODUCE
 	player = players[human_player]
-	for f in player.military.keys():
-		app.addLabel("num_" + k, player.military[k])
-
+	for k in player.military.keys():
 		if k == "irregulars":
-			app.setLabel("att_" + k, player.irregulars["attack"])
-			app.setLabel("def_" + k, player.irregulars["defend"])
-			app.setLabel("man_" + k, player.irregulars["manouver"])
-			app.setLabel("ammo_use_" + k, player.irregulars["ammo_use"])
-			app.setLabel("oil_use_" + k, player.irregulars["oil_use"])
-			if player.freePOP < 0.2 or player.goods["cannons"] < 1:
-				app.disableButton("build_" + k)
+			continue
+		app.setLabel("num_" + k, player.military[k])
+
+		#if k == "irregulars":
+			#app.setLabel("att_" + k, player.irregulars["attack"])
+		#	app.setLabel("def_" + k, player.irregulars["defend"])
+			#app.setLabel("man_" + k, player.irregulars["manouver"])
+			#app.setLabel("ammo_use_" + k, player.irregulars["ammo_use"])
+			#app.setLabel("oil_use_" + k, player.irregulars["oil_use"])
+			#if player.freePOP < 0.2 or player.goods["cannons"] < 1:
+			#	app.disableButton("build_" + k)
 
 		if k == "infantry":
 			app.setLabel("att_" + k, player.infantry["attack"])
@@ -982,9 +1055,9 @@ def update_military_gui():
 			else:
 				app.enableButton("build_"+ k)
 		if player.military[k] < 1:
-			app.disableButton("disband_" + _type)
+			app.disableButton("disband_" + k)
 		else:
-			app.enableButton("disband_" + _type)
+			app.enableButton("disband_" + k)
 
 
 def good_material(_type):
@@ -1036,7 +1109,8 @@ def increase_population(btn):
 		if player.resources["food"] < 1 or player.goods["clothing"] < 1:
 			app.disableButton("POP UP")
 		else:
-			app.enableButton("POP UP")	
+			app.enableButton("POP UP")
+		app.enableButton("add_pro_pop")	
 
 def if_spend_chem():
 	cont = getYesNoBox("chem_for_growth")
