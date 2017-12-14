@@ -90,7 +90,7 @@ def initialize_modern_minor(player):
 	player.goods["cannons"] = 1.0
 	
 
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies" }
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies"}
 
 
 
@@ -103,7 +103,7 @@ def initialize_modern_minor(player):
 def initialize_oldempire(player):
 
 	player.stability = 0.0
-	player.milPOP = 1.0
+	player.milPOP = 0.8
 	player.government = "despotism"
 	player.type = "old_empire"
 
@@ -115,7 +115,7 @@ def initialize_oldempire(player):
 	player.goods["cannons"] = 1.0
 	player.goods["furniture"] = 0.0
 
-	player.military["irregulars"] = 4.0
+	player.military["infantry"] = 3.0
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 
@@ -145,8 +145,7 @@ def initialize_old_minor(player):
 	player.resources["gold"] = 6.0
 
 
-	player.military["irregulars"] = 2.0
-	player.military["cavalry"] = 1.0
+	player.military["infantry"] = 2.0
 	player.military["frigates"] = 0.0
 
 	player.techModifier = 0.6
@@ -167,7 +166,7 @@ def initilize_uncivilized(player):
 	player.freePOP = 2
 	#player.technologies.add("pre_industry_1")
 	player.resources["gold"] = 4.0
-	player.military["irregulars"] = 2.0
+	player.military["infantry"] = 1.0
 	player.techModifier = 0.5
 	player.reputation = 0.6
 	player.colonization = -8.0

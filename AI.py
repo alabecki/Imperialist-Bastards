@@ -138,7 +138,7 @@ class AI(Player):
             "pre_industry_1": 5,
             "pre_industry_2": 5,
             "pre_industry_3": 5,
-            # "professional_armies": 7,
+            "professional_armies": 7,
             "high_pressure_steam_engine": 7,
             "square_timbering": 4,
             "cotton_gin": 4,
@@ -1716,6 +1716,16 @@ class AI(Player):
         market.report.append("%s researched %s" % (self.name, _choice))
         self.research -= technology_dict[choice]["cost"]
         self.technologies.add(choice)
+        if choice == "professional_armies":
+            self.irregulars["attack"] += 0.15
+            self.irregulars["defend"] += 0.15
+            self.infantry["attack"] += 0.15
+            self.infantry["defend"] += 0.15
+            self.cavalry["attack"] += 0.15
+            self.cavalry["defend"] += 0.15
+            self.artillery["attack"] += 0.15
+            self.artillery["defend"] += 0.15
+            self.frigates["attack"] += 0.2
         if choice == "flint_lock":
             self.irregulars["attack"] += 0.15
             self.irregulars["defend"] += 0.1
@@ -1788,7 +1798,7 @@ class AI(Player):
 
         if choice == "early_computers":
             self.battle_ship["attack"] += 1
-            self.production_modifier += 1.5
+            self.production_modifier += 0.15
         #if choice == "atomic_bomb":
            # print("Holy Shit!")
             #pause = input()
@@ -2316,60 +2326,7 @@ class AI(Player):
             self.military_priority[k] += 0.1
         print("%s has completed an fighter irregulars unit" % (self.name))
 
-    def check_if_prov_can_be_dev(self, prov):
-        # print("Check if %s can be developed..." % (prov))
-        if self.provinces[prov].development_level >= 2:
-            return
-        max_dev = 0
-        if (self.provinces[prov].resource == "food"):
-            max_dev = 0
-            if ("steel_plows" in self.technologies):
-                #	print("Is steel plows working?")
-                max_dev = 1
-            if ("mechanical_reaper" in self.technologies):
-                max_dev = 2
-        elif (self.provinces[prov].resource == "iron" or self.provinces[prov].resource == "coal"):
-            max_dev = 0
-            if ("square_timbering" in self.technologies):
-                max_dev = 1
-            if ("dynamite" in self.technologies):
-                max_dev = 2
-        elif (self.provinces[prov].resource == "cotton"):
-            max_dev = 0
-            if ("cotton_gin" in self.technologies):
-                max_dev = 1
-            if ("compound_steam_engine" in self.technologies):
-                max_dev = 2
-        elif (self.provinces[prov].resource == "wood"):
-            max_dev = 0
-            if ("saw_mill" in self.technologies):
-                max_dev = 1
-            if ("compound_steam_engine" in self.technologies):
-                max_dev = 2
-        elif (self.provinces[prov].resource == "spice"):
-            max_dev = 0
-            if ("steel_plows" in self.technologies):
-                max_dev = 1
-        elif (self.provinces[prov].resource == "gold"):
-            max_dev = 0
-            if ("dynamite" in self.technologies):
-                max_dev = 1
-        elif (self.provinces[prov].resource == "dyes"):
-            max_dev = 0
-            if ("compound_steam_engine" in self.technologies):
-                max_dev = 1
-        elif (self.provinces[prov].resource == "oil"):
-            max_dev = 0
-            if ("oil_drilling" in self.technologies):
-                max_dev = 1
-        elif (self.provinces[prov].resource == "rubber"):
-            max_dev = 0
-            if ("chemistry" in self.technologies):
-                max_dev = 1
-        if self.provinces[prov].development_level >= max_dev:
-            return False
-        else:
-            return True
+
 
     def use_chemicals(self, market, relations, players):
         if self.goods["chemicals"] > 4:
@@ -2377,7 +2334,7 @@ class AI(Player):
                 self.goods["chemicals"] -= 1
                 self.resources["dyes"] += 1
            #     print("Turned Chemicals to dyes")
-        if self.resources["food"] < 8 and len(market.market["food"]) < 12:
+        if self.resources["food"] < 5 and len(market.market["food"]) < 12 and "fertlizer" in self.technologies:
             count = 0
             for p, prov in self.provinces.items():
                 if prov.resource == "food":

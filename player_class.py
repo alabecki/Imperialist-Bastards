@@ -243,7 +243,7 @@ class Player(object):
 		self.chemicals = set()
 		#self.tech_added = 0.0
 
-        #diplomacy
+		#diplomacy
 		self.reputation = 1.0
 		self.diplo_action = 0.0
 		self.CB = set()
@@ -579,6 +579,7 @@ class Player(object):
 	def collect_goods(self):
 
 		for k, p in self.goods_produced.items():
+			print("Has produced %d %s" % (p, k))
 			self.goods[k] += p
 		
 		for k, v in self.military_produced.items():
@@ -1043,7 +1044,7 @@ class Player(object):
 			options.append("cannons")
 		if self.factories["chemicals"]["number"] == 0 and "chemistry" in self.technologies:
 			options.append("chemicals")
-		if self.factories["chemicals"]["number"] == 1 and "dyes" in self.technologies:
+		if self.factories["chemicals"]["number"] == 1 and "synthetic_dyes" in self.technologies:
 			options.append("chemicals")
 		if self.factories["gear"]["number"] < 2 and "electricity" in self.technologies:
 			options.append("gear")
@@ -1072,11 +1073,17 @@ class Player(object):
 
 
 	def manifacture_good(self, _type, amount):
+		print(_type)
+		print(amount)
+		print("manifacture_good...")
 		self.AP -= 1
 		if self.factories[_type]["number"] == 0:
 			for i in craft[_type]:
 				self.resources[i] -= craft[_type][i]
-			self.goods_produced[_type] += 1
+			print("Should produce %d %s" % (amount, _type))
+			self.goods_produced[_type] += amount
+			print(self.goods_produced[_type])
+			return
 
 		else:
 			material_mod = 1 - (self.developments["management"]/10)
@@ -1085,8 +1092,10 @@ class Player(object):
 					self.resources[i] -= manufacture[_type][i] * amount * material_mod
 				else:
 					self.goods[i] -= manufacture[_type][i] * amount * material_mod
+			print("Should produce %d %s" % (amount, _type))
 			self.goods_produced[_type] += amount
-			self.AP -= 1
+			print(self.goods_produced[_type])
+			
 			self.factories[_type]["used"] = True
 			return
 
@@ -1097,4 +1106,57 @@ class Player(object):
 
 	def pro_POP_subtract(self):
 		self.proPOP -= 1
-		self.freePOP + 1
+		self.freePOP += 1
+
+	def check_if_prov_can_be_dev(self, prov):
+		if self.provinces[prov].development_level >= 2:
+			return
+		max_dev = 0
+		if (self.provinces[prov].resource == "food"):
+			max_dev = 0
+			if ("steel_plows" in self.technologies):
+				max_dev = 1
+			if ("mechanical_reaper" in self.technologies):
+				max_dev = 2
+		elif (self.provinces[prov].resource == "iron" or self.provinces[prov].resource == "coal"):
+			max_dev = 0
+			if ("square_timbering" in self.technologies):
+				max_dev = 1
+			if ("dynamite" in self.technologies):
+				max_dev = 2
+		elif (self.provinces[prov].resource == "cotton"):
+			max_dev = 0
+			if ("cotton_gin" in self.technologies):
+				max_dev = 1
+			if ("compound_steam_engine" in self.technologies):
+				max_dev = 2
+		elif (self.provinces[prov].resource == "wood"):
+			max_dev = 0
+			if ("saw_mill" in self.technologies):
+				max_dev = 1
+			if ("compound_steam_engine" in self.technologies):
+				max_dev = 2
+		elif (self.provinces[prov].resource == "spice"):
+			max_dev = 0
+			if ("steel_plows" in self.technologies):
+				max_dev = 1
+		elif (self.provinces[prov].resource == "gold"):
+			max_dev = 0
+			if ("dynamite" in self.technologies):
+				max_dev = 1
+		elif (self.provinces[prov].resource == "dyes"):
+			max_dev = 0
+			if ("compound_steam_engine" in self.technologies):
+				max_dev = 1
+		elif (self.provinces[prov].resource == "oil"):
+			max_dev = 0
+			if ("oil_drilling" in self.technologies):
+				max_dev = 1
+		elif (self.provinces[prov].resource == "rubber"):
+			max_dev = 0
+			if ("chemistry" in self.technologies):
+				max_dev = 1
+		if self.provinces[prov].development_level >= max_dev:
+			return False
+		else:
+			return True

@@ -3,7 +3,6 @@ from player_class import*
 import random
 import minor_classes
 from technologies import technology_dict
-from commands import*
 
 manufacture = {
 			"parts": {"iron": 0.67, "coal": 0.33},
@@ -230,9 +229,15 @@ class Human(Player):
 	def research_tech(self, choice):
 			self.research -= technology_dict[choice]["cost"]
 			self.technologies.add(choice)
+			if choice == "professional_armies":
+				self.infantry["attack"] += 0.15
+				self.infantry["defend"] += 0.15
+				self.cavalry["attack"] += 0.15
+				self.cavalry["defend"] += 0.15
+				self.artillery["attack"] += 0.15
+				self.artillery["defend"] += 0.15
+				self.frigates["attack"] += 0.2
 			if choice == "flint_lock":
-				self.irregulars["attack"] += 0.15
-				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.3
 				self.infantry["defend"] += 0.1
 				self.cavalry["attack"] += 0.2
@@ -240,10 +245,7 @@ class Human(Player):
 				self.artillery["attack"] += 0.3
 				self.artillery["defend"] += 0.1
 				self.frigates["attack"] += 0.25
-
 			if(choice == "muzzle_loaded_arms"):
-				self.irregulars["attack"] += 0.15
-				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.3
 				self.infantry["defend"] += 0.1
 				self.cavalry["attack"] += 0.2
@@ -254,8 +256,6 @@ class Human(Player):
 			if(choice == "cement"):
 				self.max_fortification += 0.1
 			if(choice == "breach_loaded_arms"):
-				self.irregulars["attack"] += 0.15
-				self.irregulars["defend"] += 0.1
 				self.infantry["attack"] += 0.35
 				self.infantry["defend"] += 0.2
 				self.cavalry["attack"] += 0.25
@@ -264,7 +264,6 @@ class Human(Player):
 				self.artillery["defend"] += 0.2
 				self.frigates["attack"] += 0.35
 			if(choice == "machine_guns" ):
-				self.irregulars["defend"] += 0.2
 				self.infantry["defend"] += 1.0
 				self.cavalry["defend"] + 0.1
 			if(choice == "indirect_fire"):
@@ -292,7 +291,7 @@ class Human(Player):
 
 			if choice == "early_computers":
 				self.battle_ship["attack"] += 1
-				self.production_modifier += 1.5
+				self.production_modifier += 0.15
 			if choice == "atomic_bomb":
 				print("Holy Shit!")
 
@@ -430,6 +429,12 @@ class Human(Player):
 			self.build_tank()
 		if _type == "fighter":
 			self.build_fighter()
+		if _type == "frigates":
+			self.build_frigates()
+		if _type == "iron_clad":
+			self.build_ironclad()
+		if _type == "battle_ship":
+			self.build_battleship()
 
 
 	def build_infantry(self):
@@ -508,10 +513,6 @@ class Human(Player):
 		self.milPOP += 0.2
 		self.number_units += 1
 		
-
-
-
-
 
 
 	def improve_fortifications(self):

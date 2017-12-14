@@ -29,10 +29,9 @@ from human_turn import*
 from AI_turn import*
 from globe import*
 
-from historical.Scenario import* 
-from BalanceScenario.Scenario import*
+from Scenarios.historical.Scenario import* 
+from Scenarios.BalanceScenario.Scenario import*
 #sys.path.insert(0, 'C:\Users\Labecki\Documents\Python\game\historical')
-#from Scenario import*
 
 # Main Game Loop
 
@@ -134,7 +133,39 @@ while True:
 		print("Saving game as %s ....." % (auto_name))
 		save_game(auto_name, players, relations, market, provinces)
 
+
+
+	def AI_turnS(auto_save, players, relations, market, provinces):
+		market.turn +=1
+		order = list(players.keys())
+		shuffle(order)
+		for k, v in market.market.items():
+			for i in v:
+				if i.owner not in players.keys():
+					market.market[k].remove(i)
+					del i
+		for o in order:
+			if o not in players.keys():
+				continue
+			if type(players[o]) == AI:
+				AI_turn(players, players[o], market, relations, provinces)
+			else:
+				player = players[o]
+
+			for k in player.goods_produced.keys():
+				player.goods_produced[k] = 0
+		gc.collect()
+		
+		if auto_save != "":
+	
+			#if market.turn % 2 == 1:
+
+			print("Saving....\n")
+			save_game(auto_save, players, relations, market, provinces)
+
 						
+
+
 	_continue = True
 	while(_continue == True):
 		
@@ -178,6 +209,7 @@ while True:
 
 				for k in player.goods_produced.keys():
 					player.goods_produced[k] = 0
+
 
 
 				print("############################################################################################################### \n ")
