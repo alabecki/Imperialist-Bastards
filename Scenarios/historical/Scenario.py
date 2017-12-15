@@ -14,7 +14,7 @@ modern_minors = ["Denmark", "Sweden", "Portugal", "Two Sicilies", "Switzerland",
 "Bavaria", "NorthGermany", "Papal States"]
 old_empires = ["China", "India", "Japan", "Persia"]
 old_minors = ["Korea", "Egypt", "Algeria", "Morocco", "Kazakhstan", "Philippines", "Dai Nam", "Siam", "Malaysia", \
-"Brunei", "Tunisia", "Libya", "Nejd", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
+"Brunei", "Tunisia", "Libya", "Nejd", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Bali", "Java"]
 #unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
 #"South Australia", "New Zealand", "Zululand"]
 #unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
@@ -194,8 +194,8 @@ def historical(human_player):
 				cambodia(player, provinces)
 			if player.name == "Brunei":
 				brunei(player, provinces)
-			if player.name == "Sulawesi":
-				sulawesi(player, provinces)
+			if player.name == "Bali":
+				bali(player, provinces)
 			if player.name == "Java":
 				java(player, provinces)
 

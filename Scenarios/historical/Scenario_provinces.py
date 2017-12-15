@@ -613,10 +613,10 @@ def create_provinces():
 	#Singapour.y = 23
 	#provinces["Singapour"] = Singapour
 
-	Sulawesi = Province("_Sulawesi", "Sulawesi", "spice", 1.4, "old", "Sulawesi")
-	Sulawesi.x = 14
-	Sulawesi.y = 28
-	provinces["_Sulawesi"] = Sulawesi
+	Bali = Province("_Bali", "Bali", "spice", 1.4, "old", "Bali")
+	Bali.x = 14
+	Bali.y = 28
+	provinces["_Bali"] = Bali
 
 	NorthPhilippines = Province("NorthPhilippines", "Philippines", "food", 1.2, "old", "Filipino")
 	NorthPhilippines.x = 11

@@ -18,6 +18,16 @@ def england(player, provinces):
 	player.colonization = 1
 	player.diplo_action = 1	####################
 
+	player.resources["food"] = 5
+	player.resources["spice"] = 2
+	player.goods["clothing"] = 3
+	player.goods["furniture"] =3
+	player.goods["paper"] = 3
+	player.goods["parts"] = 3
+	player.goods["cannons"] = 4
+
+	player.research = 8
+ 
 
 	player.provinces["SouthEastEngland"] = provinces["SouthEastEngland"]
 	player.provinces["SouthWestEngland"] = provinces["SouthWestEngland"]
@@ -399,13 +409,10 @@ def ottoman(player, provinces):
 	player.capital.add("WestTurky")
 	player.resources["gold"] = 3
 
-	player.military["irregulars"] = 2
-	player.military["infantry"] = 2.0
-	player.military["cavalry"] = 1.0
-	player.military["frigates"] = 0.0
+
 	player.military["artillery"] = 0.0
 
-	player.number_units = 5.0
+	player.number_units = 4.0
 	player.diplo_action = 0.0
 
 	player.shipyard = 0
@@ -414,7 +421,8 @@ def ottoman(player, provinces):
 	player.development_level = 0
 	player.developments["research"] = 0
 
-	player.colonization = -3 
+	player.colonization = -3
+	player.milPOP = 0.8
 	player.POP = 9
 	player.numLowerPOP = 9
 	player.freePOP = 8
@@ -462,13 +470,9 @@ def spain(player, provinces):
 	player.capital.add("Leon")
 
 	player.technologies.add("pre_industry_2")
-	player.technologies.add("flintlock")
 
 
-	player.military["irregulars"] = 1
-	player.military["infantry"]	= 1	
 	player.colonization = 0 
-	player.military["frigates"] = 1
 	player.POP = 7
 	player.numLowerPOP = 7
 	player.freePOP = 6
@@ -538,7 +542,7 @@ def netherlands(player, provinces): # major power
 
 
 	player.objectives = {"Holland", "Wallonie", "Rhineland", "Sumatra", "_Brunei",  \
-	"_Sulawesi", "_Java", "Madres", "Bombay"}
+	"_Bali", "_Java", "Madres", "Bombay"}
 
 
 
@@ -860,10 +864,10 @@ def malaysia(player, provinces):
 
 
 
-def	sulawesi(player, provinces):
-	player.culture = "Sulawesi"
-	player.capital.add("_Sulawesi")
-	player.provinces["_Sulawesi"] = provinces["_Sulawesi"]
+def	bali(player, provinces):
+	player.culture = "Bali"
+	player.capital.add("_Bali")
+	player.provinces["_Bali"] = provinces["_Bali"]
 	player.resources["spice"] = 1
 
 
