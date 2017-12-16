@@ -56,8 +56,35 @@ manufacture = {
 def update_gui():
 	global players, human_player, market, PRODUCE
 	player = players[human_player]
+	print("59")
+	update_main_tab()
+	update_market_tab()
+	update_production_tab() 
+	update_tech_tab()
+	update_culture_tab()
+
+
+def update_market_tab():
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	for k, v in player.resources.items():
+		if k in ["gold", "/", "//"]:
+			continue
+		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.resources[k]), len(market.market[k]), player.supply[k], \
+			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
+
+	for k, v in player.goods.items():
+		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.goods[k]), len(market.market[k]), player.supply[k], \
+			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
 	update_buy_button()
-	update_sell_button()
+	update_sell_button() 
+
+def update_main_tab():
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	#Update Main Tab (except map)
 	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
 	app.setLabel("l5", "%.2f" % round(player.culture_points, 2))
 	app.setLabel("l6",  "%.2f" % round(player.POP, 2))
@@ -73,35 +100,33 @@ def update_gui():
 	app.setLabel("l26", player.num_colonies)
 	app.setLabel("l27", "%.2f" % round(player.colonization))
 	app.setLabel("l28", 1 + round((player.num_colonies * 1.5),2))
+	
+	if player.check_development() == False:
+		app.disableButton("Develop")
+	else:
+		app.enableButton("Develop")
 
 	if(player.POP_increased > 1):
 		app.disableButton("POP UP")
-	elif player.POP_increased == 1.0 and player.goods["chemicals"] < 1:
+	elif player.POP_increased == 1 and player.goods["chemicals"] < 1:
 		app.disableButton("POP UP")
 	elif player.resources["food"] < 1 or player.goods["clothing"] < 1:
 		app.disableButton("POP UP")
 	else:
 		app.enableButton("POP UP")
 
-
 	for p in player.provinces.keys():
 		if player.check_if_prov_can_be_dev(p):
 			if player.AP >= 1 and player.goods["parts"] >= 1 and player.resources["wood"] > 1:
 				app.enableButton("Develop " + p)
+			else:
+				app.disableButton("Develop " + p)
 		else:
 			app.disableButton("Develop " + p)
 
-	for k, v in player.resources.items():
-		if k in ["gold", "/", "//"]:
-			continue
-		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.resources[k]), len(market.market[k]), player.supply[k], \
-			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
-
-	for k, v in player.goods.items():
-		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.goods[k]), len(market.market[k]), player.supply[k], \
-			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
+def update_production_tab():
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
 	if player.freePOP < 1:
 		app.disableButton("add_pro_pop")
 	else:
@@ -113,10 +138,13 @@ def update_gui():
 	update_production_gui()
 	update_military_gui()
 
+def update_tech_tab():
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
 	stab_rounds = round(player.stability * 2) / 2
 	research_per_turn = 0.25 + ((player.developments["research"] + player.developments["management"]/6) * \
 	government_map[player.government] * stability_map[stab_rounds])
-	app.setLabel("research_status", "      Current Research Points: %s    Research Points Per Turn: %s      "  % (player.research, research_per_turn))
+	app.setLabel("research_status", "      Current Research Points: %s    Research Points Per Turn: %s      "  % (round(player.research, 2), round(research_per_turn, 2)))
 	for k, v in technology_dict.items():
 		if k in player.technologies:
 			app.setLabelBg("tech_"+ k, "dark orange")
@@ -130,51 +158,28 @@ def update_gui():
 			else:
 				app.disableButton("res_" + k)
 
-
-def AI_turnS(auto_save):
-	global players, market, relations, provinces, human_player
-	market.report = []
-	market.market_report = " "
-	market.turn +=1
-	order = list(players.keys())
-	shuffle(order)
-	for k, v in market.market.items():
-		for i in v:
-			if i.owner not in players.keys():
-				market.market[k].remove(i)
-				del i
-	for o in order:
-		if o not in players.keys():
-			continue
-		if type(players[o]) == AI:
-			AI_turn(players, players[o], market, relations, provinces)
-		else:
-			for k in players[o].goods_produced.keys():
-				players[o].goods_produced[k] = 0
-	gc.collect()
-	
-	if auto_save != "":
-
-		#if market.turn % 2 == 1:
-		app.showSubWindow("saving")
-		print("Saving....\n")
-		save_game(auto_save, players, relations, market, provinces)
-		app.hideSubWindow("saving")
-	for p in provinces.values():
-		temp = p.owner
-		owner = players[temp]
-		app.setButtonBg(p.position, owner.colour)
-		app.setButtonFg(p.position, owner.colour)
-
-	app.setMessage("turn_report", market.report)
-	app.setMessage("turn_market_report", market.market_report)
-
+def update_culture_tab():
+	global players, human_player, market, PRODUCE
 	player = players[human_player]
-	print("____________________________________________________________________________________")
-	player.calculate_access_to_goods(market)
-	app.setLabel("t1", "Turn:" +  str(market.turn))
-
-	update_gui()
+	if player.culture_points < 1:
+		app.disableButton("Increase Stability")
+		app.disableButton("Export Culture")
+	else:
+		app.enableButton("Increase Stability")
+		app.enableButton("Export Culture")	
+	if player.culture_points < 1 or player.diplo_action < 1:
+		app.disableButton("Improve Reputation")
+	else:
+		app.enableButton("Improve Reputation")
+	others = player.check_for_non_accepted_cultures()
+	if len(others) == 0 or player.culture_points < 1:
+		app.disableButton("Integrate Culture")
+	else:
+		app.enableButton("Integrate Culture")
+	if player.resources["spice"] < 1 or player.stability >= 3:
+		app.disableButton("Consume Spice")
+	else:
+		app.enableButton("Consume Spice")
 
 
 
@@ -274,6 +279,7 @@ def get_auto_save_name(bn):
 		
 	else:
 		start_main_screen()
+		#start_game_tread()
 
 def create_auto_save(btn):
 	app.hideSubWindow("auto_save_name")
@@ -282,7 +288,8 @@ def create_auto_save(btn):
 	if auto_save != "":
 		auto_save = app.getEntry("auto_save")
 		auto_save = create_new_save_game(auto_save, players, relations, market, provinces)
-	start_main_screen()
+	#start_main_screen()
+	start_game_tread()
 
 
 def saving(bn):
@@ -338,7 +345,6 @@ def start_main_screen():
 	#app.startFrame("info")
 	#app.setExpand("all")
 	#app.setFrameHeight("info", 20)
-	
 	#app.setExpand("none")
 	app.setFont(10)
 	app.addImage("player_flag", player.name + ".gif", 1, 1)
@@ -469,16 +475,12 @@ def start_main_screen():
 
 	app.startPanedFrameVertical("map")
 	
-
 	app.startScrollPane("map_scroll")
 	app.setExpand("all")
-
-
 	app.setStretch("all")
 
 	#app.setExpand("none")
 	global provinces
-
 	for i in range(1, 19):
 		for j in range(1, 33):
 			nm = str(i)+ " " + str(j)
@@ -489,7 +491,7 @@ def start_main_screen():
 			app.setButtonBg(nm , "blue")
 			app.setButtonFg(nm, "blue")			
 
-				
+	print("494\n")			
 	for p in provinces.values():
 		temp = p.owner
 		owner = players[temp]
@@ -502,9 +504,9 @@ def start_main_screen():
 		app.setPadding([10, 10])
 		app.startLabelFrame("*" + p.name)
 		app.setSticky("nesw")
-		app.addLabel(p.name+owner.name, "Owner: ", 1, 0)
+		app.addLabel(p.name, "Owner: ", 1, 0)
 		print(owner.name)
-		app.addImage(p.name+owner.name, owner.name + ".gif", 1, 1)
+		app.addImage(p.name, owner.name + ".gif", 1, 1)
 		app.addLabel("*res" + p.name, "Resource: ", 2, 0)
 		app.addLabel("*qual"+ p.name, "Quality: ", 3, 0)
 		app.addLabel("*dev" + p.name, " Ind. Development: ", 2, 1)
@@ -512,6 +514,7 @@ def start_main_screen():
 		app.addLabel("*cult" + p.name, "Culture:", 3, 2)
 		app.stopLabelFrame()
 		app.stopSubWindow()
+
 
 		if type(owner) == Human:
 			app.startSubWindow("human" + p.position, modal = False)
@@ -535,7 +538,6 @@ def start_main_screen():
 	app.stopScrollPane()
 	app.stopPanedFrame()
 
-
 	app.startPanedFrameVertical("report_pane")
 	app.startScrollPane("report")
 	app.setBg("goldenrod3")
@@ -548,20 +550,21 @@ def start_main_screen():
 
 	app.stopPanedFrame()
 
-
 	app.stopTab()
 
 	app.startTab("Market")
+
 	app.setStretch("all")
 	app.startPanedFrameVertical("market pan")
 	app.startScrollPane("Market_Scroll")
 	app.setBg("khaki")
 
-	app.startLabelFrame("Inventroy and Market")
+	app.startLabelFrame("Inventory and Market")
 	app.setStretch("none")
 	app.setSticky("nw")
 
 	i = 1
+
 	app.addLabel("resources_", "Invent  |   Market   |   Price", 0, 1, 3, 1)
 	for k, v in player.resources.items():
 		if k in ["gold", "/", "//"]:
@@ -593,7 +596,6 @@ def start_main_screen():
 			app.enableButton(k + "_sell")
 		i = i + 1
 	i = 1
-
 	app.addLabel("goods_", "Invent  |   Market   |   Price", 0, 9, 4, 1)
 	for k, v in player.goods.items():
 		app.addLabel("blank_" + k, "   ", i, 7)
@@ -643,6 +645,7 @@ def start_main_screen():
 	app.setBg("light steel blue")
 	app.startScrollPane("Production")
 
+	print("654\n")			
 
 	app.startLabelFrame("Urban Workers")
 	app.addLabel("num_urban_workers", "Number of Urban Workers %s" % (player.proPOP), 1, 1)
@@ -659,9 +662,11 @@ def start_main_screen():
 	app.stopLabelFrame()
 
 	i = 2
+	print("671\n")			
+
 	fact_options = player.factory_optons()
 	app.startLabelFrame("Manufacture Goods")
-	app.addLabel("production_"," Fact. Type            Level       Used?      Upgrade             Inventory      Can Prod.   Producing       Produce", 1, 0, 9)
+	app.addLabel("production_"," Fact. Type          Level       Used?     Upgrade         Inventory   Can Prod.   Producing    Produce", 1, 0, 9)
 	for f in player.goods.keys():
 		app.addLabel("p_" + f, " ", i, 0, 1, 1)
 		app.addImage("p_" + f, f +".gif", i, 0, 1, 1)
@@ -688,10 +693,12 @@ def start_main_screen():
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Infrastructure")
-	
+	print("702\n")			
+
 	app.addImage("fort", "fort.gif", 1, 0, 1, 1)
-	app.addLabel("upgrade_fortification", "Fortification Level: %f" % player.fortification, 1, 1, 2)
+	app.addLabel("upgrade_fortification", "Fortification Level: %.2f" % player.fortification, 1, 1, 2)
 	app.addNamedButton("Upgrade", "upgrade_fort", upgrade_fort, 1, 3, 1)
+
 
 	app.addImage("shipyard", "shipyard.gif", 2, 0, 1, 1)
 	app.addLabel("upgrade_shipyard", "shipyard Level: %d" % player.shipyard, 2, 1, 2)
@@ -707,9 +714,38 @@ def start_main_screen():
 		app.enableButton("upgrade_shipyard")
 	app.stopLabelFrame()
 
+
+	app.startLabelFrame("Chemical Conversion")
+	app.addImage("chemical_frame", "chemical_conversion.gif", 1, 0, 1, 4)	
+	app.addButton("Synthetic Dyes", synthetic_dyes, 1, 2, 3)
+	app.addButton("Fertilize Soil", fertilize_soil, 2, 2, 3)
+	app.addButton("Synthetic Rubber", synthetic_rubber, 3, 2, 3)
+	app.addButton("Synthetic Oil", synthetic_oil, 4, 2, 3)
+	#app.addImage("chemical_frame", "chemical_conversion.gif", 1, 5)
+	app.stopLabelFrame()
+
+	if "synthetic_dyes" not in player.technologies or player.goods["chemicals"] < 1:
+		app.disableButton("Synthetic Dyes")
+	else:
+		app.enableButton("Synthetic Dyes")
+	if "fertilizer" not in player.technologies or player.goods["chemicals"] < 1:
+		app.disableButton("Fertilize Soil")
+	else:
+		app.enableButton("Fertilize Soil")
+	if "synthetic_rubber" not in player.technologies or player.goods["chemicals"] < 1 or player.goods["oil"] < 1:
+		app.disableButton("Synthetic Rubber")
+	else:
+		app.enableButton("Synthetic Rubber")
+	if "synthetic_oil" not in player.technologies or player.goods["chemicals"] < 3:
+		app.disableButton("Synthetic Oil")
+	else:
+		app.enableButton("Synthetic Oil")
+
+	print("750\n")			
+
 	app.startLabelFrame("Army")
 	row = 1
-	app.addLabel("army_breakdown", "  Type  Number  Att.   Def.   Man.  AmmoUse   OilUse", 0, 0, 9, 1)
+	app.addLabel("army_breakdown", " Type          Number    Att.    Def.   Man.  AmmoUse   OilUse", 0, 0, 9, 1)
 	for k in player.military.keys():
 		if k == "irregulars":
 			continue
@@ -780,7 +816,6 @@ def start_main_screen():
 				else:
 					app.enableButton("build_"+ k)
 
-
 			if k == "fighter":
 				app.addLabel("att_" + k, player.fighter["attack"], row, 2, 1, 1)
 				app.addLabel("def_" + k, player.fighter["defend"], row, 3, 1, 1)
@@ -799,11 +834,11 @@ def start_main_screen():
 				app.enableButton("disband_" + k)
 			row += 1
 	app.stopLabelFrame()
-
+		
 
 	app.startLabelFrame("Navy")
 	row = 1
-	app.addLabel("navy_breakdown", "  Type  Number  Att.   HP   AmmoUse   OilUse", 0, 0, 8, 1)
+	app.addLabel("navy_breakdown", "  Type      Number   Att.    HP    AmmoUse    OilUse", 0, 0, 8, 1)
 
 	for k in player.military.keys():
 		if 	k not in ["frigates", "iron_clad", "battle_ship"]:
@@ -859,6 +894,7 @@ def start_main_screen():
 	app.stopLabelFrame()
 	app.stopScrollPane()
 	app.stopTab()
+	print("905\n")			
 
 	app.startTab("Technology")
 	app.setExpand("all")
@@ -869,16 +905,17 @@ def start_main_screen():
 	stab_rounds = round(player.stability * 2) / 2
 	research_per_turn = 0.25 + ((player.developments["research"] + player.developments["management"]/6) * \
 		government_map[player.government] * stability_map[stab_rounds])
-	app.addLabel("research_status", "      Current Research Points: %s    Research Points Per Turn: %s      "  % (player.research, research_per_turn), 1, 1, 8, 2)
+	app.addLabel("research_status", "      Current Research Points: %.2f    Research Points Per Turn: %.2f      "  % (round(player.research, 2), round(research_per_turn, 2)), 1, 1, 8, 2)
 	app.stopLabelFrame()
 #	app.startScrollPane("technologies")
-	
+	print("919\n")			
+
 	app.startLabelFrame("Technology List")
 	#app.addImage()
 	app.add
 	row = 1
 	for k, v in technology_dict.items():
-		app.addLabel("tech_" + k, "%s: requires: %s, cost: %s, min dev: %s" % \
+		app.addLabel("tech_" + k, "%s: requires: %s, cost: %.2f, min dev: %d" % \
 		 (k, v["requirement"], v["cost"], v["min_mid"]), row, 1, 6, 1)
 		app.addNamedButton("Select", "sel_" + k, select_technology, row, 7, 1, 1)
 		app.addNamedButton("Research", "res_" + k, research_technology,  row, 8, 1, 1)
@@ -907,115 +944,47 @@ def start_main_screen():
 
 	app.stopTab()
 
+	app.startTab("Culture")
+	app.setExpand("none")
+	app.setBg("purple")
+		
+	app.startLabelFrame("Culture Commands")
+	app.addImage("culture_tab", "culture_tab.gif", 1, 0, 1, 5)
+	app.addButton("Increase Stability", increase_stability, 1, 2, 3)
+	app.addButton("Improve Reputation", improve_reputation, 2, 2, 3)
+	app.addButton("Integrate Culture", integrate_culture, 3, 2, 3)
+	app.addButton("Export Culture", export_culture, 4, 2, 3)
+	app.addButton("Consume Spice", consume_spice, 5, 2, 3)
+	app.stopLabelFrame()
+
+	if player.culture_points < 1:
+		app.disableButton("Increase Stability")
+		app.disableButton("Export Culture")
+	else:
+		app.enableButton("Increase Stability")
+		app.enableButton("Export Culture")	
+	if player.culture_points < 1 or player.diplo_action < 1:
+		app.disableButton("Improve Reputation")
+	else:
+		app.enableButton("Improve Relations")
+	others = player.check_for_non_accepted_cultures()
+	if len(others) == 0 or player.culture_points < 1:
+		app.disableButton("Integrate Culture")
+	else:
+		app.enableButton("Integrate Culture")
+	if player.resources["spice"] < 1 or player.stability >= 3:
+		app.disableButton("Consume Spice")
+	else:
+		app.enableButton("Consume Spice")
+
+	app.stopTab()
+	print("988\n")			
+
 	app.stopTabbedFrame()
+	print("992\n")
 	app.hideSubWindow("loading new game")
+	print("994\n")
 
-
-def upgrade_fort(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	player.improve_fortifications()
-	update_gui()
-
-def upgrade_shipyard(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	player.build_steam_ship_yard()
-	update_gui()
-
-
-def select_technology(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	tech = btn[4:]
-	app.setMessage("tech_description", tech_descriptions[tech])
-	app.setImage("tech_image", tech + ".gif")
-
-
-
-def research_technology(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	tech = btn[4:]
-	player.research_tech(tech)
-	update_gui()
-
-
-
-def build_army(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	_type = btn[6:]
-	player.build_army_unit(_type)
-	update_gui()
-
-
-def disband_army(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	_type = btn[8:]
-	player.disband_unit(_type)
-	if player.military[_type] < 1:
-		app.disableButton("disband_" + _type)
-	else:
-		app.enableButton("disband_" + _type)
-	update_gui()
-
-
-
-def add_pro_pop(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	player.pro_POP_add()
-	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
-
-	if player.freePOP < 1:
-		app.disableButton("add_pro_pop")
-	else:
-		app.enableButton("add_pro_pop")
-	app.enableButton("remove_pro_pop")
-	app.setLabel("num_urban_workers", "Number of Urban Workers %s" % (player.proPOP))
-
-
-
-def remove_pro_pop(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	player.pro_POP_subtract()
-	app.enableButton("add_pro_pop")
-	if player.proPOP < 1:
-		app.disableButton("remove_pro_pop")
-	else:
-		app.enableButton("remove_pro_pop")
-	app.setLabel("num_urban_workers", "Number of Urban Workers %s" % (player.proPOP))
-	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
-
-
-
-
-def manifacture_good_1(btn):
-	global players, human_player, market, PRODUCE
-	print(human_player)
-	player = players[human_player]
-	_type = btn[8:]
-	print(_type)
-	PRODUCE = _type
-	max_amt = int(player.amount_can_manif(_type)) + 1
-	opts = list(range(1, max_amt))
-	app.changeOptionBox("amount_to_man", opts)
-	app.showSubWindow("amount_to_man")
-	update_gui()
-
-def manifacture_good_2(btn):
-	global players, human_player, market, PRODUCE
-	player = players[human_player]
-	app.hideSubWindow("amount_to_man")
-	_type = PRODUCE
-	amount = app.getOptionBox("amount_to_man")
-	player.manifacture_good(_type, int(amount))
-	print(player.goods_produced[_type])
-	print(player.name)
-	update_gui()
 
 def update_production_gui():
 	global players, human_player, market, PRODUCE
@@ -1035,6 +1004,38 @@ def update_production_gui():
 			app.disableButton("produce_" + f)
 		else:
 			app.enableButton("produce_" + f)
+	if player.goods["cannons"] < 1 or player.AP < 1 or (player.fortification >= 1.1 and "cement" \
+		not in player.technologies) or player.fortification >= 1.2:
+		app.disableButton("upgrade_fort")
+	else:
+		app.enableButton("upgrade_fort")
+	
+	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1:
+		app.disableButton("upgrade_shipyard")
+	elif player.shipyard == 1 and "ironclad" not in player.technologies:
+		app.disableButton("upgrade_shipyard")
+	elif player.shortcut == 2 and oil_powered_ships not in player.technologies:
+		app.disableButton("upgrade_shipyard")
+	else:
+		app.enableButton("upgrade_shipyard")
+
+
+	if "synthetic_dyes" not in player.technologies or player.goods["chemicals"] < 1:
+		app.disableButton("Synthetic Dyes")
+	else:
+		app.enableButton("Synthetic Dyes")
+	if "fertilizer" not in player.technologies or player.goods["chemicals"] < 1:
+		app.disableButton("Fertilize Soil")
+	else:
+		app.enableButton("Fertilize Soil")
+	if "synthetic_rubber" not in player.technologies or player.goods["chemicals"] < 1 or player.goods["oil"] < 1:
+		app.disableButton("Synthetic Rubber")
+	else:
+		app.enableButton("Synthetic Rubber")
+	if "synthetic_oil" not in player.technologies or player.goods["chemicals"] < 3:
+		app.disableButton("Synthetic Oil")
+	else:
+		app.enableButton("Synthetic Oil")
 	
 
 def update_military_gui():
@@ -1045,92 +1046,83 @@ def update_military_gui():
 			continue
 		app.setLabel("num_" + k, player.military[k])
 
-		#if k == "irregulars":
-			#app.setLabel("att_" + k, player.irregulars["attack"])
-		#	app.setLabel("def_" + k, player.irregulars["defend"])
-			#app.setLabel("man_" + k, player.irregulars["manouver"])
-			#app.setLabel("ammo_use_" + k, player.irregulars["ammo_use"])
-			#app.setLabel("oil_use_" + k, player.irregulars["oil_use"])
-			#if player.freePOP < 0.2 or player.goods["cannons"] < 1:
-			#	app.disableButton("build_" + k)
-
 		if k == "infantry":
-			app.setLabel("att_" + k, player.infantry["attack"])
-			app.setLabel("def_" + k, player.infantry["defend"])
-			app.setLabel("man_" + k, player.infantry["manouver"])
-			app.setLabel("ammo_use_" + k, player.infantry["ammo_use"])
-			app.setLabel("oil_use_" + k, player.infantry["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.infantry["attack"])
+			app.setLabel("def_" + k, "%.2f" % player.infantry["defend"])
+			app.setLabel("man_" + k, "%.2f" % player.infantry["manouver"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.infantry["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.infantry["oil_use"])
 			if player.freePOP < 0.2 or player.goods["cannons"] < 1.5:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 
 		if k == "cavalry":
-			app.setLabel("att_" + k, player.cavalry["attack"])
-			app.setLabel("def_" + k, player.cavalry["defend"])
-			app.setLabel("man_" + k, player.cavalry["manouver"])
-			app.setLabel("ammo_use_" + k, player.cavalry["ammo_use"])
-			app.setLabel("oil_use_" + k, player.cavalry["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.cavalry["attack"])
+			app.setLabel("def_" + k, "%.2f" % player.cavalry["defend"])
+			app.setLabel("man_" + k, "%.2f" % player.cavalry["manouver"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.cavalry["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.cavalry["oil_use"])
 			if player.freePOP < 0.2 or player.goods["cannons"] < 1.5 or player.resources["food"] < 2:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 		if k == "artillery":
-			app.setLabel("att_" + k, player.artillery["attack"])
-			app.setLabel("def_" + k, player.artillery["defend"])
-			app.setLabel("man_" + k, player.artillery["manouver"])
-			app.setLabel("ammo_use_" + k, player.artillery["ammo_use"])
-			app.setLabel("oil_use_" + k, player.artillery["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.artillery["attack"])
+			app.setLabel("def_" + k, "%.2f" % player.artillery["defend"])
+			app.setLabel("man_" + k, "%.2f" % player.artillery["manouver"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.artillery["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.artillery["oil_use"])
 			if player.freePOP < 0.2 or player.goods["cannons"] < 2.5:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 
 		if k == "tank":
-			app.setLabel("att_" + k, player.tank["attack"])
-			app.setLabel("def_" + k, player.tank["defend"])
-			app.setLabel("man_" + k, player.tank["manouver"])
-			app.setLabel("ammo_use_" + k, player.tank["ammo_use"])
-			app.setLabel("oil_use_" + k, player.tank["oil_use"],)
+			app.setLabel("att_" + k, "%.2f" % player.tank["attack"])
+			app.setLabel("def_" + k, "%.2f" % player.tank["defend"])
+			app.setLabel("man_" + k, "%.2f" % player.tank["manouver"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.tank["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.tank["oil_use"],)
 			if player.freePOP < 0.2 or player.goods[k] < 1:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 
 		if k == "fighter":
-			app.setLabel("att_" + k, player.fighter["attack"])
-			app.setLabel("def_" + k, player.fighter["defend"])
-			app.setLabel("man_" + k, player.fighter["manouver"])
-			app.setLabel("ammo_use_" + k, player.fighter["ammo_use"])
-			app.setLabel("oil_use_" + k, player.fighter["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.fighter["attack"])
+			app.setLabel("def_" + k, "%.2f" % player.fighter["defend"])
+			app.setLabel("man_" + k, "%.2f" % player.fighter["manouver"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.fighter["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.fighter["oil_use"])
 			if player.freePOP < 0.2 or player.goods[k] < 1:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 		if k == "frigates":
-			app.setLabel("att_" + k, player.frigates["attack"])
-			app.setLabel("HP_" + k, player.frigates["HP"])
-			app.setLabel("ammo_use_" + k, player.frigates["ammo_use"])
-			app.setLabel("oil_use_" + k, player.frigates["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.frigates["attack"])
+			app.setLabel("HP_" + k, "%.2f" % player.frigates["HP"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.frigates["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" %  player.frigates["oil_use"])
 			if player.shipyard < 1 or player.AP < 1 or player.resources["wood"] < 1 or player.goods["cannons"] < 1.5 or player.resources["cotton"] < 1:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 		if k == "iron_clad":
-			app.setLabel("att_" + k, player.iron_clad["attack"])
-			app.setLabel("HP_" + k, player.iron_clad["HP"])
-			app.setLabel("ammo_use_" + k, player.iron_clad["ammo_use"])
-			app.setLabel("oil_use_" + k, player.iron_clad["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.iron_clad["attack"])
+			app.setLabel("HP_" + k, "%.2f" % player.iron_clad["HP"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.iron_clad["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.iron_clad["oil_use"])
 			if player.shipyard < 2 or player.AP < 1 or player.resources["iron"] < 1 or \
 			player.goods["cannons"] < 1.5 or player.goods["parts"] < 1:				
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
 		if k == "battle_ship":
-			app.setLabel("att_" + k, player.battle_ship["attack"])
-			app.setLabel("HP_" + k, player.battle_ship["HP"])
-			app.setLabel("ammo_use_" + k, player.battle_ship["ammo_use"])
-			app.setLabel("oil_use_" + k, player.battle_ship["oil_use"])
+			app.setLabel("att_" + k, "%.2f" % player.battle_ship["attack"])
+			app.setLabel("HP_" + k, "%.2f" % player.battle_ship["HP"])
+			app.setLabel("ammo_use_" + k, "%.2f" % player.battle_ship["ammo_use"])
+			app.setLabel("oil_use_" + k, "%.2f" % player.battle_ship["oil_use"])
 			if player.shipyard < 3 or player.AP < 1 or player.goods["cannons"] < 4 \
 			or player.resources["iron"] < 3 or player.goods["parts"] < 1 or player.goods["gear"] < 1:
 				app.disableButton("build_" + k)
@@ -1141,108 +1133,6 @@ def update_military_gui():
 		else:
 			app.enableButton("disband_" + k)
 
-
-def good_material(_type):
-	if _type in ["parts", "cannons"]:
-		return ["iron", "coal"]
-	if _type == "clothing":
-		return ["cotton", "dyes"]
-	if _type == "furniture":
-		return ["wood", "cotton"]
-	if _type == "paper":
-		return []
-
-
-
-def build_fact(btn):
-	global players, human_player, market
-	player = players[human_player]
-	_type = btn[8:]
-	print(_type)
-	player.build_factory(_type, market)
-	app.setLabel("level_" + _type, player.factories[_type]["number"])
-	update_gui()
-
-
-
-def increase_population(btn):
-	global players, human_player
-	player = players[human_player]
-	if player.POP_increased == 1.0:
-		#showSubWindow("chem_growth")
-		#cont = if_spend_chem()
-		player.goods["chemicals"] -= 1
-		return
-	else:
-		player.increase_pop()
-		app.setLabel("l6",  "%.2f" % round(player.POP, 2))
-		app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
-
-		app.setLabel("i_food_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.resources["food"]), len(market.market["food"]), player.supply["food"], \
-				market.buy_price("food", len(market.market["food"])), market.buy_price("food", player.supply["food"])))
-		app.setLabel("i_clothing_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.goods["clothing"]), len(market.market["clothing"]), player.supply["clothing"], \
-			market.buy_price("clothing", len(market.market["clothing"])), market.buy_price("clothing", player.supply["clothing"])))
-		if(player.POP_increased > 1):
-			app.disableButton("POP UP")
-		if player.POP_increased == 1.0 and player.goods["chemicals"] < 1:
-			app.disableButton("POP UP")
-		if player.resources["food"] < 1 or player.goods["clothing"] < 1:
-			app.disableButton("POP UP")
-		else:
-			app.enableButton("POP UP")
-		app.enableButton("add_pro_pop")	
-
-def if_spend_chem():
-	cont = getYesNoBox("chem_for_growth")
-	app.hideSubWindow("chem_growth")
-	return cont
-
-def	dev_type(btn):
-	global players, human_player
-	player = players[human_player]
-	d_options = player.development_options()
-	app.changeOptionBox("get_dev_type", d_options)
-	#app.setOptionBox(title, position, value=True, callFunction=True, override=False)
-	app.showSubWindow("chose_dev_type")
-	
-
-def increase_dev_level(btn):
-	global players, human_player
-	player = players[human_player]
-	app.hideSubWindow("chose_dev_type")
-	kind = app.getOptionBox("get_dev_type")
-	requirements = player.determine_middle_class_need()
-	player.increase_development(kind)
-	for k in requirements:
-		if k == "spice":
-			app.setLabel("i_spice_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.resources["spice"]), len(market.market["spice"]), player.supply["spice"], \
-				market.buy_price("spice", len(market.market["spice"])), market.buy_price("spice", player.supply["spice"])))
-	
-		else: 
-			app.setLabel("i_" + k + "_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.goods[k]), len(market.market[k]), player.supply[k], \
-			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
-
-	app.setLabel("l22", "%s" % (player.development_level))
-	if player.check_development() == False:
-		app.disableButton("Develop")
-	else:
-		app.enableButton("Develop")
-	if kind == "military":
-		doc_ops = player.doctrine_options()
-		app.changeOptionBox("get_mil_doct", doc_ops)
-		app.showSubWindow("choose doctrine")
-
-
-def acquire_doctrine(btn):
-	global human_player, players, market
-	player = players[human_player]
-	app.hideSubWindow("choose doctrine")
-	choice = app.getOptionBox("get_mil_doct")
-	player.choose_doctrine(choice)
 
 def update_buy_button():
 	global human_player, players, market
@@ -1319,6 +1209,323 @@ def update_military_buttons():
 			app.enableButton("disband_" + k)
 
 
+def AI_turnS(auto_save):
+	global players, market, relations, provinces, human_player
+	market.report = []
+	market.market_report = " "
+	market.turn +=1
+	order = list(players.keys())
+	shuffle(order)
+	for k, v in market.market.items():
+		for i in v:
+			if i.owner not in players.keys():
+				market.market[k].remove(i)
+				del i
+	for o in order:
+		if o not in players.keys():
+			continue
+		if type(players[o]) == AI:
+			AI_turn(players, players[o], market, relations, provinces)
+		else:
+			for k in players[o].goods_produced.keys():
+				players[o].goods_produced[k] = 0
+	gc.collect()
+	
+	if auto_save != "":
+
+		#if market.turn % 2 == 1:
+		app.showSubWindow("saving")
+		print("Saving....\n")
+		save_game(auto_save, players, relations, market, provinces)
+		app.hideSubWindow("saving")
+	for p in provinces.values():
+		temp = p.owner
+		owner = players[temp]
+		app.setButtonBg(p.position, owner.colour)
+		app.setButtonFg(p.position, owner.colour)
+
+	app.setMessage("turn_report", market.report)
+	app.setMessage("turn_market_report", market.market_report)
+
+	player = players[human_player]
+	print("____________________________________________________________________________________")
+	player.calculate_access_to_goods(market)
+	app.setLabel("t1", "Turn:" +  str(market.turn))
+	update_gui()
+
+
+def increase_stability(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.increase_Stability()
+	app.setLabel("l10", "%.2f" % round(player.stability, 2))
+	app.setLabel("l5", "%.2f" % round(player.culture_points, 2))
+
+def improve_reputation(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.improve_Reputation()
+	update_main_tab()
+
+def integrate_culture(btn):
+	global players, human_player, market
+	player = players[human_player]
+	others = player.check_for_non_accepted_cultures()
+	app.changeOptionBox("prov_to_integrate", opts)
+	app.showSubWindow("Province to Integrate")
+	update_gui()
+
+
+def integrate_culture_2(btn):
+	global players, human_player, market
+	player = players[human_player]
+	app.hideSubWindow("Provinces to Integrate")
+	prov = app.getOptionBox("prov_to_int")
+	player.integrate_Culture(prov)
+	update_gui()
+
+def export_culture(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.export_Culture()
+	update_main_tab()
+
+def consume_spice(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.use_Spice_Stability() 
+	update_gui()
+
+def upgrade_fort(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.improve_fortifications()
+	update_gui()
+
+def upgrade_shipyard(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.build_steam_ship_yard()
+	update_gui()
+
+def synthetic_dyes(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.create_synthetic_dyes()
+	update_market()
+	update_production_gui()
+
+def fertilize_soil(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.chem_to_food()
+	update_market()
+	update_production_gui()
+
+def synthetic_rubber(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.create_synthetic_rubber()
+	update_market()
+	update_production_gui()
+
+def synthetic_oil(btn):
+	global players, human_player, market
+	player = players[human_player]
+	player.create_synthetic_oil()
+	update_market()
+	update_production_gui()
+
+
+def select_technology(btn):
+	global players, human_player, market
+	player = players[human_player]
+	tech = btn[4:]
+	app.setMessage("tech_description", tech_descriptions[tech])
+	app.setImage("tech_image", tech + ".gif")
+
+
+def research_technology(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	tech = btn[4:]
+	player.research_tech(tech)
+	update_gui()
+
+
+
+def build_army(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	_type = btn[6:]
+	player.build_army_unit(_type)
+	update_gui()
+
+
+def disband_army(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	_type = btn[8:]
+	player.disband_unit(_type)
+	if player.military[_type] < 1:
+		app.disableButton("disband_" + _type)
+	else:
+		app.enableButton("disband_" + _type)
+	update_gui()
+
+
+def add_pro_pop(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	player.pro_POP_add()
+	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
+
+	if player.freePOP < 1:
+		app.disableButton("add_pro_pop")
+	else:
+		app.enableButton("add_pro_pop")
+	app.enableButton("remove_pro_pop")
+	app.setLabel("num_urban_workers", "Number of Urban Workers %s" % (player.proPOP))
+
+
+def remove_pro_pop(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	player.pro_POP_subtract()
+	app.enableButton("add_pro_pop")
+	if player.proPOP < 1:
+		app.disableButton("remove_pro_pop")
+	else:
+		app.enableButton("remove_pro_pop")
+	app.setLabel("num_urban_workers", "Number of Urban Workers %s" % (player.proPOP))
+	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
+
+
+def manifacture_good_1(btn):
+	global players, human_player, market, PRODUCE
+	print(human_player)
+	player = players[human_player]
+	_type = btn[8:]
+	print(_type)
+	PRODUCE = _type
+	max_amt = int(player.amount_can_manif(_type)) + 1
+	opts = list(range(1, max_amt))
+	app.changeOptionBox("amount_to_man", opts)
+	app.showSubWindow("amount_to_man")
+	update_gui()
+
+def manifacture_good_2(btn):
+	global players, human_player, market, PRODUCE
+	player = players[human_player]
+	app.hideSubWindow("amount_to_man")
+	_type = PRODUCE
+	amount = app.getOptionBox("amount_to_man")
+	player.manifacture_good(_type, int(amount))
+	print(player.goods_produced[_type])
+	print(player.name)
+	update_gui()
+
+
+def good_material(_type):
+	if _type in ["parts", "cannons"]:
+		return ["iron", "coal"]
+	if _type == "clothing":
+		return ["cotton", "dyes"]
+	if _type == "furniture":
+		return ["wood", "cotton"]
+	if _type == "paper":
+		return []
+
+def build_fact(btn):
+	global players, human_player, market
+	player = players[human_player]
+	_type = btn[8:]
+	print(_type)
+	player.build_factory(_type, market)
+	app.setLabel("level_" + _type, player.factories[_type]["number"])
+	update_gui()
+
+def increase_population(btn):
+	global players, human_player
+	player = players[human_player]
+	if player.POP_increased == 1.0:
+		#showSubWindow("chem_growth")
+		#cont = if_spend_chem()
+		player.goods["chemicals"] -= 1
+		return
+	else:
+		player.increase_pop()
+		app.setLabel("l6",  "%.2f" % round(player.POP, 2))
+		app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
+
+		app.setLabel("i_food_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.resources["food"]), len(market.market["food"]), player.supply["food"], \
+				market.buy_price("food", len(market.market["food"])), market.buy_price("food", player.supply["food"])))
+		app.setLabel("i_clothing_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.goods["clothing"]), len(market.market["clothing"]), player.supply["clothing"], \
+			market.buy_price("clothing", len(market.market["clothing"])), market.buy_price("clothing", player.supply["clothing"])))
+		if(player.POP_increased > 1):
+			app.disableButton("POP UP")
+		if player.POP_increased == 1.0 and player.goods["chemicals"] < 1:
+			app.disableButton("POP UP")
+		if player.resources["food"] < 1 or player.goods["clothing"] < 1:
+			app.disableButton("POP UP")
+		else:
+			app.enableButton("POP UP")
+		app.enableButton("add_pro_pop")	
+
+
+def if_spend_chem():
+	cont = getYesNoBox("chem_for_growth")
+	app.hideSubWindow("chem_growth")
+	return cont
+
+def	dev_type(btn):
+	global players, human_player
+	player = players[human_player]
+	d_options = player.development_options()
+	app.changeOptionBox("get_dev_type", d_options)
+	#app.setOptionBox(title, position, value=True, callFunction=True, override=False)
+	app.showSubWindow("chose_dev_type")
+	
+
+def increase_dev_level(btn):
+	global players, human_player
+	player = players[human_player]
+	app.hideSubWindow("chose_dev_type")
+	kind = app.getOptionBox("get_dev_type")
+	requirements = player.determine_middle_class_need()
+	player.increase_development(kind)
+	for k in requirements:
+		if k == "spice":
+			app.setLabel("i_spice_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.resources["spice"]), len(market.market["spice"]), player.supply["spice"], \
+				market.buy_price("spice", len(market.market["spice"])), market.buy_price("spice", player.supply["spice"])))
+	
+		else: 
+			app.setLabel("i_" + k + "_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+			(round(player.goods[k]), len(market.market[k]), player.supply[k], \
+			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
+
+	app.setLabel("l22", "%s" % (player.development_level))
+	if player.check_development() == False:
+		app.disableButton("Develop")
+	else:
+		app.enableButton("Develop")
+	if kind == "military":
+		doc_ops = player.doctrine_options()
+		app.changeOptionBox("get_mil_doct", doc_ops)
+		app.showSubWindow("choose doctrine")
+
+
+def acquire_doctrine(btn):
+	global human_player, players, market
+	player = players[human_player]
+	app.hideSubWindow("choose doctrine")
+	choice = app.getOptionBox("get_mil_doct")
+	player.choose_doctrine(choice)
+
+
 def work_prov(btn):
 	global players, human_player
 	btn = btn[5:]
@@ -1353,9 +1560,10 @@ def free_prov(btn):
 	app.enableButton("Work "+p.name + "?") 
 	app.disableButton("Free " + p.name + " Pop?")
 	if player.freePOP < 1:
+		app.disableButton("add_pro_pop")
+	else:
 		app.enableButton("add_pro_pop")
 	app.hideSubWindow("human" + p.position)
-
 
 
 def dev_prov(btn):
@@ -1369,7 +1577,7 @@ def dev_prov(btn):
 	app.setLabel("dev" + p.name, str(p.development_level))
 	app.setLabel("l16", player.AP)
 	app.setLabel("l23", player.new_development)
-	if owner.can_improve_prov(p) == False:
+	if player.can_improve_prov(p) == False:
 		app.disableButton("Develop " + p.name)
 	else:
 		app.enableButton("Develop " + p.name)
@@ -1426,10 +1634,11 @@ def show_AI_province(p):
 	global players 
 	owner = p.owner
 	owner = players[owner]
+	print("Owner: %s", owner.name)
 	print(owner.name)
 	app.showSubWindow("ai"+ p.position)
-	app.setLabel(p.name+owner.name, "Owner: %s" % (owner.name))
-	app.setImage(p.name+owner.name, owner.name + ".gif")
+	app.setLabel(p.name, "Owner: %s" % (owner.name))
+	app.setImage(p.name, owner.name + ".gif")
 	app.setLabel("*res" + p.name, "Resource: %s" % (p.resource) )
 	app.setLabel("*qual"+ p.name, "Quality: %s" % (p.quality))
 	app.setLabel("*dev" + p.name, "Ind. Development: %s" % (p.development_level))
@@ -1486,6 +1695,8 @@ def sell(btn):
 		app.setLabel("i_" + _type + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
 			(round(player.goods[_type]), len(market.market[_type]), player.supply[_type], \
 			market.buy_price(_type, len(market.market[_type])), market.buy_price(_type, player.supply[_type])))
+
+
 
 def new_game(btn):
 	load_basic_widgets()
@@ -1587,11 +1798,12 @@ def gui_load_game(btn):
 			human_player = p.name
 			break
 	start_main_screen()
+	#start_game_tread()
 
 
 def start_game_tread():
-
-	appJarapp.thread(start_main_screen)
+	app.thread(start_main_screen)
+	print("Game should have started now \n")
 
 def exit_game(btn):
 	sys.exit(0)
@@ -1605,16 +1817,12 @@ def gui_save_game(btn):
 	app.hideSubWindow("saving")
 
 
-
-
 def load_basic_widgets():
-
 	
 	#app.playSound("Grand March from Aida.wav", wait=False)
 
 	app.startSubWindow("loading new game", modal = False)
 	app.addLabel("nload", " Please wait while the game world is loaded... ")
-	app.setLabelInPadding("nload", [2, 2])
 	app.stopSubWindow()
 
 	app.startSubWindow("Scenario_Choice", modal=True)
@@ -1681,11 +1889,16 @@ def load_basic_widgets():
 	app.addNamedButton("Select", "doct_select", acquire_doctrine)
 	app.stopSubWindow()
 
-
 	app.startSubWindow("amount_to_man", modal = True)
 	app.addLabel("amnt_to_make", "How many would you like to produce?")
 	app.addOptionBox("amount_to_man", [])
 	app.addNamedButton("OK", "amount_good_select", manifacture_good_2)
+	app.stopSubWindow()
+
+	app.startSubWindow("Province to Integrate", modal = True)
+	app.addLabel("prov_to_integrate", "Which Province would you like to culturally integrate?")
+	app.addOptionBox("prov_to_int", [])
+	app.addNamedButton("OK", "prov_to_integrate", integrate_culture_2)
 	app.stopSubWindow()
 
 	#app.startSubWindow("chem_growth", modal = True)
@@ -1697,6 +1910,9 @@ app.setIcon("crown.gif")
 app.setFont("11", "arial")
 app.setLocation("CENTER")
 app.setExpand("all")
+app.setPadding([1, 1])
+app.setInPadding([2, 2])
+
 app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 app.setImageLocation("Images")

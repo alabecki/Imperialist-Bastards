@@ -4,15 +4,145 @@ import gc
 import os
 from appJar import gui
 
-from gui_main.py import*
 from player_class import*
 from human import*
 
-initial = dict()
+
+def load_basic_widgets():
+	#app.playSound("Grand March from Aida.wav", wait=False)
+	app.startSubWindow("loading new game", modal = False)
+	app.addLabel("nload", " Please wait while the game world is loaded... ")
+	app.stopSubWindow()
+
+	app.startSubWindow("Scenario_Choice", modal=True)
+	app.addLabel("Scenario_Choice", "Which Scenario Would You Like to Play?")
+	app.addRadioButton("Scen", "None")
+	app.addRadioButton("Scen", "Semi-Historical")
+	app.addRadioButton("Scen", "Fictional")
+	#app.setRadioButton("Scen", "None", callFunction = True)
+	#app.setRadioButtonFunction("Scen", gameChoice)   # call this funciton, whenever the RadioButton changes
+	#app.setRadioButtonChangeFunction("Scen", gameChoice)
+	app.addButton("Cont", scen_press)
+	app.stopSubWindow()
+
+	app.startSubWindow("Choose_Type", modal= True)
+	app.addRadioButton("nation_type", "Major Power")
+	app.addRadioButton("nation_type", "Minor Power")
+	app.addRadioButton("nation_type", "Old Empire")
+	app.addButton("Cont.", nation_type_press)
+	app.stopSubWindow()
+
+
+	app.startSubWindow("AI turn")
+	app.addLabel("processing", "Please wait while the AI turns are processed" )
+	app.stopSubWindow()
+
+	app.startSubWindow("player_gains", modal = False)
+	dummy = 0
+	app.addLabel("RG", "Research Gain:")
+	app.addLabel("CG", "Culture Gain:")
+	app.addLabel("CPG", "Colonization Point Gain:")
+	app.addLabel("DPG", "Diplomatic Point Gain:")
+	app.stopSubWindow()
+
+
+	app.startSubWindow("diplomacy", modal = False)
+	app.startLabelFrame("dip")
+	app.addLabel("other_player", "Relations with: ")
+	app.addLabel("curr_relation", "Current Relations: ")
+	app.stopLabelFrame()
+	app.stopSubWindow()
+
+
+	app.startSubWindow("saving", modal = True)
+	app.addLabel("saveing label", "Saving Game ...")
+	app.stopSubWindow()
+
+	app.startSubWindow("chose_seller", modal = True)
+	app.startLabelFrame("From whom you would like to buy?")
+	app.addLabel("item_to_buy", "")
+	app.addLabelOptionBox("Sellers", [""])
+	app.addNamedButton("Select", "seller_select", _buy)
+	app.stopLabelFrame()
+	app.stopSubWindow()
+
+	app.startSubWindow("chose_dev_type", modal = True)
+	app.addLabel("ask_dev_type", "In what area will you develop your nation?")
+	app.addOptionBox("get_dev_type", [])
+	app.addNamedButton("Select", "dev_select", increase_dev_level)
+	app.stopSubWindow()
+
+	app.startSubWindow("choose doctrine", modal = True)
+	app.addLabel("Please choose a military doctrine for your glorious army!")
+	app.addOptionBox("get_mil_doct", [])
+	app.addNamedButton("Select", "doct_select", acquire_doctrine)
+	app.stopSubWindow()
+
+	app.startSubWindow("amount_to_man", modal = True)
+	app.addLabel("amnt_to_make", "How many would you like to produce?")
+	app.addOptionBox("amount_to_man", [])
+	app.addNamedButton("OK", "amount_good_select", manifacture_good_2)
+	app.stopSubWindow()
+
+	app.startSubWindow("Province to Integrate", modal = True)
+	app.addLabel("prov_to_integrate", "Which Province would you like to culturally integrate?")
+	app.addOptionBox("prov_to_int", [])
+	app.addNamedButton("OK", "prov_to_integrate", integrate_culture_2)
+	app.stopSubWindow()
+
+	#app.startSubWindow("chem_growth", modal = True)
+	#app.yesNoBox("chem_for_growth", "Increasing Your Pop again this turn will require 1 chemical", parent= None)
+	#app.stopSubWindow()
+
+def start_game_tread():
+	app.thread(start_main_screen)
+	print("Game should have started now \n")
+
+def exit_game(btn):
+	sys.exit(0)
+
+def gui_save_game(btn):
+	save_path = app.saveBox(title="Save Game", fileName= None, dirName = "/Saved Games", fileExt=".txt", fileTypes=None, asFile=None, parent=None)
+	#save_path = save_path.name
+	app.showSubWindow("saving")
+	print("Saving....\n")
+	save_game(save_path, players, relations, market, provinces)
+	app.hideSubWindow("saving")
+
+def player_type(_type):
+	if kind == "Modern Major":
+		print("Which Great Power will player " + str(i) + " control? \n")
+		app.startSubWindow("nation_choice", modal = True)
+		app.addLabelOptionBox("great powers", modern_major)
+		app.setLabelOptionFunction("great_powers", select_great_power)
+		app.stopSubWindow()
+
+	if kind == "Modern Minor":
+		print("Which Minor Modern nation will player " + str(i) + " control? \n")
+		app.startSubWindow("nation_choice", modal = True)
+		app.addLabelOptionBox("minor powers", modern_minors)
+		app.setLabelOptionFunction("minor_powers", select_minor_power)
+		app.stopSubWindow()
+
+	if kind == "Old Empire":
+		print("This feature is not yet implemented") 
+
+
+def new_game(btn):
+	load_basic_widgets()
+	app.showSubWindow("Scenario_Choice")
+
 
 def menuPress(command):
 	if command == "New Game":
 		first_choice = command
+		print("first choice is new game")
+		app.startSubWindow("Scen_Choice", modal=True)
+		app.directoryBox(title= "Choose Scenario", dirName= "Scenarios", parent= "Scen_Choice")	
+		app.addRadioButton("Scen", "Semi-Historical")
+		app.addRadioButton("Scen", "Fictional")
+		app.setRadioButtonFunction("Scen", gameChoice)   # call this funciton, whenever the RadioButton changes
+		app.stopSubWindow()
 		#start_main_screen()
 	elif command == "Load Game":
 		app.openBox(title= "Load Game", dirName="game", fileTypes= None, asFile=True, parent=None)
@@ -47,7 +177,7 @@ def menuPress(command):
 	
 		initial = {"players": players, "provinces": provinces, "relations": relations, "market": market}
 	elif command == "Save":
-		save_game(auto_name, players, relations, market, provinces)
+		save_game(auto_save, players, relations, market, provinces)
 	elif command == "Save as...":
 		print("Please provide a name for the save")
 		name = input()
@@ -56,117 +186,36 @@ def menuPress(command):
 		sys.exit(0)
 	elif command == "Close":
 		return
+def good_material(_type):
+	if _type in ["parts", "cannons"]:
+		return ["iron", "coal"]
+	if _type == "clothing":
+		return ["cotton", "dyes"]
+	if _type == "furniture":
+		return ["wood", "cotton"]
+	if _type == "paper":
+		return []
 
+def get_auto_save_name(bn):
+	app.hideSubWindow("auto_save?")
+	temp = app.getRadioButton("?auto_save?")
+	if temp == "Yes":
+		app.startSubWindow("auto_save_name", modal = True)
+		app.addLabel("ask save name", "Please enter a name for your saved game:")
+		app.addEntry("auto_save")
+		app.addButton("Onwards!", create_auto_save)
+		app.stopSubWindow()
+		app.showSubWindow("auto_save_name")
+	else:
+		start_main_screen()
+		#start_game_tread()
 
+def ask_auto_save():
+	app.startSubWindow("auto_save?", modal = True)
+	app.addLabel("auto?", "Would you like to turn Auto Save on?")
+	app.addRadioButton("?auto_save?", "Yes")
+	app.addRadioButton("?auto_save?", "No")
+	app.addButton("Ok then..", get_auto_save_name)
+	app.stopSubWindow()
 
-def gameChoice(name):
-	if name == "Semi-Historical":
-		initial = historical()
-
-	if name == "Fictional":
-		initial = balance()
-
-
-def start_main_screen():
-	name = player.name
-	color = "green"
-	app.startFrame("info")
-	app.setFrameHeight("info", 4)
-	app.setFrameBg("info", "Khaki")
-	app.setExpand("none")
-	app.setFont(10)
-
-	app.addLabel("l0", name, 1, 1, 3)
-	app.getLabelWidget("l0").config(font="Times 14 bold underline")
-	app.setLabelFg("l0", color)
-	
-	app.addLabel("l1", "Gold:", 2, 1)
-	app.addImage("l1", "coins.png", 2, 1)
-	app.shrinkImage("l1", 2)
-	app.setImageTooltip("l1", "Gold")
-	app.addLabel("l2", "Cult Pts:", 3, 1)
-	app.addImage("l2", "culture.png", 3,1)
-	app.shrinkImage("l2", 2)
-	app.addLabel("l3", "POP:", 4,1)
-	app.addImage("l3", "POP.png", 4, 1)
-	app.shrinkImage("l3", 2)
-	app.shrinkImage("l3", 2)
-	app.addLabel("l4", "%.2f" % round(player.resources["gold"], 2), 2, 2)
-	app.addLabel("l5", "%.2f" % round(player.culture_points, 2), 3, 2)
-	app.addLabel("l6",  "%.2f" % round(player.POP, 2), 4, 2)
-	app.addLabel("l7", "Stability", 2, 3)
-	app.addImage("l7", "stability.png", 2, 3)
-	app.shrinkImage("l7", 2)
-	app.addLabel("l8", "Diplomacy",  3, 3)
-	app.addImage("l8", "diplo.png", 3, 3)
-	app.shrinkImage("l8", 2)
-	app.addLabel("l9", "FreePOP", 4, 3)
-	app.addImage("l9", "freePOP.png", 4,3)
-	app.shrinkImage("l9", 2)
-	app.addLabel("l10", "%.2f" % round(player.stability, 2), 2, 4)
-	app.addLabel("l11", "%.2f" % round(player.diplo_points, 2), 3, 4)
-	app.addLabel("l12", "%.2f" % round(player.freePOP, 2), 4, 4)
-	app.addLabel("l13", "AP", 2, 5)
-	app.addImage("l13", "AP.png", 2, 5)
-	app.shrinkImage("l13", 2)
-	app.addLabel("l14", "Scinece Pts", 3, 5)
-	app.addImage("l14", "science.png", 3, 5)
-	app.shrinkImage("l14", 2)
-	app.addLabel("l15", "Mid POP", 4, 5)
-	app.addImage("l15", "midPOP.png", 4, 5)
-	app.shrinkImage("l15", 2)
-	app.addLabel("l16", "%.2f" % round(player.AP, 2), 2, 6)
-	app.addLabel("l17", "%.2f" % round(player.midPOP, 2), 3, 6)
-	app.addLabel("l18", "%.2f" % round(player.freePOP, 2), 4, 6)
-	app.addLabel("l19", "Dev Level", 2, 7)
-	app.addImage("l19", "dev_level.png", 2, 7)
-	app.shrinkImage("l19", 2)
-	app.addLabel("l20", "New Industry", 3, 7)
-	app.addImage("l20", "new_ind.png", 3, 7)
-	app.shrinkImage("l20", 2)
-	app.addLabel("l21", "Reputation", 4, 7)
-	app.addImage("l21", "reputation.png", 4, 7)
-	app.shrinkImage("l21", 2)
-	app.addLabel("l22", "%.2f" % (player.development_level, 2), 8)
-	app.addLabel("l23", "%.2f" % round(player.new_development, 2), 3, 8)
-	app.addLabel("l24", "%.2f" % round(player.reputation, 2), 4, 8)
-
-	app.addLabel("l25", "Colonial", 2, 10)
-	app.addImage("l25", "flag.png", 2, 10)
-	app.shrinkImage("l25", 2)
-	app.addLabel("l26", player.num_colonies, 2, 11)
-	app.addLabel("l27", int(player.colonization), 2, 12)
-	app.addLabel("l28", 1 + (player.num_colonies * 1.5), 2, 13)
-
-
-	for i in range(1, 29):
-		sz = "l" + str(i)
-		app.setLabelHeight(sz, 1)
-		app.setLabelWidth(sz, 4)
-		app.setLabelRelief(sz, "ridge")
-	app.stopFrame()
-
-
-	app.startFrame("map")
-	app.setFrameHeight("map", 18)
-	app.setFrameWidth("map", 30)
-
-	app.startScrollPane("map_scroll")
-	app.setExpand("none")
-
-	for i in range(1, 25):
-		for j in range(1, 33):
-			nm = str(i)+ " " + str(j)
-			app.addLabel(nm, "", i, j)
-			app.setLabelHeight(nm, 2)
-			app.setLabelWidth(nm, 3)
-			app.setLabelBg(nm, "blue")
-			app.setLabelRelief(nm, "ridge")
-		#	app.getLabelWidget(nm).config(font= "Times 6")
-	app.stopScrollPane()
-	app.stopFrame()
-
-	app.startFrame("links")
-	app.setFrameHeight("links", 4)
-
-	app.stopFrame()
+	app.showSubWindow("auto_save?")

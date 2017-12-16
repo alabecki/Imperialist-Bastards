@@ -374,15 +374,11 @@ class Human(Player):
 					self.freePOP += 1
 					print("You now have %s free POPS  and %s POPs working in production\n " % (self.freePOP, self.proPOP))
 
-	def use_spice_stability(self):
-		if self.resources["spice"] < 1:
-			print("You do not have enough spice")
-		else:
-			if self.resources["spice"] >= 1 and self.stability < 3:
-				self.resources["spice"] -=1
-				self.stability += 2/(self.POP + 0.01) 
-			if self.stability > 3:
-				self.stability = 3
+	def use_Spice_Stability(self):
+		self.resources["spice"] -=1
+		self.stability += 2/(self.POP + 0.01) 
+		if self.stability > 3:
+			self.stability = 3
 		print("Your stability is now %s " % (self.stability))
 
 
@@ -516,24 +512,11 @@ class Human(Player):
 
 
 	def improve_fortifications(self):
-		if self.AP < 1:
-			print("You do not have enough action points \n")
-			return
-		elif self.goods["cannons"] < 1:
-			print("You do not have enough cannoms \n")
-			return
-		elif self.fortification >= 1.1 and "cement" not in self.technologies:
-			print("You cannot further upgrade your fortifications without cement \n")
-			return
-		elif self.fortification >= 1.2:
-			print("You have already upgraded your fortifications as much as possible \n")
-			return
-		else:
-			self.AP -= 1
-			self.goods["cannons"] -= 1
-			self.fortification += 0.1
-			print("Your fortresses now modifies your defense strength by a scalar if %s \n" % (self.fortification))
-			return
+		self.AP -= 1
+		self.goods["cannons"] -= 1
+		self.fortification += 0.1
+		print("Your fortresses now modifies your defense strength by a scalar if %s \n" % (self.fortification))
+		return
 
 	def build_steam_ship_yard(self):
 		if(self.new_development < 1):
@@ -549,7 +532,7 @@ class Human(Player):
 			print("You do not have enough parts \n")
 			return
 		max_ship_yard_level = 1
-		if "iron_clad" in self.technologies:
+		if "ironclad" in self.technologies:
 			max_ship_yard_level = 2
 		if "oil_powered_ships" in self.technologies:
 			max_ship_yard_level = 3
@@ -772,79 +755,77 @@ class Human(Player):
 				(key, self.resources[key], need, current_production, forecast))
 
 
-	def use_culture(self, players):
-		if self.culture_points < 1:
-			print("Your barbaric nation does not have any culture points at this time")
-			return
-		choice = " "
-		while (choice not in culture_commands.keys()):
-			for k, v in culture_commands.items():
-				print("%s: %s" % (k,v))
-			choice = input()
-		if choice == "1":
-			self.culture_points -= 1
-			self.stability += 0.5
-			if self.stability > 3:
-				self.stability = 3
-			print("Your stability is now %s" % (self.stability))
-		if choice == "2":
-			if self.diplo_action < 1:
-				print("You need at least 1 diplo action for that")
-				return
-			self.culture_points -= 1
-			self.diplo_action -= 1
-			self.reputation += 0.1
-			print("Your reputation is now %s" % (self.reputation))
-		if choice == "3":
-			options = []
-			for p, prov in self.provinces.items():
-				if prov.culture != self.culture and prov.culture not in self.accepted_cultures:
-					options.append(prov)
-			if len(options) == 0:
-				print("Fortunately, you have no provinces in need of assimalation")
-				return
+	def check_for_non_accepted_cultures(self):
+		options = []
+		for p, prov in self.provinces.items():
+			if prov.culture != self.culture and prov.culture not in self.accepted_cultures:
+				options.append(prov.name)
+		return options 
+
+	def increase_Stability(self):
+		self.culture_points -= 1
+		self.stability += 0.5
+		if self.stability > 3:
+			self.stability = 3
+
+	def improve_Reputation(self):
+		self.culture_points -= 1
+		self.diplo_action -= 1
+		self.reputation += 0.1
+
+	def integrate_Culture(self, prov):
+		self.culture_points -= 1
+		chance = uniform(0, 1)
+		print("Roll: %s" % (chance))
+		if opt.type == "uncivilized":
+			if chance < 0.66:
+				self.accepted_cultures.add(prov)
+				print("Integrated Culture")
 			else:
-				print("Which province would you like to try to include?")
-				for o in options:
-					print(o.name) 
-				opt = input()
-				opt = self.provinces[opt]
-				self.culture_points -= 1
-				chance = uniform(0, 1)
-				print("Roll: %s" % (chance))
-				if opt.type == "uncivilized":
-					if chance < 0.66:
-						self.accepted_cultures.add(opt.culture)
-						print("Integrated Culture")
-					else:
-						print("Not this time :(")
-				if opt.type == "old":
-					if chance < 0.33:
-						self.accepted_cultures.add(opt.culture)
-						print("Integrated Culture") 
-					else:
-						print("Not this time :(")
+				print("Not this time :(")
+		if opt.type == "old":
+			if chance < 0.33:
+				self.accepted_cultures.add(prov)
+				print("Integrated Culture") 
+			else:
+				print("Not this time :(")
 
-				if opt.type == "civilized":
-					if chance < 0.25:
-						opt.culture = self.culture
-						self.accepted_cultures.add(opt.culture)
-						print("Integrated Culture")
-					else:
-						print("Not this time :(")
+		if opt.type == "civilized":
+			if chance < 0.25:
+				opt.culture = self.culture
+				self.accepted_cultures.add(prov)
+				print("Integrated Culture")
+			else:
+				print("Not this time :(")
 
-		if choice == "4":
-			gain = 0
-			for p in players.values():
-				if p.type == "major":
-					p.resources["gold"] -= 1
-					self.resources["gold"] += 1
-					gain += 1
-			self.culture_points -= 1
-			print("You have gained %s gold" % (gain))
+	def export_Culture(self):
+		gain = 0
+		for p in players.values():
+			if p.type == "major":
+				p.resources["gold"] -= 1
+				gain += 1
+		self.culture_points -= 1
+		self.resources["gold"] += gain
+		print("You have gained %s gold" % (gain))
 
-		if choice == "5":
-			self.use_spice_stability()
+
+	def create_synthetic_dyes(self):
+		self.goods["chemicals"] -= 1
+		self.resources["dyes"] += 1
+
+	def chem_to_food(self):
+		self.goods["chemicals"] -= 1
+		self.resources["food"] += 1
+
+	def create_synthetic_rubber(self):
+		self.goods["chemicals"] -= 1
+		self.goods["oil"] -= 1
+		self.goods["rubber"] += 1
+
+	def create_synthetic_oil(self):
+		self.goods["chemicals"] -= 3
+		self.goods["oil"] += 1
+	
 
 
 		#if choice == "4":

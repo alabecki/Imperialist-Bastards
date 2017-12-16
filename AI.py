@@ -153,7 +153,7 @@ class AI(Player):
             "power_loom": 3,
             "chemistry": 4,
             "pulping": 2,
-            "iron_clad": 4,
+            "ironclad": 4,
             "electricity": 3.5,
             "medicine": 3,
             "synthetic_dyes": 3,
@@ -1612,7 +1612,7 @@ class AI(Player):
             self.technology_priority["square_timbering"] += 0.5
             self.technology_priority["dynamite"] += 0.5
             self.technology_priority["bessemer_process"] += 0.5
-            self.technology_priority["iron_clad"] += 0.25
+            self.technology_priority["ironclad"] += 0.25
             self.technology_priority["muzzle_loaded_arms"] += 0.25
             self.technology_priority["breach_loaded_arms"] += 0.25
             self.technology_priority["machine_guns"] += 0.25
@@ -1903,7 +1903,7 @@ class AI(Player):
 
             if self.shipyard == 0:
                 options.append("shipyard")
-            if self.shipyard < 2 and "iron_clad" in self.technologies:
+            if self.shipyard < 2 and "ironclad" in self.technologies:
                 options.append("shipyard")
             if self.shipyard < 3 and "oil_powered_ships" in self.technologies:
                 options.append("shipyard")
@@ -2517,7 +2517,7 @@ class AI(Player):
             self.number_units -= 1
             self.military["iron_clad"] -= 1
 
-        if "iron_clad" in self.technologies and self.military["frigates"] >= 2:
+        if "ironclad" in self.technologies and self.military["frigates"] >= 2:
             self.resources["iron"] += 1
             self.military["frigates"] -= 1
             self.milPOP -= 0.2

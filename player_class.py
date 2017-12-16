@@ -488,7 +488,7 @@ class Player(object):
 
 	def check_development(self):
 		requirement = self.determine_middle_class_need()
-		if self.check_mid_requirement(requirement) == True:
+		if self.check_mid_requirement(requirement) == True and self.freePOP >= 0.5:
 			return True
 		else:
 			return False
@@ -654,6 +654,7 @@ class Player(object):
 			#print("Your supply: %s" % (self.supply[k]))
 
 	def turn(self, market):
+		self.POP_increased = 0
 		if self.stability < -3: 
 			self.stability = - 3
 		if self.stability > 3:
@@ -977,6 +978,10 @@ class Player(object):
 
 
 	def amount_can_manif(self, _type):
+		if self.stability < -3.0:
+			self.stability = -3.0
+		if self.stability > 3.0:
+			self.stability = 3.0
 		if self.AP < 1:
 			return 0
 		if self.factories[_type]["number"] == 0:
