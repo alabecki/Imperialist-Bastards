@@ -798,7 +798,7 @@ class Human(Player):
 			else:
 				print("Not this time :(")
 
-	def export_Culture(self):
+	def export_Culture(self, players):
 		gain = 0
 		for p in players.values():
 			if p.type == "major":

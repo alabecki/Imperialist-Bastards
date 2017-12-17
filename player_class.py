@@ -115,13 +115,13 @@ class Player(object):
 			"management": 0
 		}
 
-		self.midPOP = {
+		'''self.midPOP = {
 		"researchers": {"number": 0.0, "priority": 0.2},
 		"officers": {"number": 0.0, "priority": 0.2},
 		"bureaucrats": {"number": 0.0, "priority": 0.2},
 		"artists": {"number": 0.0, "priority": 0.2},
 		"managers": {"number": 0.0, "priority": 0.2}
-		}
+		}'''
 
 		self.midGrowth = True
 		self.numMidPOP = 0.0
@@ -229,7 +229,7 @@ class Player(object):
 			"radio": {"number":0, "used": False},
 		}
 
-
+		self.crafted = False 
 
 		#self.factories = set()
 		self.factory_throughput = 4.0
@@ -247,7 +247,6 @@ class Player(object):
 		self.reputation = 1.0
 		self.diplo_action = 0.0
 		self.CB = set()
-
 		#culture
 		self.culture_points = 0.0
 		self.culture_level = 0.0
@@ -654,6 +653,7 @@ class Player(object):
 			#print("Your supply: %s" % (self.supply[k]))
 
 	def turn(self, market):
+		self.crafted == False
 		self.POP_increased = 0
 		if self.stability < -3: 
 			self.stability = - 3

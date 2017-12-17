@@ -521,13 +521,13 @@ class AI(Player):
         if self.resources["iron"] < 1 and market.buy_price("iron", self.supply["iron"]) < self.resources["gold"] * 1.5:
             self.ai_buy("iron", 1, market, relations, players)
         if self.factories["cannons"]["number"] == 0 and self.goods["cannons"] < 2.5:
-            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2:
+            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2 and self.crafted == False:
                 self.ai_craftman_production("cannons", market)
         if self.resources["cotton"] < 1 and market.buy_price("cotton", self.supply["cotton"]) < self.resources[
             "gold"] * 1.5:
             self.ai_buy("cotton", 1, market, relations, players)
         if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2:
-            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3:
+            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("clothing", market)
 
     def early_game_army(self, market, relations, players):
@@ -536,13 +536,13 @@ class AI(Player):
         if self.resources["iron"] < 1 and market.buy_price("iron", self.supply["iron"]) < self.resources["gold"] * 1.5:
             self.ai_buy("iron", 1, market, relations, players)
         if self.factories["cannons"]["number"] == 0 and self.goods["cannons"] < 2.5:
-            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2:
+            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2 and self.crafted == False:
                 self.ai_craftman_production("cannons", market)
         if self.resources["cotton"] < 1 and market.buy_price("cotton", self.supply["cotton"]) < self.resources[
             "gold"] * 1.5:
             self.ai_buy("cotton", 1, market, relations, players)
         if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2:
-            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3:
+            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("clothing", market)
 
     def early_game_development(self, market, relations, players):
@@ -552,13 +552,13 @@ class AI(Player):
             "gold"] * 1.5:
             self.ai_buy("cotton", 1, market, relations, players)
         if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2:
-            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3:
+            if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("clothing", market)
         if self.factories["paper"]["number"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
-            if self.resources["wood"] >= 2 and self.supply["paper"] <= 3:
+            if self.resources["wood"] >= 2 and self.supply["paper"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("paper", market)
         if self.factories["furniture"]["number"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
-            if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3:
+            if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("furniture", market)
 
     def early_game(self, market, relations, players):
@@ -574,20 +574,20 @@ class AI(Player):
         if self.resources["iron"] < 1 and market.buy_price("iron", self.supply["iron"]) < self.resources["gold"] * 1.5:
             self.ai_buy("iron", 1, market, relations, players)
         if self.factories["cannons"]["number"] == 0 and self.goods["cannons"] < 2.5:
-            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2:
+            if self.resources["iron"] >= 2 and self.supply["cannons"] <= 2 and self.crafted == False:
                 self.ai_craftman_production("cannons", market)
         # if self.goods["cannons"] >= 1 and self.resources["wood"] >= 1 and self.shipyard >= 1 and \
         #	self.resources["cotton"] >= 1 and self.AP >= 1:
         #		if self.military["frigates"] < 2:
         #			self.ai_build_frigates()
-        if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2:
+        if self.factories["clothing"]["number"] == 0 and self.goods["clothing"] < 2 and self.crafted == False:
             if self.resources["cotton"] >= 2 and self.supply["clothing"] <= 3:
                 self.ai_craftman_production("clothing", market)
-        if self.factories["paper"]["number"] == 0 and self.goods["paper"] < 2 and self.AP >= 1:
+        if self.factories["paper"]["number"] == 0 and self.goods["paper"] < 2 and self.AP >= 1 and self.crafted == False:
             if self.resources["wood"] >= 2 and self.supply["paper"] <= 3:
                 self.ai_craftman_production("paper")
         if self.factories["furniture"]["number"] == 0 and self.goods["furniture"] < 1 and self.AP >= 1:
-            if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3:
+            if self.resources["wood"] >= 2 and self.supply["furniture"] <= 3 and self.crafted == False:
                 self.ai_craftman_production("furniture", market)
 
     def num_army_units(self):
@@ -742,7 +742,7 @@ class AI(Player):
             self.ai_factory_production(_type, market)
         elif decision == "buy":
             self.ai_buy(_type, 1, market, relations, players)
-        elif decision == "craft_ready":
+        elif decision == "craft_ready" and self.crafted == False:
             self.ai_craftman_production(_type, market)
         else:
             if _type in craft.keys():
@@ -751,7 +751,7 @@ class AI(Player):
                     get = self.ai_buy(i, craft[_type][i], market, relations, players)
                     if get == "fail":
                         check = False
-                if check == True:
+                if check == True and self.crafted == False:
                     self.ai_craftman_production(_type, market)
 
     def assign_priorities_to_provs(self):
@@ -1399,6 +1399,7 @@ class AI(Player):
             self.resources[i] -= craft[_type][i]
         self.goods_produced[_type] += 1.0
         self.AP -= 1
+        self.crafted == True
         print("%s crafted %s" % (self.name, _type))
         market.report.append("%s crafted %s" % (self.name, _type))
         # print("AP points remaining__: %s \n" % (self.AP))
