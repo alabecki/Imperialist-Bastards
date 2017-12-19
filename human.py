@@ -1,6 +1,6 @@
 
 from player_class import*
-import random
+from random import*
 import minor_classes
 from technologies import technology_dict
 
@@ -826,6 +826,85 @@ class Human(Player):
 		self.goods["chemicals"] -= 3
 		self.goods["oil"] += 1
 	
+
+	def improve_Relations(self, other, relations):
+		relata = frozenset([self.name, other])
+		self.diplo_action -=1
+		other = players[other]
+		relations[relata].relationship += min(1, 5/(other.POP + 0.001))
+		self.reputation += 0.02
+
+	def damage_Relations(self, other, relations):
+		relata = frozenset([self.name, other])
+		self.diplo_action -=1
+		other = players[other]
+		relations[relata].relationship -= min(1, 10/(other.POP + 0.001))
+		self.reputation -= 0.02
+
+	def check_for_claims(self, other, provinces):
+		options = []
+		for o in self.objectives:
+			if o in self.provinces.keys():
+				continue
+			op = provinces[o]
+			if op.owner == other:
+				options.append(o)
+		return options 
+
+
+	def gain_CB(self, other, annex):
+		annex = provinces[annex]
+		self.diplo_action -= 1
+		new = CB(self, annex.owner, "annex", annex.name, 5)
+		self.CB.add(new)
+		self.reputation -= 0.025
+
+
+	def destabilize_Nation(self, other, players, relations):
+		amount = 0
+		other = players[other]
+		if other.type == "old_empire" or other.type == "old_minor":
+			amount = random()/2
+		else:
+			amount = random()/4
+		other.stability -= amount
+		if other.stability < -3.0:
+			other.stability = -3.0
+		self.diplo_action -=1
+		self.reputation -= 0.033
+		relata = frozenset([self.name, other.name])
+		relations[relata].relationship -= 0.2
+
+	def bribeNation(self, other, relations):
+		relata = frozenset([self.name, other])
+		self.resources["gold"] -= 2
+		relations[relata].relationship += min(1, 8/(other.POP + 0.001))
+
+	
+	def sabotage_Relatons(self, other1, other2, players, relations):
+		relata = frozenset([other1, other2])
+		other1 = players[other1]
+		other2 = players[other2]
+		modifier = 4/((PA.POP + PB.POP)/2)
+		relations[relata].relationship -= modifier
+		print("Relations between %s and %s have been reduced by %s to %s" % \
+			(PA.name, PB.name, modifier, relations[relata].relationship))
+		self.diplo_action -= 1
+		self.reputation -= 0.025
+
+	def embargo_Nation(self, other, players, relations):
+		other = players[other]
+		if self.name in other.embargo:
+			other.embargo.remove(self.name)
+		else:
+			other.embargo.add(self.name)
+		name = other.name
+		relata = frozenset([self.name, name])
+		relations[relata].relationship -= 0.25
+		self.diplo_action -= 1
+
+
+
 
 
 		#if choice == "4":

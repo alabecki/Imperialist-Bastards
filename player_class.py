@@ -74,7 +74,6 @@ class Player(object):
 
 	player_count = 0
 
-
 	def __init__ (self, _name, _type, number):
 		# Basic Attributes
 		self.colour = "white"
@@ -1165,3 +1164,17 @@ class Player(object):
 			return False
 		else:
 			return True
+
+
+	def get_fact_level(self):
+		value = 0
+		for k, v in self.factories.items():
+			value += v["number"]
+		return value
+
+	def everyone_but_self(self, players):
+		all_others = []
+		for k in players.keys():
+			if self.name != k:
+				all_others.append(k)
+		return all_others

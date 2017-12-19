@@ -37,6 +37,7 @@ provinces = dict()
 relations = dict()
 human_player = ""
 PRODUCE = ""
+OTHER = ""
 
 manufacture = {
 	"parts": {"iron": 0.67, "coal": 0.33},
@@ -54,7 +55,7 @@ manufacture = {
 	}
 
 def update_gui():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	print("59")
 	update_main_tab()
@@ -65,7 +66,7 @@ def update_gui():
 
 
 def update_market_tab():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	for k, v in player.resources.items():
 		if k in ["gold", "/", "//"]:
@@ -82,7 +83,7 @@ def update_market_tab():
 	update_sell_button() 
 
 def update_main_tab():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	#Update Main Tab (except map)
 	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
@@ -126,7 +127,7 @@ def update_main_tab():
 			app.disableButton("Develop " + p)
 
 def update_production_tab():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	if player.freePOP < 1:
 		app.disableButton("add_pro_pop")
@@ -139,7 +140,7 @@ def update_production_tab():
 	update_production_gui()
 
 def update_tech_tab():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	stab_rounds = round(player.stability * 2) / 2
 	research_per_turn = 0.25 + ((player.developments["research"] + player.developments["management"]/6) * \
@@ -159,7 +160,7 @@ def update_tech_tab():
 				app.disableButton("res_" + k)
 
 def update_culture_tab():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 
 	app.setLabel("num_officers", "%.2f" % player.developments["military"])
@@ -335,7 +336,7 @@ def show_player_gains(gains):
 
 
 def start_main_screen():
-	global auto_save, players, human_player, market
+	global auto_save, players, human_player, market, relations
 	#load_basic_widgets()
 	nation = human_player
 	player = players[nation]
@@ -759,7 +760,7 @@ def start_main_screen():
 	app.startTab("Technology")
 	app.setExpand("all")
 	app.setBg("chartreuse")
-	app.startScrollPane("technologies")
+	#app.startScrollPane("technologies")
 	#app.startPanedFrame("tech_divider")
 	app.startLabelFrame("Research Status")
 	stab_rounds = round(player.stability * 2) / 2
@@ -768,7 +769,9 @@ def start_main_screen():
 	app.addLabel("research_status", "      Current Research Points: %.2f    Research Points Per Turn: %.2f      "  % (round(player.research, 2), round(research_per_turn, 2)), 1, 1, 8, 2)
 	app.stopLabelFrame()
 #	app.startScrollPane("technologies")
-	
+
+	app.startLabelFrame("")
+	app.startScrollPane("technologies")
 	app.startLabelFrame("Technology List")
 	#app.addImage()
 	app.add
@@ -792,18 +795,19 @@ def start_main_screen():
 	app.stopLabelFrame()
 	app.stopScrollPane()
 	#app.startPanedFrame("Tech Descriptions")
-	app.startLabelFrame("   Tech Description   ")
+	#app.startLabelFrame("   Tech Description   ")
 	#app.setSticky("w")
-	app.addMessage("tech_description", "    Description    ")
+	app.addMessage("tech_description", "    Description    ", 2, 11)
 
-	app.addImage("tech_image", "default_tech_pic.gif")
+	app.addImage("tech_image", "default_tech_pic.gif", 5,11)
 	app.stopLabelFrame()
+	#app.stopScrollPane()
 
 	app.stopTab()
 	####################################################################################################
 	app.startTab("Culture")
 	app.setExpand("none")
-	app.setBg("purple")
+	app.setBg("MediumOrchid2")
 
 	app.startLabelFrame("Demographics:")
 	app.addImage("officers", "officer.gif", 0, 0)
@@ -853,15 +857,18 @@ def start_main_screen():
 	else:
 		app.enableButton("Consume Spice")
 	app.stopTab()
+
 	#######################################################################################################
 	app.startTab("Military")
-	app.setBg("tomato3")
+	app.setBg("OrangeRed2")
 
 	app.startLabelFrame("Total Strength")
 	attack = player.calculate_base_attack_strength()
 	defense = player.calculate_base_defense_strength()
-	app.addLabel("total_attack_str", "Attack Strength: %.2f" % (attack), 1, 1, 2, 1)
-	app.addLabel("total_defense_str", "Defense Strength: %.2f" % (defense) 1, 3, 2, 1)
+	naval = player.calculate_naval_strength()
+	app.addLabel("total_attack_str", "Land Attack Strength: %.2f" % (attack), 1, 1)
+	app.addLabel("total_defense_str", "Land Defense Strength: %.2f" % (defense), 1, 2)
+	app.addLabel("total_naval_str", "Naval Strength: %.2f" % (naval), 1, 3)
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Army")
@@ -955,7 +962,6 @@ def start_main_screen():
 				app.enableButton("disband_" + k)
 			row += 1
 	app.stopLabelFrame()
-		
 
 	app.startLabelFrame("Navy")
 	row = 1
@@ -1016,16 +1022,215 @@ def start_main_screen():
 
 	app.stopTab()
 	############################################################################################
-	app.startTab(" ")
+	app.startTab("Diplomacy")
+	
+	app.startScrollPane("diplomacy")
+	app.startLabelFrame("Nations")
+	count = 1
+	for k, v in players.items():
+		if k == player.name:
+			continue
+		app.addImage(k + " flag", k + ".gif", count, 1)
+		app.setImageTooltip(k + " flag", k)
+		relata = frozenset([player.name, v.name])
+		app.addLabel("relations_with_" + k, "Relations: %.2f" % relations[relata].relationship, count, 2)
+		app.setLabelFg("relations_with_" + k, "white")
+		app.setLabelBg("relations_with_" + k, "black")
+		app.addImage("imp_rel_w" + k, "diplomacy.gif", count, 3)
+		app.setImageTooltip("imp_rel_w" + k, "Improve Relations")
+		#app.addNamedButton("Improve Relations", "imp_rel_w" + k, improve_relations, count, 3)
+		app.addImage("dmg_rel_w" + k, "fire.gif", count, 4)
+		app.setImageTooltip("dmg_rel_w" + k, "Damage Relations")
+		app.addImage("CB_" + k, "casus_belli.gif", count, 5)
+		app.setImageTooltip("CB_" + k, "Gain Casus Belli")
+		app.addImage("destab" + k, "unrest.gif", count, 6)
+		app.setImageTooltip("destab" + k, "Destabilize Nation")
+		app.addImage("bribe" + k, "bribe.gif", count, 7)
+		app.setImageTooltip("bribe" + k, "Bribe Nation")
+		app.addImage("sab_rel" + k, "divide.gif", count, 8)
+		app.setImageTooltip("sab_rel" + k, "Sabotage Relations")
+		app.addImage("embargo" + k, "embargo.gif", count, 9)
+		app.setImageTooltip("embargo" + k, "Embargo!")
+		app.addImage("info" + k, "info.gif", count, 10)
+		app.setImageTooltip("info" + k, "Nation Details")
 
+		relata = frozenset([player.name, k])
+		if player.diplo_action < 1 or relations[relata].relationship >= 3.0:
+			app.setImageSubmitFunction("imp_rel_w" + k, none)
+		else:
+			app.setImageSubmitFunction("imp_rel_w" + k, improve_relations)
+		if player.diplo_action < 1 or relations[relata].relationship <= - 3.0:
+			app.setImageSubmitFunction("dmg_rel_w" + k, none)
+		else:
+			app.setImageSubmitFunction("dmg_rel_w" + k, damage_relations)
+		if player.diplo_action < 1 or relations[relata].relationship >= -2.5:
+			app.setImageSubmitFunction("CB_" + k, none)
+		else:
+			app.setImageSubmitFunction("CB_" + k, gain_casus_belli)
+
+		if player.diplo_action < 1 or players[k].stability <= - 3.0:
+			app.setImageSubmitFunction("destab" + k, none)
+		else:
+			app.setImageSubmitFunction("destab" + k, destabilize_nation)
+		if player.resources["gold"] < 2.0 or relations[relata].relationship >= 3.0 or players[k].type == "major":
+			app.setImageSubmitFunction("bribe" + k, none)
+		else:
+			app.setImageSubmitFunction("bribe" + k, bribe)
+		if player.diplo_action < 1:
+			app.setImageSubmitFunction("sab_rel" + k, none)
+		else:
+			app.setImageSubmitFunction("sab_rel" + k, sabotage_relatons)
+		if player.diplo_action < 1 or (player.name not in players[k].embargo and relations[relata].relationship > -1.5):
+			app.setImageSubmitFunction("embargo" + k, non)
+		else:
+			app.setImageSubmitFunction("embargo" + k, embargo_nation)
+
+
+		count += 1
+
+
+
+	app.stopLabelFrame()
+	app.stopScrollPane()
 	app.stopTab()
 
 	app.stopTabbedFrame()
 	app.hideSubWindow("loading new game")
 
+def none(btn):
+	return
+
+def improve_relations(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	other = btn[9:]
+	player.improve_Relations(other, relations)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def damage_relations(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	other = btn[9:]
+	player.damage_Relations(other, relations)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def gain_casus_belli(btn):
+	global players, human_player, relations, provinces
+	player = players[human_player]
+	other = btn[3:]
+	opts = player.check_for_claims(other, provinces)
+	app.changeOptionBox("prov_to_annex", opts)
+	app.showSubWindow("Province to Annex")
+
+def cb_2(btn):
+	global players, human_player, provinces
+	player = players[human_player]
+	app.hideSubWindow("Province to Annex")
+	prov = app.getOptionBox("prov_to_annex")
+	other = provinces[prov].owner
+	player.gain_CB(other, prov.name)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def destabilize_nation(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	other = btn[6:]
+	player.destabilize_Nation(other, players, relations)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def bribe(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	other = btn[5:]
+	player.bribeNation(other, relations)
+	update_diplomacy_gui()
+	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
+
+def integrate_culture_2(btn):
+	global players, human_player
+	player = players[human_player]
+	app.hideSubWindow("Provinces to Integrate")
+	prov = app.getOptionBox("prov_to_int")
+	player.integrate_Culture(prov)
+	update_gui()
+
+def sabotage_relatons(btn):
+	global players, human_player
+	player = players[human_player]
+	OTHER = btn[7:]
+	firstOther = players[OTHER]
+	all_others = firstOther.everyone_but_self(players)
+	app.changeOptionBox("other_player", all_others)
+	app.showSubWindow("Choose Other Player")
+
+def sab_rel_2(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	app.hideSubWindow("Choose Other Player")
+	other2 = app.getOptionBox("other_player")
+	player.sabotage_Relatons(OTHER, other2, players, relations)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def embargo_nation(btn):
+	global players, human_player, relations
+	player = players[human_player]
+	other = btn[7:]
+	other = players[other]
+	player.embargo_Nation(other, players, relations)
+	update_diplomacy_gui()
+	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+def get_nation_info(btn):
+	global players, human_player, relations
+	other = btn[4:]
+	other = players[other]
+	update_Nation_Info(other)
+	app.showSubWindow("Nation Info")
+
+def update_Nation_Info(other):
+	app.setLabel("Nation_Name", other.name)
+	fact_level = other.get_fact_level()
+	app.setLabel("PrimaryStats", "Gold: %.2f  DevLevel: %d  Number Tech: %d  ProvinceDevs: %d  Number Factory-Levels: %d" % \
+		other.resources["gold"], other.development_level, len(other.technologies), other.number_developments, fact_level)
+	app.setLabel("NationMiddleCLass", "Scientists: %.2f,  Officers: %.2f,  Bureaucrats: %.2f,  Artists: %.2f,  Managers: %.2f " % \
+		other.developments["research"], other.developments["military"], other.developments["government"], \
+		other.developments["culture"], other.developments["management"])
+	app.setLabel("factories_1", "Parts: %d,  Cannons: %d,  Clothing: %d,  Paper: %d,  Furniture: %d, Chemicals: %d" % \
+		other.factories["parts"]["number"], other.factories["cannons"]["number"], other.factories["clothing"]["number"], \
+		other.factories["paper"]["number"], other.factories["furniture"]["number"], other.factories["chemicals"])
+	app.setLabel("factories_2", "Gear: %d,  Radio: %d,  Telephone: %d,  Auto: %d,  Fighter: %d,  Tank: %d" % \
+		other.factories["gear"]["number"], other.factories["radio"]["number"], other.factories["telephone"]["number"], \
+		other.factories["auto"]["number"], other.factories["fighter"]["number"], other.factories["tank"]["number"])
+	invent = ""
+	for (k1,v1), (k2,v2) in zip(other.resources.items(), other.goods.items()):
+		invent.append(" %-12s: %.2f        %-12s: %.2f \n" % (k1, v1, k2, v2))
+	app.setMessage("NationInventory", invent)
+
+	military_info = ""
+	total_att = opther.calculate_base_attack_strength()
+	total_defense = other.calculate_base_defense_strength()
+	total_naval = other.calculate_naval_strength()
+	military_info.append("Total Land Attack Strength: %.2f   " % total_att)
+	military_info.append("Total Land Defense Strength: %.2f   " % total_defense)
+	military_info.append("Total Naval Strength")
+	for k, v in other.military.items():
+		military_info.append("%s: %.2f,   " % k, v)
+	app.setMessage("NationMilitary", military_info)
+
 
 def update_production_gui():
-	global players, human_player, market, PRODUCE
+	global players, human_player
 	player = players[human_player]
 	fact_options = player.factory_optons()
 	for f in player.goods.keys():	
@@ -1079,7 +1284,7 @@ def update_production_gui():
 	
 
 def update_military_gui():
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	for k in player.military.keys():
 		if k == "irregulars":
@@ -1320,7 +1525,7 @@ def integrate_culture(btn):
 def integrate_culture_2(btn):
 	global players, human_player, market
 	player = players[human_player]
-	app.hideSubWindow("Provinces to Integrate")
+	app.hideSubWindow("Province to Integrate")
 	prov = app.getOptionBox("prov_to_int")
 	player.integrate_Culture(prov)
 	update_gui()
@@ -1388,7 +1593,7 @@ def select_technology(btn):
 
 
 def research_technology(btn):
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	tech = btn[4:]
 	player.research_tech(tech)
@@ -1397,7 +1602,7 @@ def research_technology(btn):
 
 
 def build_army(btn):
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	_type = btn[6:]
 	player.build_army_unit(_type)
@@ -1405,7 +1610,7 @@ def build_army(btn):
 
 
 def disband_army(btn):
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	_type = btn[8:]
 	player.disband_unit(_type)
@@ -1417,7 +1622,7 @@ def disband_army(btn):
 
 
 def add_pro_pop(btn):
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	player.pro_POP_add()
 	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
@@ -1431,7 +1636,7 @@ def add_pro_pop(btn):
 
 
 def remove_pro_pop(btn):
-	global players, human_player, market, PRODUCE
+	global players, human_player, market
 	player = players[human_player]
 	player.pro_POP_subtract()
 	app.enableButton("add_pro_pop")
@@ -1908,7 +2113,7 @@ def load_basic_widgets():
 
 
 	app.startSubWindow("saving", modal = True)
-	app.addLabel("saveing label", "Saving Game ...")
+	app.addLabel("saving label", "Saving Game ...")
 	app.stopSubWindow()
 
 	app.startSubWindow("chose_seller", modal = True)
@@ -1941,6 +2146,33 @@ def load_basic_widgets():
 	app.addLabel("prov_to_integrate", "Which Province would you like to culturally integrate?")
 	app.addOptionBox("prov_to_int", [])
 	app.addNamedButton("OK", "prov_to_integrate", integrate_culture_2)
+	app.stopSubWindow()
+
+	app.startSubWindow("Province to Annex", modal = True)
+	app.addLabel("prov_to_annex", "Which Province would you like to annex?")
+	app.addLabel("(If list is empty, you may still go to war for general spoils (33\%\ of opponent's gold")
+	app.addOptionBox("prov_to_annex", [])
+	app.addNamedButton("OK", "prov_to_annex", cb_2)
+	app.stopSubWindow()
+
+	app.startSubWindow("Choose Other Player", modal = True)
+	app.addLabel("choose_other", "Please chose another player")
+	app.addOptionBox("other_player", [players.keys()])
+	app.addNamedButton("OK", "other_player", sab_rel_2)
+	app.stopSubWindow()
+
+	app.startSubWindow("Nation Info", modal = False)
+	app.startLabelFrame("Report")
+	app.addLabel("Nation_Name", " ")
+	app.getLabelWidget("Nation_Name").config(font="Times 13 bold underline")
+	app.addLabel("PrimaryStats", " ")
+	#Primary Stats: Gold, DevelopmentLevel, NumTechnologies, NumDevelopments, NumFactories
+	app.addLabel("NationMiddleCLass", " ")
+	app.addLabel("factories_1", " ")
+	app.addLabel("factories_2", " ")
+	app.stopLabelFrame()
+	app.addMessage("NationInventory", """ """)
+	app.addMessage("NationMilitary", """ """)
 	app.stopSubWindow()
 
 	#app.startSubWindow("chem_growth", modal = True)
