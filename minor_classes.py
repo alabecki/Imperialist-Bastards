@@ -81,3 +81,14 @@ class Factory(object):
 		self.kind = kind
 		self.size = 1
 		self.used = False
+
+class War(object):
+	def __init__(self, attacker, defender):
+		self.attacker = attacker 
+		self.defender = defender
+		self.current_attacker_forces = []
+		self.current_defender_forces = []
+		self.current_attacker_strength = 0
+		self.current_defender_strength = 0
+		self.attack_manouver = 0
+		self.defence_manouver = 0

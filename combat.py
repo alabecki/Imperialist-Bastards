@@ -888,6 +888,7 @@ def amph_combat(p1, p2, p1_forces, prov, players, market, relations):
 		market.report.append("%s has %s units and base defense strength of %s \n" % (p2.name, def_number_units_army, def_str))
 		att_manouver = att_manouver * att_manouver_roll
 		def_manouver = def_manouver * def_manouver_roll
+		# 1 - 1/att_man
 
 		print("%s manouver = %s, %s manouver = %s \n" % (p1.name, att_manouver, p2.name, def_manouver))
 		market.report.append("%s manouver = %s, %s manouver = %s \n" % (p1.name, att_manouver, p2.name, def_manouver))

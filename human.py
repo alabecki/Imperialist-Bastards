@@ -780,23 +780,23 @@ class Human(Player):
 		if opt.type == "uncivilized":
 			if chance < 0.66:
 				self.accepted_cultures.add(prov)
-				print("Integrated Culture")
+				return True
 			else:
-				print("Not this time :(")
+				return False
 		if opt.type == "old":
 			if chance < 0.33:
 				self.accepted_cultures.add(prov)
-				print("Integrated Culture") 
+				return True 
 			else:
-				print("Not this time :(")
+				return False
 
 		if opt.type == "civilized":
 			if chance < 0.25:
 				opt.culture = self.culture
 				self.accepted_cultures.add(prov)
-				print("Integrated Culture")
+				return True
 			else:
-				print("Not this time :(")
+				return False
 
 	def export_Culture(self, players):
 		gain = 0
@@ -827,14 +827,14 @@ class Human(Player):
 		self.goods["oil"] += 1
 	
 
-	def improve_Relations(self, other, relations):
+	def improve_Relations(self, other, relations, players):
 		relata = frozenset([self.name, other])
 		self.diplo_action -=1
 		other = players[other]
 		relations[relata].relationship += min(1, 5/(other.POP + 0.001))
 		self.reputation += 0.02
 
-	def damage_Relations(self, other, relations):
+	def damage_Relations(self, other, relations, players):
 		relata = frozenset([self.name, other])
 		self.diplo_action -=1
 		other = players[other]
@@ -875,20 +875,20 @@ class Human(Player):
 		relata = frozenset([self.name, other.name])
 		relations[relata].relationship -= 0.2
 
-	def bribeNation(self, other, relations):
+	def bribeNation(self, other, relations, players):
 		relata = frozenset([self.name, other])
 		self.resources["gold"] -= 2
-		relations[relata].relationship += min(1, 8/(other.POP + 0.001))
+		relations[relata].relationship += min(1, 8/(players[other].POP + 0.001))
 
 	
 	def sabotage_Relatons(self, other1, other2, players, relations):
 		relata = frozenset([other1, other2])
 		other1 = players[other1]
 		other2 = players[other2]
-		modifier = 4/((PA.POP + PB.POP)/2)
+		modifier = 4/((other1.POP + other2.POP)/2)
 		relations[relata].relationship -= modifier
 		print("Relations between %s and %s have been reduced by %s to %s" % \
-			(PA.name, PB.name, modifier, relations[relata].relationship))
+			(other1.name, other2.name, modifier, relations[relata].relationship))
 		self.diplo_action -= 1
 		self.reputation -= 0.025
 
