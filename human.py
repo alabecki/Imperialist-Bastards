@@ -187,43 +187,22 @@ class Human(Player):
 	def doctrine_options(self):
 		options = []
 		for md in military_doctrines:
-			if "flight" not in self.technologies and (md == "Fighter_Offense" or md == "Fighter_Defense"):
+			if "mobile_warfare" not in self.technologies and md = "CombinedArms":
+				continue
+			if "flight" not in self.technologies and md = "Ace Pilots":
+				continue 
+			if "bombers" not in self.technologies and md == "CombinedArms":
+				continue
+			if "machine_guns" not in self.technologies and md == "Entrenchment":
+				continue
+			if "ManouverI" not in self.doctrines and md == "ManouverII":
+				continue
+			if "SeaI" not in self.doctrines and md == "SeaII":
 				continue
 			if md not in self.doctrines:
 				options.append(md)
 		return options
 
-
-	def choose_doctrine(self, choice):
-		
-		self.doctrines.add(choice)
-		if choice == "Sea_Doctrine1" or choice == "Sea_Doctrine2":
-			self.frigates["attack"] += 0.3
-			self.iron_clad["attack"] += 0.32
-			self.battle_ship["attack"] += 1
-			return 
-		if choice == "Infantry_Offense":
-			self.infantry["attack"] += 0.25
-		if choice == "Mobile_Offense":
-			self.cavalry["attack"] += 0.3
-			self.tank["attack"] += 0.5
-		if choice == "Artillery_Offense":
-			self.artillery["attack"] += 0.4
-		if choice == "Fighter_Offense":
-			self.fighter["attack"] += 0.25
-		if choice == "Infantry_Defense":
-			self.infantry["defend"] += 0.3
-		if choice == "Mobile_Defense":
-			self.cavalry["defend"] += 0.25
-			self.tank["attack"] += 0.4
-		if choice == "Artillery_Defense":
-			self.artillery["defend"] += 0.4
-		if choice == "Fighter_Defense":
-			self.fighter["defend"] += 0.3
-		if choice == "Enhanced_Mobility":
-			self.cavalry["manouver"] + 0.5
-			self.tank["manouver"] + 1
-			self.fighter["manouver"] + 1
 	
 
 	def research_tech(self, choice):
@@ -232,8 +211,11 @@ class Human(Player):
 			if choice == "professional_armies":
 				self.infantry["attack"] += 0.15
 				self.infantry["defend"] += 0.15
+				self.infantry["manouver"] += 0.2
 				self.cavalry["attack"] += 0.15
 				self.cavalry["defend"] += 0.15
+				self.cavalry["manouver"] += 0.2
+				self.cavalry["recon"] += 0.2
 				self.artillery["attack"] += 0.15
 				self.artillery["defend"] += 0.15
 				self.frigates["attack"] += 0.2
@@ -852,11 +834,16 @@ class Human(Player):
 		return options 
 
 
-	def gain_CB(self, other, annex):
-		annex = provinces[annex]
+	def gain_CB(self, other, annex, provinces):
+		if annex in provinces:
+			annex = provinces[annex]
+			new = CB(self, annex.owner, "annex", annex.name, 5)
+			self.CB.add(new)
+		else:
+			new = CB(self, other, "punish", "", 5)
+			self.CB.add(new)
+		print(len(self.CB))
 		self.diplo_action -= 1
-		new = CB(self, annex.owner, "annex", annex.name, 5)
-		self.CB.add(new)
 		self.reputation -= 0.025
 
 

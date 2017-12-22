@@ -38,9 +38,8 @@ government_map = {
 	"oligarchy":  1.1
 }
 
-military_doctrines = ["Infantry_Offense", "Infantry_Defense", "Mobile_Offense", "Mobile_Defense", "Artillery_Offense",
-"Artillery_Defense", "Fighter_Offense", "Fighter_Defense", "Sea_Doctrine1", "Sea_Doctrine2", "Enhanced_Mobility", 
-"Army_Discipline"]
+military_doctrines = ["Discipline", "Recon", "ManouverI", "ManouverII", "Entrenchment", "CombinedArms", \
+"SeaI", "SeaII", "AcePilots", "FirePower"]
 
 
 manufacture = {
@@ -269,7 +268,8 @@ class Player(object):
 		self.irregulars = {
 			"attack": 0.5,
 			"defend": 0.625,
-			"manouver": 0.2,
+			"manouver": 0.1,
+			"recon": 0.0,
 			"ammo_use": 0.02,
 			"oil_use": 0.0
 			}
@@ -278,6 +278,7 @@ class Player(object):
 			"attack": 1.0,
 			"defend": 1.2,
 			"manouver": 0.5,
+			"recon": 0.2,
 			"ammo_use": 0.05,
 			"oil_use": 0.0
 			}
@@ -285,7 +286,8 @@ class Player(object):
 		self.artillery = {
 			"attack": 1.0,
 			"defend": 1.8,
-			"manouver": 0.2,
+			"manouver": 0.0,
+			"recon": 0.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.0
 			}
@@ -293,7 +295,8 @@ class Player(object):
 		self.cavalry = {
 			"attack": 1.5,
 			"defend": 1.0,
-			"manouver": 2.0,
+			"manouver": 1.0,
+			"recon": 1.0,
 			"ammo_use": 0.05,
 			"oil_use": 0.0
 		}
@@ -301,36 +304,38 @@ class Player(object):
 		self.fighter = {
 			"attack": 1.0,
 			"defend": 1.5,
-			"manouver": 4.0,
+			"manouver": 1.0,
+			"recon": 2.0,
 			"ammo_use": 0.75,
 			"oil_use": 0.1
 		}
 
 		self.tank = {
-			"attack": 3,
-			"defend": 2,
-			"manouver": 3.0,
+			"attack": 3.0,
+			"defend": 2.0,
+			"manouver": 1.0,
+			"recon": 0.2,
 			"ammo_use": 0.75,
 			"oil_use": 0.1
 		}
 		
 		self.frigates = {
-			"attack": 2.0,
+			"attack": 1.0,
 			"HP": 1.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.0
 		}
 
 		self.iron_clad = {
-			"attack": 3,
-			"HP": 2,
+			"attack": 1.5,
+			"HP": 2.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.0,
 			}
 
 		self.battle_ship = {
-			"attack": 7,
-			"HP": 4,
+			"attack": 4.0,
+			"HP": 4.0,
 			"ammo_use": 0.3,
 			"oil_use": 0.2
 		}
@@ -1178,3 +1183,97 @@ class Player(object):
 			if self.name != k:
 				all_others.append(k)
 		return all_others
+
+
+	def choose_doctrine(self, choice):	
+		self.doctrines.add(choice)
+		if choice == "AcePilots":
+			self.fighter["manouver"] += 0.5
+			self.fighter["attack"] += 0.1
+			self.fighter["defend"] += 0.1
+			self.fighter["recon"] += 0.1
+
+		if choice == "Discipline":
+			self.infantry["attack"] += 0.15
+			self.infantry["defend"] += 0.15
+			self.artillery["attack"] += 0.1
+			self.artillery["defend"] += 0.1
+			self.tank["attack"] += 0.2
+			self.tank["defend"] += 0.2
+			self.cavalry["attack"] += 0.1
+			self.cavalry["defend"] += 0.1
+
+		if choice == "Recon":
+			self.infantry["recon"] += 0.15
+			self.cavalry["recon"] += 0.3
+			self.fighter["recon"] += 0.45
+			self.tank["recon"] += 0.2
+
+		if choice == "ManouverI":
+			self.infantry["manouver"] += 0.2
+			self.cavalry["manouver"] += 0.3
+			self.tank["manouver"] += 0.3
+
+		if choice == "ManouverII":
+			self.infantry["manouver"] += 0.3
+			self.cavalry["manouver"] += 0.4
+			self.tank["manouver"] += 0.4
+
+		if choice == "Entrenchment":
+			self.infantry["defend"] += 0.3
+			self.artillery["defend"] += 0.3
+			self.tank["defend"] += 0.1
+
+		if choice == "CombinedArms":
+			self.fighter["attack"] += 0.1
+			self.fighter["recon"] += 0.2
+			self.tank["manouver"] += 0.15
+			self.tank["attack"] += 0.1
+			self.artillery["attack"] += 0.1
+			self.infantry["attack"] += 0.1
+
+		if choice == "FirePower":
+			self.artillery["attack"] += 0.25
+			self.artillery["attack"] += 0.25
+			self.tank["attack"] += 0.1
+			self.tank["defend"] += 0.1
+			self.fighter["attack"] += 0.1
+
+		if choice == "SeaI":
+			self.frigates["attack"] += 0.2
+			self.iron_clad["attack"] += 0.3
+			self.battle_ship["attack"] += 0.8
+
+		if choice == "SeaII":
+			self.frigates["attack"] += 0.3
+			self.iron_clad["attack"] += 0.4
+			self.battle_ship["attack"] += 1.0
+
+
+	def recon(self):
+		recon = 0
+		recon += self.military["infantry"] * self.infantry["recon"]
+		recon += self.military["cavalry"] * self.cavalry["recon"]
+		recon += self.military["tank"] * self.tank["recon"]
+		recon += self.military["fighter"] * self.fighter["recon"]
+		return recon
+
+	def ammo_penalty(self, ammo_needed):
+		if ammo_needed > self.goods["cannons"]:
+			AmmoPenalty = self.goods["cannon"]/ammo_needed
+			AmmoPenalty = AmmoPenalty + (1 - AmmoPenalty)/2
+			self.goods["cannons"] = 0
+		else:
+			self.goods["cannons"] -= ammo_needed
+			AmmoPenalty = 1
+		return AmmoPenalty
+
+
+	def oil_penalty(self, oil_needed):
+		if oil_needed > self.resources["oil"]:
+			OilPenalty = self.resources["oil"]/oil_needed
+			self.resources["oil"] = 0
+		else:
+			self.resources["oil"] -= oil_needed
+			OilPenalty = 1
+		return OilPenalty

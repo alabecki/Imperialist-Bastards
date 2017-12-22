@@ -439,79 +439,56 @@ class AI(Player):
 
     def ai_choose_doctrine(self):
         while (len(self.doctrines) <= 10):
-            if "Sea_Doctrine1" not in self.doctrines and "Sea_Doctrines2" not in self.doctrines:
+            if "SeaI" not in self.doctrines:
                 if self.personality["Navy"] > 0.75:
-                    self.doctrines.add("Sea_Doctrine1")
-                    self.frigates["attack"] += 0.3
-                    self.iron_clad["attack"] += 0.32
-                    self.battle_ship["attack"] += 1
+                    self.doctrines.add("SeaI")
+                    self.frigates["attack"] += 0.2
+                    self.iron_clad["attack"] += 0.3
+                    self.battle_ship["attack"] += 0.8
                     return
-            else:
-                roll = random()
-                if roll < 0.2:
-                    self.doctrines.add("Sea_Doctrine1")
-                    self.frigates["attack"] += 0.3
-                    self.iron_clad["attack"] += 0.32
-                    self.battle_ship["attack"] += 1
-                    return
+                else:
+                    roll = random()
+                    if roll < 0.2:
+                        self.doctrines.add("SeaI")
+                        self.frigates["attack"] += 0.3
+                        self.iron_clad["attack"] += 0.32
+                        self.battle_ship["attack"] += 1
+                        return
 
-            if "Sea_Doctrine1" not in self.doctrines or "Sea_Doctrines2" not in self.doctrines:
+            if "SeaI" in self.doctrines and "SeaII" not in self.doctrines:
                 roll = random()
                 if self.personality["Navy"] > 0.75:
                     if roll < 0.5:
-                        self.doctrines.add("Sea_Doctrine1")
+                        self.doctrines.add("SeaII")
                         self.frigates["attack"] += 0.3
-                        self.iron_clad["attack"] += 0.32
-                        self.battle_ship["attack"] += 1
+                        self.iron_clad["attack"] += 0.4
+                        self.battle_ship["attack"] += 1.0
                         return
                 else:
                     if roll < 0.15:
-                        self.doctrines.add("Sea_Doctrine1")
+                        self.doctrines.add("SeaII")
                         self.frigates["attack"] += 0.3
-                        self.iron_clad["attack"] += 0.32
-                        self.battle_ship["attack"] += 1
+                        self.iron_clad["attack"] += 0.4
+                        self.battle_ship["attack"] += 1.0
                         return
             options = []
-            temp2 = self.personality["Offensive"]
-            roll = random()
-            if roll < temp2:
-                for i in military_doctrines:
-                    if "flight" not in self.technologies and (i == "Fighter_Offense" or i == "Fighter_Defense"):
-                        continue
-                    if i not in self.doctrines and "Offense" in i:
-                        options.append(i)
-                if len(options) != 0:
-                    doct = choice(options)
-                    self.doctrines.add(doct)
-                    if doct == "Infantry_Offense":
-                        self.infantry["attack"] += 0.25
-                    if doct == "Mobile_Offense":
-                        self.cavalry["attack"] += 0.3
-                        self.tank["attack"] += 0.5
-                    if doct == "Artillery_Offense":
-                        self.artillery["attack"] += 0.4
-                    if doct == "Fighter_Offense":
-                        self.fighter["attack"] += 0.25
-                    return
-            else:
-                for i in military_doctrines:
-                    if "flight" not in self.technologies and (i == "Fighter_Offense" or i == "Fighter_Defense"):
-                        continue
-                    if i not in self.doctrines and "Defense" in i:
-                        options.append(i)
-                if len(options) != 0:
-                    doct = choice(options)
-                    self.doctrines.add(doct)
-                    if doct == "Infantry_Defense":
-                        self.infantry["defend"] += 0.3
-                    if doct == "Mobile_Defense":
-                        self.cavalry["defend"] += 0.25
-                        self.tank["attack"] += 0.4
-                    if doct == "Artillery_Defense":
-                        self.artillery["defend"] += 0.4
-                    if doct == "Fighter_Defense":
-                        self.fighter["defend"] += 0.3
-                    return
+            for md in military_doctrines:
+            if md == "SeaII" or md == "SeaI":
+                continue
+            if "mobile_warfare" not in self.technologies and md = "CombinedArms":
+                continue 
+            if "flight" not in self.technologies and md == "CombinedArms":
+                continue
+            if "machine_guns" not in self.technologies and md == "Entrenchment":
+                continue
+            if "ManouverI" not in self.doctrines and md == "ManouverII":
+                continue
+            if "SeaI" not in self.doctrines and md == "SeaII":
+                continue
+            if md not in self.doctrines:
+                options.append(md)
+            doct = choice(options)
+            self.choose_doctrine(doct)
 
     def early_game_expansion(self, market, relations, players):
         if market.turn > 8:
@@ -1718,12 +1695,13 @@ class AI(Player):
         self.research -= technology_dict[choice]["cost"]
         self.technologies.add(choice)
         if choice == "professional_armies":
-            self.irregulars["attack"] += 0.15
-            self.irregulars["defend"] += 0.15
             self.infantry["attack"] += 0.15
             self.infantry["defend"] += 0.15
+            self.infantry["manouver"] += 0.2
             self.cavalry["attack"] += 0.15
             self.cavalry["defend"] += 0.15
+            self.cavalry["manouver"] += 0.2
+            self.cavalry["recon"] += 0.2
             self.artillery["attack"] += 0.15
             self.artillery["defend"] += 0.15
             self.frigates["attack"] += 0.2

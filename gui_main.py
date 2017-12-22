@@ -187,8 +187,6 @@ def update_culture_tab():
 	else:
 		app.enableButton("Consume Spice")
 
-def update_military_tab():
-	update_military_gui()
 
 def update_diplomacy_tab():
 	global players, human_player, relations
@@ -212,6 +210,9 @@ def update_diplomacy_tab():
 			app.disableButton("CB_" + k)
 		else:
 			app.enableButton("CB_" + k)
+		for cb in player.CB:
+			if cb.opponent == k:
+				app.disableButton("CB_" + k)
 
 		if player.diplo_action < 1 or players[k].stability <= - 3.0:
 			app.disableButton("destab" + k)
@@ -858,10 +859,11 @@ def start_main_screen():
 	#app.startPanedFrame("Tech Descriptions")
 	
 	app.startLabelFrame("  ")
-	#app.setSticky("w")
+	app.setSticky("nw")
 	app.addImage("tech_image", "default_tech_pic.gif", 1, 1)
+	app.setSticky("ne")
 	app.startLabelFrame("Technology Description")
-	app.addMessage("tech_description", "    Description    ", 1, 2)
+	app.addMessage("tech_description", "    Technology Descriptions go here    ", 1, 2)
 	app.setMessageBg("tech_description", "DarkSeaGreen1")
 	app.stopLabelFrame()
 	app.stopLabelFrame()
@@ -949,19 +951,7 @@ def start_main_screen():
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Casus Belli")
-	if len(player.CB) == 0:
-		app.addLabel("no CB", "You do not currently have a CB on any nation")
-	else:
-		count = 1
-		for p in player.CB:
-			p = provinces[p]
-			img = p.owner + ".gif"
-			ID = uniform(0, 1) * count
-			if img != ".gif" and img != " .gif":
-				app.addImage(ID, img, count, 1)
-				app.setImageTooltip(ID, p.owner)
-			app.addLabel(ID, p.name, 2)
-			count += 1
+	app.addLabelOptionBox("CB List:", [" "])
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Claims")
@@ -1260,7 +1250,7 @@ def gain_casus_belli(btn):
 		message = "We have no claims to any of territory currently belonging to %s but can still wage war for loot" % other
 		app.setLabel("general_message", message)
 		app.showSubWindow("Message_")
-		player.gain_CB(other, "")
+		player.gain_CB(other, "", provinces)
 		message = "You have gained a Casus Belli against " + other
 		app.setLabel("general_message", message)
 		update_diplomacy_tab()
@@ -1273,17 +1263,22 @@ def gain_casus_belli(btn):
 
 
 def cb_2(btn):
+	print("1276")
+	prov = app.getOptionBox("prov_to_annex")
+	print("1278")
+	app.hideSubWindow("Province to Annex")
+	print("1280")
 	app.hideSubWindow("Message_")
 	global players, human_player, provinces
 	player = players[human_player]
-	app.hideSubWindow("Province to Annex")
 	prov = app.getOptionBox("prov_to_annex")
 	prov = provinces[prov]
-	other = provinces[prov].owner
-	player.gain_CB(other, prov.name)
-	message = "You have gained a Casus Belli against " + other
+	#other = provinces[prov].owner
+	player.gain_CB(prov.owner, prov.name, provinces)
+	message = "You have gained a Casus Belli against " + prov.owner
 	app.setLabel("general_message", message)
 	update_diplomacy_tab()
+	update_military_tab()
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1468,6 +1463,12 @@ def update_military_tab():
 	app.setLabel("total_attack_str", "Land Attack Strength: %.2f" % (attack))
 	app.setLabel("total_defense_str", "Land Defense Strength: %.2f" % (defense))
 	app.setLabel("total_naval_str", "Naval Strength: %.2f" % (naval))
+
+	cb_list = []
+	for cb in player.CB:
+		addition = "%s: %s, %d" % (cb.opponent, cb.province, cb.time)
+		cb_list.append(addition)
+	app.changeOptionBox("CB List:", cb_list)
 
 	for k in player.military.keys():
 		if k == "irregulars":
@@ -2349,7 +2350,7 @@ def load_basic_widgets():
 	app.addLabel("prov_to_annex", "Which Province would you like to annex?")
 	app.addLabel("(If list is empty, you may still go to war for general spoils (33\%\ of opponent's gold")
 	app.addOptionBox("prov_to_annex", [])
-	app.addNamedButton("OK", "prov_to_annex", cb_2)
+	app.addNamedButton("OK", "prov_to_annex_", cb_2)
 	app.stopSubWindow()
 
 	app.startSubWindow("Choose Other Player", modal = True)
@@ -2375,6 +2376,25 @@ def load_basic_widgets():
 	app.startSubWindow("Message_")
 	app.addLabel("general_message", " ")
 	app.stopSubWindow()
+
+	app.startSubWindow("Land Battle")
+	app.addImage("attacking_nation", "England.gif", 1, 1)
+	app.addImage("att_infantry", "infantry.gif", 2, 1)
+	app.addImage("att_cavalry", "cavalry.gif", 3, 1)
+	app.addImage("att_artillery", "artillery.gif", 4, 1)
+	app.addImage("att_tank", "tank.gif", 5, 1)
+	app.addImage("att_fighter", "fighter.gif", 6, 1)
+	app.addLabel("total_att_str", "Total Str", 8, 1)
+	app.addLabel("att_ammo_deficit", "Ammo Deficit: %.2f" % 0, 10, 1)
+	app.addLabel("def_ammo_deficit", "Oil Deficit: %.2f" % 0, 11, 1)
+
+	app.addLabel("num_att_infantry", 0, 2, 2)
+	app.addLabel("num_att_cavalry", 0, 3, 2)
+	app.addLabel("num_att_artillery", 0, 4, 2)
+	app.addLabel("num_att_figthers", 0, 5, 2)
+	app.addLabel("num_tanks", 0, 6, 2)
+	
+
 
 	#app.startSubWindow("chem_growth", modal = True)
 	#app.yesNoBox("chem_for_growth", "Increasing Your Pop again this turn will require 1 chemical", parent= None)
