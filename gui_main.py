@@ -15,6 +15,7 @@ from minor_classes import*
 from market import*
 from technologies import*
 from combat import*
+from combat2 import*
 from start import*
 from save import*
 from AI import*
@@ -210,7 +211,7 @@ def update_diplomacy_tab():
 			app.disableButton("CB_" + k)
 		else:
 			app.enableButton("CB_" + k)
-		for cb in player.CB:
+		for cb in player.CB.values():
 			if cb.opponent == k:
 				app.disableButton("CB_" + k)
 
@@ -1396,9 +1397,130 @@ def update_Nation_Info(other):
 	app.setMessage("NationMilitary", military_info)
 
 def wage_war(btn):
-	global players, human_player
+	global players, human_player, provinces
 	player = players[human_player]
 	other = btn[:6]
+	cb = player.CB[other]
+	annex = cb.province
+	annex = provinces[annex]
+	owner = players[other]
+	if owner.type == "major" and annex.colony == True:
+		if player.check_for_border(owner.name)
+			#player.capture_by_sea(annex.name)
+			message = "Since %s is a colony since you border %s, you may take it\
+			either by establishing naval domination or by direct land invasion" % (annex.name, owner.name)
+			app.showSubWindow("Land_or_Sea")
+		else:
+			battle.naval_battle(players, market, relations, provinces)
+			victor = battle.winner
+			app.updateSeaBattleWindow(battle)
+			app.showSubWindow("Sea Battle")
+			if victor = player.name and battle.prov != "" and battle.prov != " ":
+				battle.gain_province(players, market, relations, provinces)
+				app.setMessage("general_message", "The province of %s now belongs to %s !" % (battle.prov, battle.winner))
+				app.showWindow("Message_")
+			else:
+				player.war_after_math(owner.name, players, relations, annex.name, provinces)
+	
+
+
+
+	
+def attack1(btn):
+	app.hideSubWindow("Land_or_Sea")
+	opponent = app.getLabel("land_or_sea")
+	opponent = opponent[7:]
+	cb = player.CB[opponent]
+	annex = cb.province
+	annex = provinces[annex]
+	owner = players[other]
+	decision = app.getRadioButton("land_or_sea")
+	if decision == "Sea Dominance":
+		battle.naval_battle(players, market, relations, provinces)
+		victor = battle.winner
+		app.updateSeaBattleWindow(battle)
+		app.showSubWindow("Sea Battle")
+		if victor = player.name and battle.prov != "" and battle.prov != " ":
+			battle.gain_province(players, market, relations, provinces)
+			app.setMessage("general_message", "The province of %s now belongs to %s !" % (battle.prov, battle.winner))
+			app.showWindow("Message_")
+		else:
+			player.war_after_math(owner.name, players, relations, annex.name, provinces)
+
+	if decision == "Land Dominance":
+		battle = LandBattle(player.name, owner.name, annex.name)
+		forces = {}
+		forces["infantry"] = player.military["infantry"]
+		forces["cavalry"] = player.military["cavalry"]
+		forces["artillery"] = player.military["artillery"]
+		forces["tank"] = player.military["tank"]
+		forces["fighter"] = player.military["fighter"]
+		battle.attacker_forces = forces
+		battle.landCombat(players, market, relations, provinces)
+		app.showSubWindow("Land Battle")
+
+def updateSeaBattleWindow(battle):
+	global players
+	app.setImage("sea_attacking_nation", battle.attacker + ".gif")
+	app.setImage("sea_defending_nation", battle.defender + ".gif")
+	attacker = players[battle.attacker]
+	defender = players[battle.defender]
+	app.setLabel("att_frigate", "%.2f / %.2f" % (battle.initial_attacker_forces["frigates"], attacker.military["frigates"]))
+	app.setLabel("def_frigate", "%.2f / %.2f" % (battle.initial_defender_forces["frigates"], defender.military["frigates"]))
+	app.setLabel("att_ironclad", "%.2f / %.2f" % (battle.initial_attacker_forces["iron_clad"], attacker.military["iron_clad"]))
+	app.setLabel("def_ironclad", "%.2f / %.2f" % (battle.initial_defender_forces["ironclad"], defender.military["iron_clad"]))
+	app.setLabel("att_battleship", "%.2f / %.2f" % (battle.initial_attacker_forces["battle_ship"], attacker.military["battle_ship"]))
+	app.setLabel("def_battleship", "%.2f / %.2f" % (battle.initial_defender_forces["battle_ship"], defender.military["battle_ship"]))
+	app.setLabel("sea_att_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f " % \
+	(battle.attacker_ammo, battle.attacker_ammo_needed, battle.attacker_ammo_penalty))
+	app.setLabel("sea_def_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f " % \
+	(battle.defender_ammo, battle.defender_ammo_needed, battle.defender_ammo_penalty))
+	app.setLabel("sea_att_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f " % \
+	(battle.attacker_oil, battle.attacker_oil_needed, battle.attacker_oil_penalty))
+	app.setLabel("sea_def_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f " % \
+	(battle.defender_oil, battle.defender_oil_needed, battle.defender_oil_penalty))
+	app.setLabel("sea_att_losses", battle.att_losses)
+	app.setLabel("sea_def_losses", battle.def_losses)
+	app.setLabel("sea_battle_winner", battle.winner + ".gif")
+
+def updateLandBattleWindow(battle):
+	global players
+	app.setImage("sea_attacking_nation", battle.attacker + ".gif")
+	app.setImage("sea_defending_nation", battle.defender + ".gif")
+	attacker = players[battle.attacker]
+	defender = players[battle.defender]
+	app.setLabel("att_infantry", "%.2f / %.2f" % (battle.initial_attacker_forces["infantry"], battle.attacker_forces["infantry"]))
+	app.setLabel("def_infantry", "%.2f / %.2f" % (battle.initial_defender_forces["infantry"], defender.military["infantry"]))
+	app.setLabel("att_cavalry", "%.2f / %.2f" % (battle.initial_attacker_forces["cavalry"], battle.attacker_forces["cavalry"]))
+	app.setLabel("def_cavalry", "%.2f / %.2f" % (battle.initial_defender_forces["cavalry"], defender.military["cavalry"]))
+	app.setLabel("att_artillery", "%.2f / %.2f" % (battle.initial_attacker_forces["artillery"], battle.attacker_forces["artillery"]))
+	app.setLabel("att_artillery", "%.2f / %.2f" % (battle.initial_defender_forces["artillery"], defender.military["artillery"]) )
+	app.setLabel("att_fighter", "%.2f / %.2f" % (battle.initial_attacker_forces["fighter"], battle.attacker_forces["fighter"]))
+	app.setLabel("def_fighter", "%.2f / %.2f" % (battle.initial_defender_forces["fighter"], defender.military["fighter"]))
+	app.setLabel("att_tank", "%.2f / %.2f" % (battle.initial_attacker_forces["tank"], battle.attacker_forces["tank"]))
+	app.setLabel("def_tank", "%.2f / %.2f" % (battle.initial_defender_forces["tank"], defender.military["tank"]))
+
+	app.setLabel("att_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f" % \
+		(battle.attacker_ammo, battle.attacker_ammo_needed, battle.attacker_ammo_penalty))
+	app.setLabel("def_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f" % \
+		(battle.defender_ammo, battle.defender_ammo_needed, battle.defender_ammo_penalty))
+	app.setLabel("att_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f" % \
+		(battle.attacker_oil, battle.attacker_oil_needed, battle.attacker_oil_penalty))
+	app.setLabel("def_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f" % \
+		(battle.defender_oil, battle.defender_oil_needed, battle.defender_oil_penalty))
+	app.setLabel("att_dog_fight_losses", battle.att_fighters_lost)
+	app.setLabel("def_dog_fight_losses", battle.def_fighters_lost)
+	app.setLabel("att_recon", battle.att_recon)
+	app.setLabel("def_recon", battle.def_recon)
+	app.setLabel("att_art_losses", battle.att_art_losses)
+	app.setLabel("def_art_losses", battle.def_art_losses)
+	app.setLabel("att_manouver", battle.att_manouver)
+	app.setLabel("def_manouver", battle.def_manouver)
+	app.setLabel("att_engagement_losses", battle.att_engagement_losses)
+	app.setLabel("def_engagement_losses", battle.def_engagement_losses)
+	app.setImage("battle_winner", battle.winner + ".gif")
+
+
 
 def update_production_gui():
 	global players, human_player
@@ -1465,7 +1587,7 @@ def update_military_tab():
 	app.setLabel("total_naval_str", "Naval Strength: %.2f" % (naval))
 
 	cb_list = []
-	for cb in player.CB:
+	for cb in player.CB.values():
 		addition = "%s: %s, %d" % (cb.opponent, cb.province, cb.time)
 		cb_list.append(addition)
 	app.changeOptionBox("CB List:", cb_list)
@@ -2055,7 +2177,6 @@ def show_human_province(p):
 	app.setLabel("worked" + p.name, "Worked? %s" % (p.worked))
 	app.setLabel("cult" + p.name, "Culture: %s" %  (p.culture))
 
-
 	if p.worked == True or owner.freePOP < 1: 
 		app.disableButton("Work "+p.name + "?")
 	else:
@@ -2063,12 +2184,9 @@ def show_human_province(p):
 	if p.worked == False:
 		app.disableButton("Free "+p.name + " Pop?")
 	else:
-		app.enableButton("Free " + p.name + " Pop?")
-	
+		app.enableButton("Free " + p.name + " Pop?")	
 	if owner.check_if_prov_can_be_dev(p.name):
-		print("Yes____________________________________________________________________")
 		if owner.AP >= 1 and owner.goods["parts"] >= 1 and owner.resources["wood"] > 1 and owner.new_development >= 1:
-			print("But no :(___________________________________________________")
 			app.enableButton("Develop " + p.name)
 		else:
 			app.disableButton("Develop " + p.name)
@@ -2377,23 +2495,92 @@ def load_basic_widgets():
 	app.addLabel("general_message", " ")
 	app.stopSubWindow()
 
-	app.startSubWindow("Land Battle")
-	app.addImage("attacking_nation", "England.gif", 1, 1)
-	app.addImage("att_infantry", "infantry.gif", 2, 1)
-	app.addImage("att_cavalry", "cavalry.gif", 3, 1)
-	app.addImage("att_artillery", "artillery.gif", 4, 1)
-	app.addImage("att_tank", "tank.gif", 5, 1)
-	app.addImage("att_fighter", "fighter.gif", 6, 1)
-	app.addLabel("total_att_str", "Total Str", 8, 1)
-	app.addLabel("att_ammo_deficit", "Ammo Deficit: %.2f" % 0, 10, 1)
-	app.addLabel("def_ammo_deficit", "Oil Deficit: %.2f" % 0, 11, 1)
+	app.startSubWindow("Land_or_Sea")
+	app.addLabel("land_or_sea", " ")
+	app.addRadioButton("land_or_sea", "Sea Dominance")
+	app.addRadioButton("land_or_sea", "Land Dominance")
+	app.addNamedButton("land_sea", "OK", attack1)
+	app.stopSubWindow()
 
-	app.addLabel("num_att_infantry", 0, 2, 2)
-	app.addLabel("num_att_cavalry", 0, 3, 2)
-	app.addLabel("num_att_artillery", 0, 4, 2)
-	app.addLabel("num_att_figthers", 0, 5, 2)
-	app.addLabel("num_tanks", 0, 6, 2)
-	
+	app.startSubWindow("Land Battle")
+	app.addImage("attacking_nation", "crown.gif", 1, 2)
+	app.addImage("defending_nation", "crown.gif", 1, 4)
+	app.addImage("infantry_pic", "infantry.gif", 2, 3)
+	app.addImage("cavalry_pic", "cavalry.gif", 3, 3)
+	app.addImage("artillery_pic", "artillery.gif", 4, 3)
+	app.addImage("fighter_pic", "fighter.gif", 5, 3)
+	app.addImage("tank_pic", "tank.gif", 6, 3)
+	#app.addLabel("total_att_str",  1, 1)
+	#app.addLabel("total_def_str", 1, 5)
+	app.addLabel("att_infantry", " ", 2, 2)
+	app.addLabel("att_cavalry", " ", 3, 2)
+	app.addLabel("att_artillery", " ", 4, 2)
+	app.addLabel("att_fighter", " ", 5, 2)
+	app.addLabel("att_tank", " ", 6, 2)
+	app.addLabel("def_infantry", " ", 2, 4)
+	app.addLabel("def_cavalry", " ", 3, 4)
+	app.addLabel("def_artillery", " ", 4, 4)
+	app.addLabel("def_fighter", " ", 5, 4)
+	app.addLabel("def_tank", " ", 6, 4)
+	app.addImage("battle_ammo", "ammo.gif", 7, 3)
+	app.shrinkImage("battle_ammo", 2)
+	app.addImage("battle_oil", "oil.gif", 8, 3)
+	app.shrinkImage("battle_oil", 2)
+	app.addImage("dog_fight", "dogfight.gif", 9, 3)
+	app.shrinkImage("dog_fight", 2)
+	app.addImage("recon_", "recon.gif", 10, 3)
+	app.shrinkImage("recon_", 2)
+	app.addImage("barrage", "barrage.gif", 11, 3)
+	app.shrinkImage("barrage", 2)
+	app.addImage("manouver_", "flank.gif", 12, 3)
+	app.shrinkImage("manouver_", 2)
+	app.addImage("engagement", "explosion.gif", 13, 3)
+	app.shrinkImage("engagement", 2)
+
+	app.addLabel("att_ammo_info", " ", 7, 1, 2)
+	app.addLabel("att_oil_info", " ", 8, 1, 2)
+	app.addLabel("att_dog_fight_losses", " ", 9, 1, 2)
+	app.addLabel("att_recon", " ", 10, 1, 2)
+	app.addLabel("att_art_losses", 11, 1, 2)
+	app.addLabel("att_manouver", 12, 1, 2)
+	app.addLabel("att_engagement_losses", 13, 1, 2)
+	app.addImage("battle_winner", "crown.gif", 14, 3)
+
+	app.addLabel("def_ammo_info", " ", 7, 4, 2)
+	app.addLabel("def_oil_info", " ", 8, 4, 2)
+	app.addLabel("def_dog_fight_losses", " ", 9, 4, 2)
+	app.addLabel("def_recon", " ", 10, 4, 2)
+	app.addLabel("def_art_losses", 11, 4, 2)
+	app.addLabel("def_manouver", 12, 4, 2)
+	app.addLabel("def_engagement_losses", 13, 4, 2)
+
+	app.stopSubWindow()
+
+	app.startSubWindow("Sea Battle")
+	app.addImage("sea_attacking_nation", "crown.gif", 1, 2)
+	app.addImage("sea_defending_nation", "crown.gif", 1, 4)
+	app.addImage("frigate_pic", "frigates.gif", 3, 3)
+	app.addImage("iron_clad_pic", "frigates.gif", 4, 3)
+	app.addImage("battle_ship_pic", "battle_ship.gif", 5, 3)
+	app.addLabel("att_frigate", " ", 3, 1, 2)
+	app.addLabel("def_frigate", " ", 3, 4, 2)
+	app.addLabel("att_ironclad", " ", 4, 1, 2)
+	app.addLabel("def_ironclad", " ", 4, 4, 2)
+	app.addLabel("att_battleship", " ", 5, 1, 2)
+	app.addLabel("def_battleship", " ", 5, 4, 2)
+
+	app.addImage("sea_battle_ammo", "ammo.gif", 6, 3)
+	app.addImage("sea_battle_oil", "oil.gif", 7, 3)
+	app.addImage("sea_battle_losses", "sea_battle.gif", 8, 3)
+	app.addLabel("sea_att_ammo_info", " ", 6, 1, 2)
+	app.addLabel("sea_def_ammo_info", " ", 6, 4, 2)
+	app.addLabel("sea_att_oil_info", " ", 7, 1, 2)
+	app.addLabel("sea_def_oil_info", " ", 7, 4, 2)
+	app.addLabel("sea_att_losses", " ", 8, 1, 2)
+	app.addLabel("sea_def_losses", " ", 8, 4, 2)
+	app.addImage("sea_battle_winner", "crown.gif", 9, 3)
+	app.stopSubWindow()
+
 
 
 	#app.startSubWindow("chem_growth", modal = True)

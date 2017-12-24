@@ -21,7 +21,7 @@ def calculate_number_of_units(player):
 
 
 
-def calculate_ammo_needed(p):
+def calculate_land_ammo_needed(p):
 	ammo_needed = 0.0
 	ammo_needed += p.military["infantry"] * p.infantry["ammo_use"]
 	ammo_needed += p.military["cavalry"] * p.cavalry["ammo_use"]
@@ -277,7 +277,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 					p1.resource_base[pr.resource] += pr.quality
 					p1.ai_modify_priorities_from_province(p1.provinces[pr.name].resource)
 
-
 		core_keys = []
 		for c in core:
 			core_keys.append(c.name)
@@ -288,7 +287,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			p2.provinces.pop(ck)
 			p2.resource_base[pr.resource] -= pr.quality
 
-	
 
 		remains = (len(p2.provinces.keys()) * 1.2)
 
@@ -303,8 +301,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 		#	p2.numMidPOP -= p2.midPOP[k]["number"]
 		#	p2.POP -= p2.midPOP[k]["number"]
 		#	p2.midPOP[k]["number"] = 0
-		
-
 		for p, pl in players.items():
 			
 			if len(set([p1.name, p])) == 1 or len(set([p2.name, p])) == 1:
@@ -376,8 +372,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			#			pl.sphere_targets.remove(st)
 		
 			del players[p2.name]
- 	
-
 	elif winner == p2.name:
 		p1.stability -= 1
 		if p1.stability < -3.0:
@@ -390,8 +384,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 
 	#	print("Will we soon see a counter invasion from %s ?" %  (p2.name))
 							
-
-
 def combat_outcome(winner, p1, p2, prov, players, market, relations):
 
 	if prov == "total":
@@ -403,8 +395,6 @@ def combat_outcome(winner, p1, p2, prov, players, market, relations):
 	p1.rival_target = []
 	relations[relata].relationship += 1
 	#cb_copy = deepcopy(p1.CB)
-
-
 	cb_keys = []
 	for cb in p1.CB:
 		cb_keys.append(cb)
@@ -434,12 +424,10 @@ def combat_outcome(winner, p1, p2, prov, players, market, relations):
 				selection.development_level -= 1
 			#	print("As a result of the war, the development level of %s has been reduced to %s" % (selection.name, selection.development_level))
 
-	
 		if prov.name in p2.provinces.keys():
 			gain_province(p1, p2, prov, players, market, relations)
 		else:
 			p1.war_after_math(p2, players, relations, prov)
-
 		loot = p2.resources["gold"]/3.33
 		p1.resources["gold"] += loot
 		p2.resources["gold"] -= loot
@@ -468,19 +456,6 @@ def gain_province(p1, p2, prov, players, market, relations):
 	print("%s has defeated %s for the province of %s \n" % (win_name, loss_name, prov.name))
 	market.report.append("%s has defeated %s for the province of %s \n" % (win_name, loss_name, prov.name))
 	if prov.culture == p2.culture or prov.type == "civilized":
-		#if p2.numMidPOP >= 1.0:
-		#	num_prov = len(p2.provinces.keys())
-		#	mid_keys = list(p2.midPOP.keys())
-		#	amount = int((p2.numMidPOP/num_prov) * 8)
-		#	for i in range(amount):
-		#		switch = choice(mid_keys)
-		#		p1.midPOP[switch]["number"] += 0.2
-		#		p1.numMidPOP += 0.2
-		#		p1.POP += 0.2
-		#		p2.midPOP[switch]["number"] -= 0.2
-		#		p2.numMidPOP -= 0.2
-		#		p2.POP -= 0.2
-		#		print("%s has lost a %s to %s" % (p2.name, switch, p1.name))
 		if p2.development_level > 2:
 			p2.development_level -= 1
 			possibilities = []
@@ -679,9 +654,9 @@ def oil_amph_unit_man(player, current_makeup):
 			amount = current_makeup[k] * player.fighter["manouver"]
 	return amount 
 
-
+####################################################### Add for ALL ground battles!
 def select_ground_forces(player, target):
-
+#########################################################
 	forces = {
 		"infantry": 0,
 		"cavalry": 0,
@@ -858,7 +833,6 @@ def amph_combat(p1, p2, p1_forces, prov, players, market, relations):
 		def_oil = calculate_oil_needed(p2)
 		att_manouver = calculate_amphib_man(p1, p1_forces)
 		def_manouver = calculate_manouver(p2)
-
 
 		att_manouver_roll = uniform(1, 1.25)
 		def_manouver_roll = uniform(1, 1.25)
@@ -1119,12 +1093,6 @@ def calculate_number_of_ships(player):
 	count += player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]
 	return count
 
-def calculate_naval_strength(player):
-	count = 0
-	count += player.military["frigates"] * player.frigates["attack"]
-	count +=  player.military["iron_clad"] * player.iron_clad["attack"]
-	count +=  player.military["battle_ship"] * player.battle_ship["attack"]
-	return count
 
 
 def distribute_naval_losses(player, losses, num_units):

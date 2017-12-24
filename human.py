@@ -838,10 +838,10 @@ class Human(Player):
 		if annex in provinces:
 			annex = provinces[annex]
 			new = CB(self, annex.owner, "annex", annex.name, 5)
-			self.CB.add(new)
+			self.CB[annex.owner] = new
 		else:
 			new = CB(self, other, "punish", "", 5)
-			self.CB.add(new)
+			self.CB[annex.owner] = new
 		print(len(self.CB))
 		self.diplo_action -= 1
 		self.reputation -= 0.025

@@ -395,8 +395,8 @@ def worsen_relations(player, players, relations, provinces):
 	target = players[target]
 
 	nations_in_cb = []
-	for cb in player.CB:
-		nations_in_cb.append(cb.opponent)
+	for k, v in player.CB.items():
+		nations_in_cb.append(v.opponent)
 	if target.type == "old_minor" or target.name in nations_in_cb:
 		return
 	relata = frozenset({player.name, target.name})
@@ -437,8 +437,8 @@ def gain_cb(player, players, relations):
 	#	print("Relations too good to gain CB")
 		return
 	annex_key = []
-	for cb in player.CB:
-		if prov.name == cb.province:
+	for k, v in player.CB:
+		if prov.name == v.province:
 			return
 
 		####
@@ -446,7 +446,7 @@ def gain_cb(player, players, relations):
 	else:
 		player.diplo_action -= 1
 		new = CB(player.name, target.name, "annex", prov.name, 5)
-		player.CB.add(new)
+		player.CB[target.name] = new
 	#	print("Gain a CB against %s !!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
 
 
@@ -525,33 +525,30 @@ def attack_target(player, players, relations, provinces, market):
 	if player.colonization < player.num_colonies * 1.5:
 		return
 
-	if len(player.CB) <= 0:
+	if len(player.CB.keys()) <= 0:
 	#	print("Check 457")
 		return
 	check = False
 	cb = " "
 	count = 0
 	while check == False and count < 16:
-		cb = sample(player.CB, 1)
+		cb = sample(player.CB.values(), 1)
 		cb = cb[0]	
 		prov = provinces[cb.province]
 
 		if cb.opponent != prov.owner:
 			#print("Check 468")
-
-			player.CB.discard(cb)
-			del cb
+			del player.CB[cd.opponent]
 			player.rival_target = []
-			if len(player.CB) <= 0:
+			if len(player.CB.keys()) <= 0:
 				return
 			else:
 				continue
 		if cb.opponent not in players.keys():
 			#print("Check 478")
-			player.CB.discard(cb)
-			del cb
+			del player.CB[cb.opponent]
 			player.rival_target = []
-			if len(player.CB) <= 0:
+			if len(player.CB.keys()) <= 0:
 				return
 			else:
 				continue

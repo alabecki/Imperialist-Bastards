@@ -82,22 +82,3 @@ class Factory(object):
 		self.size = 1
 		self.used = False
 
-class Battle(object):
-	def __init__(self, attacker, defender):
-		self.attacker = attacker 
-		self.defender = defender
-		self.current_attacker_forces = []
-		self.current_defender_forces = []
-		#self.current_attacker_strength = 0
-		#self.current_defender_strength = 0
-		self.attacker_dogfight_roll = 0
-		self.defender_dogfight_roll = 0
-		self.
-		self.attack_manouver = 0
-		self.defence_manouver = 0
-		self.attacker_ammo_deficit = 0
-		self.defender_ammo_deficit = 0
-		self.attacker_oil_deficit = 0
-		self.defender_oil_deficit = 0
-		self.attacker_losses = 0
-		self.defender_losses = 0

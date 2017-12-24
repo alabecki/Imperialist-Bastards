@@ -244,7 +244,7 @@ class Player(object):
 		#diplomacy
 		self.reputation = 1.0
 		self.diplo_action = 0.0
-		self.CB = set()
+		self.CB = {}
 		#culture
 		self.culture_points = 0.0
 		self.culture_level = 0.0
@@ -711,14 +711,12 @@ class Player(object):
 			v["used"] = False
 
 		cb_keys = []
-		for cb in self.CB:
-			cb_keys.append(cb)
-
+		for k, v in self.CB.items():
+			cb_keys.append(v.opponent)
 		for cb in cb_keys:
 			cb.time -= 1
 			if cb.time < 0:
-				self.CB.discard(cb)
-				del cb
+				del self.CB[cb]
 		return [research_gain, culture_gain, col_gain, diplo_gain]
 	
 
@@ -731,7 +729,7 @@ class Player(object):
 					bBa.add(v2)
 		return bBa
 
-	def check_for_border(self, p2):
+	def check_for_border(self, p2, players):
 		self_core = self.core_provinces()
 		#print("Core Provs %s:" % (self.name))
 		#for p in self_core:
@@ -883,26 +881,15 @@ class Player(object):
 			else:
 				tries += 1
 
-
 		return forces
 
 
-	def calculate_naval_strength(self):
-		count = 0
-		
-		count += self.military["frigates"] * self.frigates["attack"]
-		count +=  self.military["iron_clad"] * self.iron_clad["attack"] * 2
-		count +=  self.military["battle_ship"] * self.battle_ship["attack"] * 4
-		return count
-
-
-	def war_after_math(self, target, players, relations, prov):
-
-
+	def war_after_math(self, target, players, relations, prov, provinces):
+		prov = provinces[prov]
+		target = players[target]
 		if self.culture == prov.culture:
 			self.reputation += 0.15
 			self.stability += 0.2
-	
 		#if target in self.CB:
 		#	self.CB.remove(target)
 		if target.type == "old_minor":
@@ -932,10 +919,10 @@ class Player(object):
 				if pl.type == "major" or pl.type == "minor":
 					if relations[frozenset([self.name, p])].relationship < 2:
 						new = CB(p, self.name, "annex", prov.name, 5)
+						pl.CB["opponent"] = new
 						pl.CB.add(new)
 					else:
 						relations[frozenset([self.name, p])].relationship -= 1
-
 
 			if pl.type == "AI":
 				if pl.rival_target != []:
@@ -954,7 +941,7 @@ class Player(object):
 		return res
 
 
-	def calculate_number_of_units(player):
+	def calculate_number_of_units(self):
 		count = 0
 		count += self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + \
 		 self.military["irregulars"] + self.military["tank"] + self.military["fighter"]
@@ -1277,3 +1264,107 @@ class Player(object):
 			self.resources["oil"] -= oil_needed
 			OilPenalty = 1
 		return OilPenalty
+
+	def delete_nation(self, market, relations):
+		market.report.append("%s no longer exists as a nation!" % (self.name))
+		for k, v in self.resources.items():
+			attacker.resources[k] += v
+		for k, v in self.goods.items():
+			attacker.goods[k] += v
+		for k, v in market.market.items():
+			for i in v:
+				if i.owner == self.name:
+					if k in attacker.resources.keys():
+						attacker.resources[k] += 1
+					if k in attacker.goods.keys():
+						p1.goods[k] +=1
+					market.market[k].remove(i)
+				#	print("removed %s %s"% (i.owner, i.kind))
+					del i
+		pause = input()
+		relkeys = list(relations.keys())
+		for r in relkeys:
+			if self.name in relations[r].relata:
+				del relations[r]
+		for pl in players.values():
+			if type(pl) == AI:
+				if self.name in pl.sphere_targets:
+					pl.sphere_targets.remove(self.name)
+				if self.name in pl.allied_target:
+					pl.allied_targets.remove(self.name)
+				if pl.rival_target != []:
+					if self.name == pl.rival_target[0].name:
+						pl.rival_target = []
+			if self.name in pl.objectives:
+					pl.objectives.remove(self.name)
+			if self.name in pl.embargo:
+				pl.embargo.remove(self.name)
+	
+		del players[self.name]
+
+	def calculate_number_of_ships(self):
+		count = 0
+		count += self.military["frigates"] + self.military["iron_clad"] + self.military["battle_ship"]
+		return count
+
+	def calculate_naval_strength(self):
+		count = 0
+		count += self.military["frigates"] * self.frigates["attack"]
+		count +=  self.military["iron_clad"] * self.iron_clad["attack"]
+		count +=  self.military["battle_ship"] * self.battle_ship["attack"]
+		return count
+
+
+	def calculate_ammo_needed_navy(self):
+		amount = 0
+		amount += self.military["frigates"] * self.frigates["ammo_use"]
+		amount += self.military["iron_clad"] * self.iron_clad["ammo_use"]
+		amount += self.military["battle_ship"] * self.battle_ship["ammo_use"]
+		return amount
+
+	def calculate_oil_needed_navy(self):
+		amount = self.military["battle_ship"] * self.battle_ship["oil_use"]
+		#print("Oil Needed for %s: %s" % (self.name, amount))
+		return amount
+
+
+	def calculate_land_ammo_needed(self):
+		ammo_needed = 0.0
+		ammo_needed += self.military["infantry"] * self.infantry["ammo_use"]
+		ammo_needed += self.military["cavalry"] * self.cavalry["ammo_use"]
+		ammo_needed += self.military["artillery"] * self.artillery["ammo_use"]
+		ammo_needed += self.military["tank"] * self.cavalry["ammo_use"]
+		ammo_needed += self.military["fighter"] * self.artillery["ammo_use"]
+		return ammo_needed
+
+	def calculate_oil_needed(self):
+		oil_needed = 0.0
+		oil_needed += self.military["tank"] * self.tank["oil_use"]
+		oil_needed += self.military["fighter"] * self.fighter["oil_use"]
+		#print("Oil Needed for %s: %s" % (self.name, oil_needed))
+		return oil_needed
+
+	def calculate_amphib_oil(self, current_makeup):
+		oil = 0
+		for k, v in current_makeup.items():
+			if k == "tank":
+				oil += current_makeup[k] * self.tank["oil_use"]
+			if k == "fighter":
+				oil += current_makeup[k] * self.fighter["oil_use"]
+		return oil
+
+
+	def calculate_amphib_ammo(self, current_makeup):
+		ammo = 0
+		for k, v in current_makeup.items():
+			if k == "infantry":
+				ammo += current_makeup[k] * self.infantry["ammo_use"]
+			if k == "cavalry":
+				ammo += current_makeup[k] * self.cavalry["ammo_use"]
+			if k == "artillery":
+				ammo += current_makeup[k] * self.artillery["ammo_use"]
+			if k == "tank":
+				ammo += current_makeup[k] * self.tank["ammo_use"]
+			if k == "fighter":
+				ammo += current_makeup[k] * self.fighter["ammo_use"]
+		return ammo_use
