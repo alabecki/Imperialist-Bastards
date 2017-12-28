@@ -2,6 +2,7 @@
 
 from AI import*
 from combat import*
+from combat2 import*
 
 from player_class import*
 from globe import*
@@ -30,7 +31,6 @@ def ai_decide_unciv_colonial_war(player, players, uncivilized_minors, provinces)
 	self_naval_projection_strength = player.ai_naval_projection()
 	if self_strength < 3.5:
 		return
-
 	c_options = set()
 	p_options = set()
 	for k, unciv in uncivilized_minors.items():
@@ -86,7 +86,7 @@ def decide_target(player, players, market, provinces, relations):
 	if len(player.rival_target) > 0:
 		return
 	self_strength = player.calculate_base_attack_strength()
-	self_navy_str = calculate_naval_strength(player)
+	self_navy_str = player.calculate_naval_strength()
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
 	self_naval_projection_strength = player.ai_naval_projection(player)
 
@@ -110,7 +110,7 @@ def decide_target(player, players, market, provinces, relations):
 			else:
 				if transport_limit < 4 or player.government == "despotism":
 					continue
-				owner_navy_str = calculate_naval_strength(owner)
+				owner_navy_str = owner.calculate_naval_strength()
 			#	print("Naval Projection: %s" % (self_naval_projection_strength))
 			#	print("Owner Defense: %s" % (owner.calculate_base_defense_strength()))
 
@@ -118,8 +118,6 @@ def decide_target(player, players, market, provinces, relations):
 					options.add(obj)
 				else:
 					continue
-
-			
 		
 		elif owner.name in player.borders and self_strength > owner.calculate_base_defense_strength() * 1.2:
 			#print("obj 129: %s" % (obj))
@@ -127,7 +125,7 @@ def decide_target(player, players, market, provinces, relations):
 		else:
 			if transport_limit < 4 or player.government == "despotism":
 					continue
-			o_navy_str = calculate_naval_strength(owner)
+			o_navy_str = owner.calculate_naval_strength()
 			if self_navy_str > o_navy_str * 1.2 and self_naval_projection_strength > owner.calculate_base_defense_strength() * 1.2:
 			#	print("obj 136: %s" % (obj))
 				options.add(obj)
@@ -161,7 +159,7 @@ def decide_target(player, players, market, provinces, relations):
 							player.diplo_action	
 						options.discard(opt)
 				else:
-					friend_navy_str = calculate_naval_strength(friend)
+					friend_navy_str = friend.calculate_naval_strength()
 					if friend_navy_str > self_navy_str * 1.22:
 						if _opt.colony == True:
 							roll = random()
@@ -263,7 +261,6 @@ def try_total_war(player,players, market, relations,provinces):
 	total_war(player, target, players, market, relations)
 
 
-		
 
 def	decide_rival_target(player, players, market, provinces, relations):
 	if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
@@ -280,7 +277,6 @@ def	decide_rival_target(player, players, market, provinces, relations):
 	if len(player.rival_target) > 0:
 		return
 	self_naval_projection_strength = player.ai_naval_projection(player)
-
 	#if "mobile_warfare" in player.technologies and player.military["tank"] >= 1:
 	if False:
 		option = []
@@ -304,8 +300,8 @@ def	decide_rival_target(player, players, market, provinces, relations):
 					return
 			else:
 
-				p_navy_str = calculate_naval_strength(player)
-				o_navy_str = calculate_naval_strength(other)
+				p_navy_str = player.calculate_naval_strength()
+				o_navy_str = other.calculate_naval_strength()
 				o_def_str = other.calculate_base_defense_strength()
 				if p_navy_str > o_navy_str * 1.25 and self_naval_projection_strength > o_def_str * 1.25:
 					relata = frozenset({player.name, other.name})
@@ -360,8 +356,8 @@ def	decide_rival_target(player, players, market, provinces, relations):
 				if other.check_for_sea_invasion() == False:
 					continue
 				relata = frozenset({player.name, other.name})
-				p_navy_str = calculate_naval_strength(player)
-				o_navy_str = calculate_naval_strength(other)
+				p_navy_str = player.calculate_naval_strength()
+				o_navy_str = other.calculate_naval_strength()
 				o_def_str = other.calculate_base_defense_strength()
 				self_naval_projection_strength = player.ai_naval_projection(other)
 				if p_navy_str > o_navy_str * 1.25 and self_naval_projection_strength > o_def_str * 1.25:
@@ -496,8 +492,7 @@ def attack_target(player, players, relations, provinces, market):
 	#print("AAAAAAAAAAAAAAAAAAAATACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
-	ammo_needed	= player.calculate_army_ammo_needed()
-
+	ammo_needed	= player.calculate_land_ammo_needed()
 	if player.goods["cannons"] < (ammo_needed * 2):
 		player.ai_buy("oil", 6, market, relations, players)
 
@@ -505,7 +500,7 @@ def attack_target(player, players, relations, provinces, market):
 	#	print("Not enough ammo")
 		return
 
-	oil_needed = player.calculate_army_oil_needed()
+	oil_needed = player.calculate_oil_needed()
 
 	if player.resources["oil"] < (oil_needed * 2):
 	#	print("Not enough oil")
@@ -522,9 +517,6 @@ def attack_target(player, players, relations, provinces, market):
 	if player.colonization < player.num_colonies * 1.5:
 		return
 
-	if player.colonization < player.num_colonies * 1.5:
-		return
-
 	if len(player.CB.keys()) <= 0:
 	#	print("Check 457")
 		return
@@ -532,7 +524,7 @@ def attack_target(player, players, relations, provinces, market):
 	cb = " "
 	count = 0
 	while check == False and count < 16:
-		cb = sample(player.CB.values(), 1)
+		cb = sample(list(player.CB.values()), 1)
 		cb = cb[0]	
 		prov = provinces[cb.province]
 
@@ -576,7 +568,6 @@ def attack_target(player, players, relations, provinces, market):
 	and player.colonization < (1 + player.num_colonies *1.5):
 		return
 
-
 	if (target.type == "major" or target.type == "minor") and cb.action == "annex" and player.reputation < 0.5:
 		return
  
@@ -600,7 +591,11 @@ def attack_target(player, players, relations, provinces, market):
 				forces = ai_select_ground_forces(player, target)
 				if forces["infantry"] == 0:
 					return
-				amph_combat(player, target, forces, prov, players, market, relations)
+				#amph_combat(player, target, forces, prov, players, market, relations)
+				landBattle = LandBattle(ID, player.name, owner.name, annex.name)
+				landBattle.attacker_forces = forces
+				market.landBattle = landBattle
+				landBattle.landCombat(self, players, market, relations, provinces):
 
 				#combat(player, target, prov, players, market, relations)
 				#war_after_math(player, target, players, relations)

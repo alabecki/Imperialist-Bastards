@@ -8,9 +8,105 @@ from minor_classes import*
 from random import*
 from pprint import pprint
 from copy import deepcopy
+
+def delete_nation(player, players, market, relations):
+	print("%s no longer exists as a nation!" % (player.name))
+	market.report.append("%s no longer exists as a nation!" % (player.name))
+	for k, v in player.resources.items():
+		player.resources[k] += v
+	for k, v in player.goods.items():
+		player.goods[k] += v
+	for k, v in market.market.items():
+		for i in v:
+			if i.owner == player.name:
+				if k in attacker.resources.keys():
+					attacker.resources[k] += 1
+				if k in attacker.goods.keys():
+					p1.goods[k] +=1
+				market.market[k].remove(i)
+			#	print("removed %s %s"% (i.owner, i.kind))
+				del i
+	relkeys = list(relations.keys())
+	for r in relkeys:
+		if player.name in relations[r].relata:
+			del relations[r]
+	for pl in players.values():
+		if type(pl) == AI:
+			if player.name in pl.sphere_targets:
+				pl.sphere_targets.remove(player.name)
+			if player.name in pl.allied_target:
+				pl.allied_targets.remove(player.name)
+			if pl.rival_target != []:
+				if player.name == pl.rival_target[0].name:
+					pl.rival_target = []
+		if player.name in pl.objectives:
+				pl.objectives.remove(player.name)
+		if player.name in pl.embargo:
+			pl.embargo.remove(player.name)
+	del players[player.name]
+
+def war_after_math(player, target, players, relations, prov, provinces):
+	print("War Aftermath")
+	prov = provinces[prov]
+	player = players[player]
+	target = players[target]
+	if player.culture == prov.culture:
+		player.reputation += 0.15
+		player.stability += 0.2
+	#if target in self.CB:
+	#	self.CB.remove(target)
+	if target.type == "old_minor":
+		player.reputation -= 0.1
+		player.stability += 0.1
+	if target.type == "old_empire":
+		player.reputation -= 0.15
+		player.stability += 0.1
+	if (target.type == "minor" or target.type == "major") and player.military["tank"] == 0:
+		player.reputation -= 0.3
+		for pl, play in players.items():
+			if play.type == "major" and player.name != pl:
+				relations[frozenset([player.name, pl])].relationship -= 0.2
+
+	for p, pl in players.items():
+		if len(set([player.name, p])) == 1 or len(set([target.name, p])) == 1:
+			continue
+		if relations[frozenset([player.name, p])].relationship < -1.5:
+			relations[frozenset([player.name, p])].relationship -= 0.1
+		if relations[frozenset([target.name, p])].relationship >= 0 and relations[frozenset([player.name, p])].relationship < 1.5:
+			relations[frozenset([player.name, p])].relationship -= 0.1
+		if relations[frozenset([target.name, p])].relationship >= 1:
+			relations[frozenset([player.name, p])].relationship -= 0.15 
+		if relations[frozenset([target.name, p])].relationship >= 2:
+			relations[frozenset([player.name, p])].relationship -= 0.15
+		if relations[frozenset([target.name, p])].relationship >= 2.7:
+			if pl.type == "major" or pl.type == "minor":
+				if relations[frozenset([player.name, p])].relationship < 2:
+					new = CB(p, player.name, "annex", prov.name, 5)
+					pl.CB["opponent"] = new
+					pl.CB.add(new)
+				else:
+					relations[frozenset([player.name, p])].relationship -= 1
+
+	if type(pl) == AI:
+		if pl.rival_target != []:
+			if target == pl.rival_target[0]: 
+				relations[frozenset([player.name, p])].relationship -= 0.15
+		if target in pl.allied_target:
+			relations[frozenset([player.name, p])].relationship -= 0.2
+
+	if len(target.provinces.keys()) == 0:
+		delete_nation(target.name, players, market, relations)
+	else:
+		p2_borders = set()
+		for k, v in players.items():
+			if target.check_for_border(v, players) == True:
+				p2_borders.add(k)
+		target.borders = p2_borders
+
 	
 class Battle(object):
-	def __init__(self, attacker, defender, prov):
+	def __init__(self, ID, attacker, defender, prov):
+		self.ID = ID
 		self.attacker = attacker 
 		self.defender = defender
 		self.prov = prov
@@ -45,14 +141,14 @@ class Battle(object):
 		attacker.rival_target = []
 		relations[relata].relationship += 1
 		cb_keys = []
-		for cb in attacker.CB:
+		for cb in attacker.CB.values():
 			cb_keys.append(cb)
 		for cb in cb_keys:
 			if cb.province == prov.name:
-				attacker.CB.remove(cb)
-				del cb
+				del attacker.CB[cb.opponent]
 		if self.winner == attacker.name:
 			market.report.append("%s has successfully invaded %s ! \n" % (attacker.name, defender.name))
+			print("%s has successfully invaded %s ! \n" % (attacker.name, defender.name))
 			#maybe gain stability with Nationalism
 			defender.just_attacked = 3
 			if defender.number_developments >= 2:
@@ -64,9 +160,7 @@ class Battle(object):
 					selection = choice(opts)
 					selection.development_level -= 1
 			if prov.name in defender.provinces.keys():
-				self.gain_province(players, market, relations)
-			else:
-				attacker.war_after_math(defender, players, relations, prov)
+				self.gain_province(players, market, relations, provinces)
 			loot = attacker.resources["gold"]/3.33
 			attacker.resources["gold"] += loot
 			defender.resources["gold"] -= loot
@@ -81,13 +175,15 @@ class Battle(object):
 			defender.stability += 0.5
 			if defender.stability > 3.0:
 				defender.stability = 3.0
-			market.report.append("%s has repelled %s's pitiful invasion! \n" % (p2.name, p1.name))
+			market.report.append("%s has repelled %s's pitiful invasion! \n" % (defender.name, attacker.name))
 
 	def gain_province(self, players, market, relations, provinces):
 		prov = provinces[self.prov]
 		attacker = players[self.attacker]
 		defender = players[self.defender]
+		war_after_math(attacker.name, defender.name, players, relations, prov.name, provinces)
 		market.report.append("%s has defeated %s for the province of %s \n" % (attacker.name, defender.name, prov.name))
+		print("%s has defeated %s for the province of %s \n" % (attacker.name, defender.name, prov.name))
 		if prov.culture == defender.culture or prov.type == "civilized":
 			if defender.development_level > 2:
 				defender.development_level -= 1
@@ -130,7 +226,7 @@ class Battle(object):
 			defender.num_colonies -= 1
 			defender.colonization += (1 + defender.num_colonies)
 		if defender.type == "old_empire" or defender.type == "old_minor" or prov.colony == True:
-			attacker.colonization -= (1 + p1.num_colonies)
+			attacker.colonization -= (1 + attacker.num_colonies)
 			attacker.provinces[prov.name].colony = True
 			attacker.num_colonies += 1
 		if prov.worked == True:
@@ -138,28 +234,18 @@ class Battle(object):
 			attacker.numLowerPOP += 1
 			defender.POP -= 1
 			defender.numLowerPOP -= 1
-		if len(defender.provinces.keys()) == 0:
-			defender.delete_nation()
-			attacker.war_after_math(defender.name, players, relations, prov.name, provinces)
-		else:
-			attacker.war_after_math(defender.name, players, relations, prov.name, provinces)
-			p2_borders = set()
-			for k, v in players.items():
-				if defender.check_for_border(v) == True:
-					p2_borders.add(k)
-			defender.borders = p2_borders
-		#recalculate borders of nations:
 		p1_borders = set()
 		for k, v in players.items():
-			if attacker.check_for_border(v) == True:
+			if attacker.check_for_border(v, players) == True:
 				p1_borders.add(k)
 		attacker.borders = p1_borders 
 		market.report.append(prov.name + " is now part of " + attacker.name)
+		print(prov.name + " is now part of " + attacker.name)
 
 
 class LandBattle(Battle):
-	def __init__(self, attacker, defender, prov, *args, **kwargs):
-		super(LandBattle, self).__init__(attacker, defender, *args, **kwargs)
+	def __init__(self, ID, attacker, defender, prov, *args, **kwargs):
+		super(LandBattle, self).__init__(ID, attacker, defender, prov, *args, **kwargs)
 		self.attacker_forces = {}
 		
 		self.attacker_dogfight_roll = 0
@@ -175,7 +261,6 @@ class LandBattle(Battle):
 		self.att_eng_losses = 0
 		self.def_eng_losses = 0
 		self.winner = ""
-
 
 
 	def dogFight(self, players):
@@ -209,7 +294,7 @@ class LandBattle(Battle):
 		defender = players[self.defender]
 		artFactor = (self.attacker_forces["artillery"] * attacker.artillery["attack"]) \
 		+ (defender.military["artillery"] * defender.artillery["defend"])
-		total = calculate_amphib_strength(attacker, self.attacker_forces) + defender.calculate_base_defense_strength()
+		total = attacker.calculate_amphib_strength(self.attacker_forces) + defender.calculate_base_defense_strength()
 		return artFactor/total
 
 
@@ -233,17 +318,25 @@ class LandBattle(Battle):
 		losses = self.artilleryPhaseLosses(players)
 		self.att_art_losses = losses * DefArtStrN
 		self.def_art_losses = losses * AttArtStrN
+		print("Def_art_losses: %s", self.def_art_losses)
 
-		self.attacker_forces = self.distribute_losses_amph(attacker, players, self.att_art_losses)
-		self.distribute_losses(defender, players, self.def_art_losses)
+		self.distribute_losses_amph(players, self.att_art_losses)
+		self.distribute_losses(players, self.def_art_losses)
 
+	def calculate_amphib_num_units(self, players):
+		player = players[self.attacker]
+		number = 0
+		for k, v in self.attacker_forces.items():
+			number += v
+		return number
 
 	def distribute_losses_amph(self, players, losses):
-		num_units = calculate_amphib_num_units(attacker, self.attacker_forces)
 		player = players[self.attacker]
+		num_units = self.calculate_amphib_num_units(players)
 		while(losses > 0.5 and num_units >= 0.5):
-			loss = uniform(0, 1)
-			if loss <= 0.30:
+			pick = uniform(0, 1)
+			print("att loss pick %.2f" % pick)
+			if pick <= 0.30:
 				if(self.attacker_forces["infantry"] >= 0.5):
 					self.attacker_forces["infantry"] -= 0.5
 					player.military["infantry"] -=0.5
@@ -254,7 +347,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif loss > 0.25 and loss <= 0.55:
+			elif pick > 0.25 and pick <= 0.55:
 				if(self.attacker_forces["cavalry"] >= 0.5):
 					self.attacker_forces["cavalry"] -= 0.5
 					player.military["cavalry"] -= 0.5
@@ -266,7 +359,7 @@ class LandBattle(Battle):
 				else:
 					continue
 
-			elif loss > 0.55 and loss <= 0.75:
+			elif pick > 0.55 and pick <= 0.75:
 				if(self.attacker_forces["tank"] >= 0.5):
 					player.military["tank"] -= 0.5
 					num_units -= 0.5
@@ -277,7 +370,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif loss > 0.75 and loss <= 0.90:
+			elif pick > 0.75 and pick <= 0.90:
 				if(self.attacker_forces["artillery"]):
 					player.military["artillery"] -= 0.5
 					self.attacker_forces["artillery"] -= 0.5
@@ -288,7 +381,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif loss > 0.90:
+			elif pick > 0.90:
 				if(self.attacker_forces["fighter"] >= 0.5):
 					player.military["fighter"] -= 0.5
 					num_units -= 0.5
@@ -302,10 +395,12 @@ class LandBattle(Battle):
 					continue
 
 	def distribute_losses(self, players, losses):
-		player = players[defender]
-		num_units = calculate_number_of_units(player)
+		player = players[self.defender]
+		num_units = player.calculate_number_of_units()
 		while(losses >= 0.5 and num_units >= 0.5):
-			if loss <= 0.30:
+			pick = uniform(0, 1)
+			print("def loss pick %.2f" % pick)
+			if pick <= 0.30:
 				if(player.military["infantry"] >= 0.5):
 					player.military["infantry"] -= 0.5
 					num_units -= 0.5
@@ -315,7 +410,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif loss > 0.30 and loss <= 0.55:
+			elif pick > 0.30 and pick <= 0.55:
 				if(player.military["cavalry"] >= 0.5):
 					player.military["cavalry"] -= 0.5
 					num_units -= 0.5
@@ -325,7 +420,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif loss > 0.55 and loss <= 0.75:
+			elif pick > 0.55 and pick <= 0.75:
 				if(player.military["tank"] >= 0.5):
 					player.military["tank"] -= 0.5
 					num_units -= 0.5
@@ -336,7 +431,7 @@ class LandBattle(Battle):
 				else:
 					continue
 
-			elif loss > 0.77 and loss <= 0.9:
+			elif pick > 0.77 and pick <= 0.9:
 				if(player.military["artillery"] >= 0.5):
 					player.military["artillery"] -= 0.5
 					num_units -= 0.5
@@ -347,7 +442,7 @@ class LandBattle(Battle):
 				else:
 					continue
 
-			elif loss > 0.9:
+			elif pick > 0.9:
 				if(player.military["fighter"] >= 0.5):
 					player.military["fighter"] -= 0.5
 					num_units -= 0.5
@@ -368,17 +463,17 @@ class LandBattle(Battle):
 
 		AttManouver = ((self.attacker_forces["infantry"] * attacker.infantry["manouver"]) + 
 		(self.attacker_forces["cavalry"] * attacker.cavalry["manouver"]) + 	
-		(self.attacker_forces["tanks"] * attacker.tanks["manouver"] * self.attacker_oil_penalty)) * AttManRoll
+		(self.attacker_forces["tank"] * attacker.tank["manouver"] * self.attacker_oil_penalty)) * AttManRoll
 		
 		DefManouver = ((defender.military["infantry"] * defender.infantry["manouver"]) +
 		(defender.military["cavalry"] * defender.cavalry["manouver"]) +
-		(defender.military["tanks"] * defender.tanks["manouver"] * self.defender_oil_penalty)) * DefManRoll
+		(defender.military["tank"] * defender.tank["manouver"] * self.defender_oil_penalty)) * DefManRoll
 
 		self.att_manouver = AttManouver/(AttManouver + DefManouver)
 		self.def_manouver = DefManouver/(AttManouver + DefManouver)
 
 
-	def direct_engagement(players):
+	def direct_engagement(self, players):
 		attacker = players[self.attacker]
 		defender = players[self.defender]
 		AttRoll = uniform(1, 1.2)
@@ -391,28 +486,36 @@ class LandBattle(Battle):
 			DefMod += (self.def_manouver - self.att_manouver)
 
 		AttStr = (self.attacker_ammo_penalty * AttRoll * AttMod) * ((self.attacker_forces["infantry"] * attacker.infantry["attack"]) + 
-		(self.attacker_forces["cavalry"] * attacker.cavalry["attack"]) + (self.attacker_forces["tank"] * attacker.tank["attack"] * self.att_man_oil_penalty))
+		(self.attacker_forces["cavalry"] * attacker.cavalry["attack"]) + (self.attacker_forces["tank"] * attacker.tank["attack"] * self.attacker_oil_penalty))
 		
 		DefStr = (self.defender_ammo_penalty * DefRoll * DefMod) * ((defender.military["infantry"] * defender.infantry["defend"]) + 
-		(defender.military["cavalry"] * defender.cavalry["defender"]) + (defender.military["tank"] * defender.tank["defend"] * self.def_man_oil_penalty))
+		(defender.military["cavalry"] * defender.cavalry["defend"]) + (defender.military["tank"] * defender.tank["defend"] * self.defender_oil_penalty))
 
 		AttStrN = AttStr/(AttStr + DefStr)
 		DefStrN = DefStr/(AttStr + DefStr)
 
-		total = calculate_amphib_strength(attacker, self.attacker_forces) + defender.calculate_base_defense_strength()
+		total = attacker.calculate_amphib_strength(self.attacker_forces) + defender.calculate_base_defense_strength()
 		losses = total/3
 
 		self.att_eng_losses = losses * DefStrN
 		self.def_eng_losses = losses * AttStrN
+		print("Att engagement losses: %.2f" % self.att_eng_losses)
+		print("Def engagement losses: %.2f" % self.def_eng_losses)
 
-		self.attacker_forces = self.distribute_losses_amph(attacker, players, self.att_eng_losses)
-		self.distribute_losses(defender, players, self.def_eng_losses)
+		self.distribute_losses_amph(players, self.att_eng_losses)
+		self.distribute_losses(players, self.def_eng_losses)
 
 
 	def landCombat(self, players, market, relations, provinces):
 		attacker = players[self.attacker]
 		defender = players[self.defender]
 		self.initial_attacker_forces = self.attacker_forces
+		self.initial_attacker_forces["infantry"] = self.attacker_forces["infantry"]
+		self.initial_attacker_forces["cavalry"] = self.attacker_forces["cavalry"]
+		self.initial_attacker_forces["artillery"] = self.attacker_forces["artillery"]
+		self.initial_attacker_forces["fighter"] = self.attacker_forces["fighter"]
+		self.initial_attacker_forces["tank"] = self.attacker_forces["tank"]
+		
 		self.initial_defender_forces["infantry"] = defender.military["infantry"]
 		self.initial_defender_forces["cavalry"] = defender.military["cavalry"]
 		self.initial_defender_forces["artillery"] = defender.military["artillery"]
@@ -433,7 +536,7 @@ class LandBattle(Battle):
 		self.attacker_oil_penalty = attacker.oil_penalty(self.attacker_oil_needed)
 		self.defender_oil_penalty = defender.oil_penalty(self.defender_oil_needed)
 
-		if att_current_makeup["fighter"] > 0.2 and defender.militart["fighter"] > 0.2:
+		if self.attacker_forces["fighter"] > 0.2 and defender.military["fighter"] > 0.2:
 			self.dogFight(players)
 		AttRecon = attacker.recon()
 		DefRecon = defender.recon()
@@ -444,33 +547,34 @@ class LandBattle(Battle):
 		#Phase Three: Manouver 
 		self.determine_manouver(players)
 		# Phase Three: Engagement
-		self.direct_engagment(players)
-		if self.calculate_attacker_strength() > defender.calculate_base_defense_strength():
+		self.direct_engagement(players)
+		if self.calculate_attacker_strength(players) > defender.calculate_base_defense_strength():
 			self.winner = self.attacker
 		else:
 			self.winner = self.defender		
 		self.combat_outcome(players, market, relations, provinces)
 		return
 
-	def calculate_attacker_strength(self):
+	def calculate_attacker_strength(self, players):
 		strength = 0
-		for k, v in self.attack_forces.items():
+		player = players[self.attacker]
+		for k, v in self.attacker_forces.items():
 			if k == "infantry":
-				strength += forces[k] * player.infantry["attack"]
+				strength += v * player.infantry["attack"]
 			if k == "cavalry":
-				strength += forces[k] * player.cavalry["attack"]
+				strength += v * player.cavalry["attack"]
 			if k == "artillery":
-				strength += forces[k] * player.artillery["attack"]
+				strength += v * player.artillery["attack"]
 			if k == "tank":
-				strength += forces[k] * player.tank["attack"]
+				strength += v * player.tank["attack"]
 			if k == "fighter":
-				strength += forces[k] * player.fighter["attack"]
+				strength += v * player.fighter["attack"]
 		return strength
 
 
 class SeaBattle(Battle):
-	def __init__(self, attacker, defender, prov, *args, **kwargs):
-		super(LandBattle, self).__init__(attacker, defender, *args, **kwargs)
+	def __init__(self, ID, attacker, defender, prov, *args, **kwargs):
+		super(SeaBattle, self).__init__(ID, attacker, defender, prov, *args, **kwargs)
 		self.att_losses = 0
 		self.def_losses = 0
 		self.winner = ""
@@ -489,7 +593,7 @@ class SeaBattle(Battle):
 		self.initial_defender_forces["frigates"] = defender.military["frigates"]
 		self.initial_defender_forces["iron_clad"] = defender.military["iron_clad"]
 		self.initial_defender_forces["battle_ship"] = defender.military["battle_ship"]
- 		market.report.append("A naval battle is being fought between %s and %s !! \n" % (p1.name, p2.name))
+		market.report.append("A naval battle is being fought between %s and %s !! \n" % (p1.name, p2.name))
 		winner = ""
 		market.report.append("%s has a fleet size of %s, %s has a fleet size of %s \n" % (p1.name, att_initial_navy, p2.name, def_initial_navy))
 		self.attacker_ammo_needed = p1.calculate_ammo_needed_navy()
@@ -529,28 +633,28 @@ class SeaBattle(Battle):
 		att_str_remaining = p1.calculate_naval_strength()
 		def_str_remaining = p2.calculate_naval_strength()
 
-			if att_str_remaining > def_str_remaining:
-				market.report.append("%s has defeated %s at sea! \n" % (p1.name, p2.name))
-				self.winner = p1.name
-				if self.prov in p2.provinces.keys():
-					p1.stability -= 0.5
-					if p1.stability < -3.0:
-						p1.stability = -3.0
-					p2.stability += 0.5
-					if p2.stability > 3.0:
-						p2.stability = 3.0
-					self.gain_province(players, market, relations, provinces)
-					p1.war_after_math(p2.name, players, relations, prov, provinces)
-				return 
-			else:
+		if att_str_remaining > def_str_remaining:
+			market.report.append("%s has defeated %s at sea! \n" % (p1.name, p2.name))
+			self.winner = p1.name
+			if self.prov in p2.provinces.keys():
 				p1.stability -= 0.5
 				if p1.stability < -3.0:
 					p1.stability = -3.0
 				p2.stability += 0.5
 				if p2.stability > 3.0:
 					p2.stability = 3.0
-				market.report.append("%s has defeated %s at sea! \n"% (p2.name, p1.name))
-				p1.war_after_math(p2.name, players, relations, prov, provinces)
-				return 
+				self.gain_province(players, market, relations, provinces)
+				war_after_math(p1.name, p2.name, players, relations, prov, provinces)
+			return 
+		else:
+			p1.stability -= 0.5
+			if p1.stability < -3.0:
+				p1.stability = -3.0
+			p2.stability += 0.5
+			if p2.stability > 3.0:
+				p2.stability = 3.0
+			market.report.append("%s has defeated %s at sea! \n"% (p2.name, p1.name))
+			war_after_math(p1.name, p2.name, players, relations, prov, provinces)
+			return 
 
 	

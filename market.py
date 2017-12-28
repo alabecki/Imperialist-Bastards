@@ -5,6 +5,7 @@ from random import*
 import player_class
 from minor_classes import*
 
+
 class Market(object):
 	def __init__ (self):
 
@@ -15,6 +16,8 @@ class Market(object):
 		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "/", "//", "///"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
+		self.landBattle = 0
+		self.seaBattle = 0 
 
 		self.market_keys = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 

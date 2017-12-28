@@ -2,7 +2,7 @@
 from player_class import Player
 from technologies import*
 from human import Human
-from AI import AI
+from AI import*
 from minor_classes import*
 
 #from AI_foreign_affairs import*
@@ -229,12 +229,10 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 					if selection.development_level >= 1:
 						selection.development_level -= 1
 					#	print("As a result of the war, the development level of %s has been reduced to %s" % (selection.name, selection.development_level))
-			
 		num_resist = 0
 		for p, pr in p2.provinces.items():
 			if pr.culture != p1.culture and pr.culture == p2.culture:
 				num_resist += 1
-
 		num_resist = int(num_resist)
 		for i in range(num_resist):
 			p1.stability -= 0.2
@@ -247,7 +245,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 				p1.milPOP -= 0.04
 				p1.POP -= 0.04
 		#	print("A %s unit belogning to %s has been damaged by %s resistance fighters!" % (kind, p1.name, p2.name))
-
 		for r, res in p2.resources.items():
 			if p1.resources[r] >= 3:
 				p1.resources[r] += (p2.resources[r] - 2)
@@ -256,7 +253,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			if p1.goods[g] >= 3:
 				p1.goods[g] += (p2.goods[g] -2)
 				p2.goods[g] = 2
-	
 		for pl in players.values():
 			sphere_target_copy = deepcopy(pl.sphere_targets)
 			for st in sphere_target_copy:
@@ -276,7 +272,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 				if type(p1) == AI:
 					p1.resource_base[pr.resource] += pr.quality
 					p1.ai_modify_priorities_from_province(p1.provinces[pr.name].resource)
-
 		core_keys = []
 		for c in core:
 			core_keys.append(c.name)
@@ -286,7 +281,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 			p2.number_developments -= p2.provinces[ck].development_level
 			p2.provinces.pop(ck)
 			p2.resource_base[pr.resource] -= pr.quality
-
 
 		remains = (len(p2.provinces.keys()) * 1.2)
 
@@ -311,7 +305,6 @@ def resolve_total_war(winner, p1, p2, prov, players, market, relations):
 				relations[frozenset([p1.name, p])].relationship -= 1
 			if relations[frozenset([p2.name, p])].relationship < 1.5:
 				relations[frozenset([p1.name, p])].relationship -= 1
-
 		#recalculate borders of nations:
 		p1_borders = set()
 		for k, v in players.items():
@@ -1271,6 +1264,7 @@ def naval_battle(p1, p2, market, relations, prov = " "):
 					return p2.name
 				else:
 					continue
+
 
 def amphib_prelude(player, other, annex, players, market, relations):
 	amount = naval_transport(player, other)

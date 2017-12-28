@@ -187,9 +187,9 @@ class Human(Player):
 	def doctrine_options(self):
 		options = []
 		for md in military_doctrines:
-			if "mobile_warfare" not in self.technologies and md = "CombinedArms":
+			if "mobile_warfare" not in self.technologies and md == "CombinedArms":
 				continue
-			if "flight" not in self.technologies and md = "Ace Pilots":
+			if "flight" not in self.technologies and md == "Ace Pilots":
 				continue 
 			if "bombers" not in self.technologies and md == "CombinedArms":
 				continue

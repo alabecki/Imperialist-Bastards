@@ -231,6 +231,10 @@ def update_diplomacy_tab():
 			app.disableButton("embargo" + k)
 		else:
 			app.enableButton("embargo" + k)
+		if k in player.CB.keys():
+			app.enableButton("war_on" + k)
+		else:
+			app.disableButton("war_on" + k)
 		count += 1
 
 
@@ -273,7 +277,7 @@ def nation_type_press(btn):
 	if scen != "None": 
 		app.startSubWindow("Choose_Nation", modal = True)
 		app.addLabelOptionBox("nation", nation_type)
-		app.addButton("OK", nation_press)
+		app.addNamedButton("OK", "select_nation", nation_press)
 		app.stopSubWindow()
 		app.showSubWindow("Choose_Nation")
 	global human_player
@@ -914,7 +918,6 @@ def start_main_screen():
 	app.addButton("Consume Spice", consume_spice, 5, 2, 3)
 	app.stopLabelFrame()
 
-
 	if player.culture_points < 1:
 		app.disableButton("Increase Stability")
 		app.disableButton("Export Culture")
@@ -1211,6 +1214,47 @@ def start_main_screen():
 def none(btn):
 	return
 
+def update_diplo_tab_singular(other):
+	global players, human_player, relations
+	player = players[human_player]
+	other = players[other]
+	relata = frozenset([player.name, other.name])
+	app.setLabel("relations_with_" + other.name, "Relations: %.2f" % relations[relata].relationship)
+	if relations[relata].relationship >= 3.0:
+			app.disableButton("imp_rel_w" + other.name)
+	else:
+		app.enableButton("imp_rel_w" + other.name)
+	if relations[relata].relationship <= - 3.0:
+		app.disableButton("dmg_rel_w" + other.name)
+	else:
+		app.enableButton("dmg_rel_w" + other.name)
+	if relations[relata].relationship >= -2.5:
+		app.disableButton("CB_" + other.name)
+	else:
+		app.enableButton("CB_" + other.name)
+	for cb in player.CB.values():
+		if cb.opponent == other.name:
+			app.disableButton("CB_" + other.name)
+
+	if players[other.name].stability <= - 3.0:
+		app.disableButton("destab" + other.name)
+	else:
+		app.enableButton("destab" + other.name)
+	if player.resources["gold"] < 2.0 or relations[relata].relationship >= 3.0 or players[other.name].type == "major":
+		app.disableButton("bribe" + other.name)
+	else:
+		app.enableButton("bribe" + other.name)
+	
+	if (player.name not in players[other.name].embargo and relations[relata].relationship > -1.5):
+		app.disableButton("embargo" + other.name)
+	else:
+		app.enableButton("embargo" + other.name)
+	if other.name in player.CB.keys():
+			app.enableButton("war_on" + other.name)
+	else:
+		app.disableButton("war_on" + other.name)
+
+
 def improve_relations(btn):
 	app.hideSubWindow("Message_")
 	global players, human_player, relations
@@ -1220,7 +1264,10 @@ def improve_relations(btn):
 	player.improve_Relations(other, relations, players)
 	message = "Relationship with %s is now %.2f" % (other, relations[relata].relationship) 
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1235,7 +1282,10 @@ def damage_relations(btn):
 	player.damage_Relations(other, relations, players)
 	message = "Relationship with %s is now %.2f" % (other, relations[relata].relationship) 
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1254,13 +1304,17 @@ def gain_casus_belli(btn):
 		player.gain_CB(other, "", provinces)
 		message = "You have gained a Casus Belli against " + other
 		app.setLabel("general_message", message)
-		update_diplomacy_tab()
-		app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
-		app.setLabel("l24", "%.2f" % round(player.reputation, 2))
-
 	else:	 
 		app.changeOptionBox("prov_to_annex", opts)
 		app.showSubWindow("Province to Annex")
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
+		app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
+		app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+
+
 
 
 def cb_2(btn):
@@ -1293,7 +1347,10 @@ def destabilize_nation(btn):
 	player.destabilize_Nation(other, players, relations)
 	message = "The stability of %s has been reduced to %.2f" % (other, players[other].stability)
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1308,7 +1365,10 @@ def bribe(btn):
 	relata = frozenset([player.name, other])
 	message = "Relationship with %s is now %.2f" % (other, relations[relata].relationship) 
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
 	app.showSubWindow("Message_")
 
@@ -1334,7 +1394,10 @@ def sab_rel_2(btn):
 	relata = frozenset([OTHER, other2])
 	message = "Relation between %s and %s have been reduced to %.2f!" % (OTHER, other2, relations[relata].relationship)
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1352,7 +1415,10 @@ def embargo_nation(btn):
 	else:
 		message = "We have decided that %s has been a good boy are are willing to resume trade... for now" % other
 	app.setLabel("general_message", message)
-	update_diplomacy_tab()
+	if player.diplo_action < 1:
+		update_diplomacy_tab()
+	else:
+		update_diplo_tab_singular(other)
 	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
 	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 	app.showSubWindow("Message_")
@@ -1396,37 +1462,97 @@ def update_Nation_Info(other):
 		military_info = military_info + "%s: %.2f,   \n" % (k, v)
 	app.setMessage("NationMilitary", military_info)
 
-def wage_war(btn):
+def add_player_prov_gui(prov):
 	global players, human_player, provinces
 	player = players[human_player]
-	other = btn[:6]
+	p = provinces[prov]
+	app.startSubWindow("human" + p.position, modal = False)
+	app.startLabelFrame("_" + p.name)
+	app.setSticky("nesw")
+	app.addLabel("res" + p.name, "Resource: ", 1, 0)
+	app.addLabel("qual"+ p.name, "Quality: ", 2, 0)
+	app.addLabel("dev" + p.name, "Ind. Development: ", 1, 1)
+	app.addLabel("worked" + p.name, "Worked? ", 2, 1)
+	app.addLabel("cult"+ p.name, "Culture: ", 2, 2 )
+	#app.addButton("Work "+p.name + "?", work_prov)
+	app.addImageButton("Work " + p.name +"?", work_prov, "work.gif", 3, 0)
+	app.setButtonTooltip("Work " + p.name +"?", "Work " + p.name +"?")
+	#app.addButton("Free " + p.name + " Pop?", free_prov)
+	app.addImageButton("Free " + p.name + " Pop?", free_prov, "red_x.gif", 3, 1)
+	app.setButtonTooltip("Free " + p.name + " Pop?", "Free " + p.name + " Pop?")
+	app.addImageButton("Develop " + p.name, dev_prov, "train_tracks.gif", 3, 2)
+	app.setButtonTooltip("Develop " + p.name, "Develop " + p.name)
+	#app.addButton("Develop " + p.name, dev_prov)
+	app.stopLabelFrame()
+	app.stopSubWindow()
+
+def wage_war(btn):
+	global players, human_player, provinces, market, relations
+	app.hideSubWindow("Message_")
+	player = players[human_player]
+	other = btn[6:]
 	cb = player.CB[other]
 	annex = cb.province
 	annex = provinces[annex]
 	owner = players[other]
 	if owner.type == "major" and annex.colony == True:
-		if player.check_for_border(owner.name)
-			#player.capture_by_sea(annex.name)
-			message = "Since %s is a colony since you border %s, you may take it\
+		if player.check_for_border(owner.name):
+			message = "Since %s is a colony and you border %s, you may take it\
 			either by establishing naval domination or by direct land invasion" % (annex.name, owner.name)
 			app.showSubWindow("Land_or_Sea")
 		else:
-			battle.naval_battle(players, market, relations, provinces)
-			victor = battle.winner
-			app.updateSeaBattleWindow(battle)
+			ID = "%d %s %s" % (market.turn, player.name, owner.name)
+			seaBattle = SeaBattle(ID, player.name, owner.name, annex.name)
+			market.seaBattle = seaBattle
+			seaBattle.naval_battle(players, market, relations, provinces)
+			victor = seaBattle.winner
+			updateSeaBattleWindow(seaBattle)
 			app.showSubWindow("Sea Battle")
-			if victor = player.name and battle.prov != "" and battle.prov != " ":
-				battle.gain_province(players, market, relations, provinces)
-				app.setMessage("general_message", "The province of %s now belongs to %s !" % (battle.prov, battle.winner))
+			if victor == player.name and seaBattle.prov != "" and seaBattle.prov != " ":
+				seaBattle.gain_province(players, market, relations, provinces)
+				add_player_prov_gui(annex.name)
+				app.setMessage("general_message", "The province of %s now belongs to %s !" % (seaBattle.prov, seaBattle.winner))
 				app.showWindow("Message_")
 			else:
 				player.war_after_math(owner.name, players, relations, annex.name, provinces)
-	
 
 
+	else:
+		land = player.check_for_border(owner, players)
+		if land == False:
+			print("Since you do not border %s, you must send your army by navy\n" % (owner.name))
+			transport_limit = (player.military["frigates"] + player.military["iron_clad"] + player.military["battle_ship"]) * 2 
+			if transport_limit < 4:
+				print("Your navy is not sufficient for carrying out an amphibious invasion!")
+				message = "Your navy is not sufficient for carrying out an amphibious invasion!"
+				app.setLabel("general_message", message)
+				app.showWindow("Message_")
+				return 
+			else:
+				ID = "%d %s %s" % (market.turn, player.name, owner.name)
+				landBattle = LandBattle(ID, player.name, owner.name, annex.name)
+				market.landBattle = landBattle
+				app.setScaleRange("Infantry", 0, player.military["infantry"])
+				app.setScaleRange("Cavalry", 0, player.military["cavalry"])
+				app.setScaleRange("Artillery", 0, player.military["artillery"])
+				app.setScaleRange("Fighter", 0, player.military["fighter"])
+				app.setScaleRange("Tank", 0, player.military["tank"])
+				limit = player.calculate_transport_limit()
+				app.setLabel("carry_limit", limit) 
+				app.showSubWindow("Select Land Forces")
+		else:
+			print("Since we border %s, we may attack by land!" % (owner.name))
+			app.setScaleRange("Infantry", 0, player.military["infantry"])
+			app.setScaleRange("Cavalry", 0, player.military["cavalry"])
+			app.setScaleRange("Artillery", 0, player.military["artillery"])
+			app.setScaleRange("Fighter", 0, player.military["fighter"])
+			app.setScaleRange("Tank", 0, player.military["tank"])
+			app.showSubWindow("Select Land Forces")
 
 	
 def attack1(btn):
+	global players, market, relations, provinces
+	player = players[player]
 	app.hideSubWindow("Land_or_Sea")
 	opponent = app.getLabel("land_or_sea")
 	opponent = opponent[7:]
@@ -1436,28 +1562,101 @@ def attack1(btn):
 	owner = players[other]
 	decision = app.getRadioButton("land_or_sea")
 	if decision == "Sea Dominance":
-		battle.naval_battle(players, market, relations, provinces)
-		victor = battle.winner
-		app.updateSeaBattleWindow(battle)
+		ID = "%d %s %s" % (market.turn, player.name, owner.name)
+		seaBattle = SeaBattle(ID, player.name, owner.name, annex.name)
+		seaBattle.naval_battle(players, market, relations, provinces)
+		market.seaBattle = seaBattle 
+		victor = seaBattle.winner
+		app.updateSeaBattleWindow(seaBattle)
 		app.showSubWindow("Sea Battle")
-		if victor = player.name and battle.prov != "" and battle.prov != " ":
-			battle.gain_province(players, market, relations, provinces)
-			app.setMessage("general_message", "The province of %s now belongs to %s !" % (battle.prov, battle.winner))
+		if victor == player.name and seaBattle.prov != "" and seaBattle.prov != " ":
+			seaBattle.gain_province(players, market, relations, provinces)
+			add_player_prov_gui(annex.name)
+			app.setButtonBg(annex.position, player.colour)
+			app.setButtonFg(annex.position, player.colour)
+			app.setMessage("general_message", "The province of %s now belongs to %s !" % (seaBattle.prov, seaBattle.winner))
 			app.showWindow("Message_")
 		else:
 			player.war_after_math(owner.name, players, relations, annex.name, provinces)
 
 	if decision == "Land Dominance":
-		battle = LandBattle(player.name, owner.name, annex.name)
-		forces = {}
-		forces["infantry"] = player.military["infantry"]
-		forces["cavalry"] = player.military["cavalry"]
-		forces["artillery"] = player.military["artillery"]
-		forces["tank"] = player.military["tank"]
-		forces["fighter"] = player.military["fighter"]
-		battle.attacker_forces = forces
-		battle.landCombat(players, market, relations, provinces)
-		app.showSubWindow("Land Battle")
+		ID = "%d %s %s" % (market.turn, player.name, owner.name)
+		landBattle = LandBattle(ID, player.name, owner.name, annex.name)
+		market.landBattle = landBattle
+		app.setScaleRange("Infantry", 0, player.military["infantry"])
+		app.setScaleRange("Cavalry", 0, player.military["cavalry"])
+		app.setScaleRange("Artillery", 0, player.military["Artillery"])
+		app.setScaleRange("Fighter", 0, player.military["Fighter"])
+		app.setScaleRange("Tank", 0, player.military["Tank"])
+		limit = 1000
+		app.setLabel("carry_limit", limit) 
+		app.showSubWindow("Select Land Forces")
+
+
+def attack1b(btn):
+	app.hideSubWindow("Message_")
+	global players, market, human_player, relations, provinces
+	player = players[human_player]
+	limit = app.getLabel("carry_limit")
+	forces = {}
+	forces["infantry"] = app.getScale("Infantry")
+	forces["cavalry"] = app.getScale("Cavalry")
+	forces["artillery"] = app.getScale("Artillery")
+	forces["tank"] = app.getScale("Tank")
+	forces["fighter"] = app.getScale("Fighter")
+	weight = player.calculate_army_weight()
+	if weight > limit:
+		message = "Your force selection exceeds your carry limit. Please try again."
+		app.setLabel("general_message")
+		app.showSubWindow("Message_")
+		return
+	else:
+		landBattle = market.landBattle
+		defender = players[landBattle.defender]
+		def_nav_str = defender.calculate_naval_strength()
+		att_nav_str = player.calculate_naval_strength()
+		if def_nav_str >= att_nav_str:
+			message = "%s is intercepting your navy. Prepare for a naval battle!" % (defender.name)
+			app.setLabel("general_message", message)
+			app.showSubWindow("Message_")
+			ID = "%d %s %s - sea" % (market.turn, player.name, defender.name)
+			seaBattle = SeaBattle(ID, player.name, defender.name, "")
+			seaBattle.naval_battle(players, market, relations, provinces)
+			market.seaBattle = seaBattle 
+			victor = seaBattle.winner
+			app.updateSeaBattleWindow(seaBattle)
+			app.hideSubWindow("Select Land Forces")
+			app.showSubWindow("Sea Battle")
+			if seaBattle.winner == seaBattle.defender.name:
+				message = "Your navy has been defeated by %s's navy! Your invasion plans have been thwarted!" % (defender.name)
+				showSubWindow("Message_")
+				return
+			else:
+				message = "Your navy has pushed through to defeat %s - prepare for the glorious ground invasion!" % (defender.name)
+				showWindow("Message_S")
+				landBattle.attacker_forces = forces
+				landBattle.landCombat(players, market, relations, provinces)
+				if landBattle.winner == player.name:
+					add_player_prov_gui(landBattle.prov)
+					p = provinces[landBattle.prov]
+					app.setButtonBg(p.position, player.colour)
+					app.setButtonFg(p.position, player.colour)
+				updateLandBattleWindow(landBattle)
+				app.hideSubWindow("Select Land Forces")
+				app.showSubWindow("Land Battle")
+				return
+		else:
+			landBattle.attacker_forces = forces
+			landBattle.landCombat(players, market, relations, provinces)
+			if landBattle.winner == player.name:
+				add_player_prov_gui(landBattle.prov)
+				p = provinces[landBattle.prov]
+				app.setButtonBg(p.position, player.colour)
+				app.setButtonFg(p.position, player.colour)
+			updateLandBattleWindow(landBattle)
+			app.hideSubWindow("Select Land Forces")
+			app.showSubWindow("Land Battle")
+
 
 def updateSeaBattleWindow(battle):
 	global players
@@ -1465,12 +1664,12 @@ def updateSeaBattleWindow(battle):
 	app.setImage("sea_defending_nation", battle.defender + ".gif")
 	attacker = players[battle.attacker]
 	defender = players[battle.defender]
-	app.setLabel("att_frigate", "%.2f / %.2f" % (battle.initial_attacker_forces["frigates"], attacker.military["frigates"]))
-	app.setLabel("def_frigate", "%.2f / %.2f" % (battle.initial_defender_forces["frigates"], defender.military["frigates"]))
-	app.setLabel("att_ironclad", "%.2f / %.2f" % (battle.initial_attacker_forces["iron_clad"], attacker.military["iron_clad"]))
-	app.setLabel("def_ironclad", "%.2f / %.2f" % (battle.initial_defender_forces["ironclad"], defender.military["iron_clad"]))
-	app.setLabel("att_battleship", "%.2f / %.2f" % (battle.initial_attacker_forces["battle_ship"], attacker.military["battle_ship"]))
-	app.setLabel("def_battleship", "%.2f / %.2f" % (battle.initial_defender_forces["battle_ship"], defender.military["battle_ship"]))
+	app.setLabel("att_Frigate", "%.2f / %.2f" % (battle.initial_attacker_forces["frigates"], attacker.military["frigates"]))
+	app.setLabel("def_Frigate", "%.2f / %.2f" % (battle.initial_defender_forces["frigates"], defender.military["frigates"]))
+	app.setLabel("att_Ironclad", "%.2f / %.2f" % (battle.initial_attacker_forces["iron_clad"], attacker.military["iron_clad"]))
+	app.setLabel("def_Ironclad", "%.2f / %.2f" % (battle.initial_defender_forces["ironclad"], defender.military["iron_clad"]))
+	app.setLabel("att_Battleship", "%.2f / %.2f" % (battle.initial_attacker_forces["battle_ship"], attacker.military["battle_ship"]))
+	app.setLabel("def_Battleship", "%.2f / %.2f" % (battle.initial_defender_forces["battle_ship"], defender.military["battle_ship"]))
 	app.setLabel("sea_att_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f " % \
 	(battle.attacker_ammo, battle.attacker_ammo_needed, battle.attacker_ammo_penalty))
 	app.setLabel("sea_def_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f " % \
@@ -1479,26 +1678,26 @@ def updateSeaBattleWindow(battle):
 	(battle.attacker_oil, battle.attacker_oil_needed, battle.attacker_oil_penalty))
 	app.setLabel("sea_def_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f " % \
 	(battle.defender_oil, battle.defender_oil_needed, battle.defender_oil_penalty))
-	app.setLabel("sea_att_losses", battle.att_losses)
-	app.setLabel("sea_def_losses", battle.def_losses)
+	app.setLabel("sea_att_losses", "%.2f" % battle.att_losses)
+	app.setLabel("sea_def_losses", "%.2f" % battle.def_losses)
 	app.setLabel("sea_battle_winner", battle.winner + ".gif")
 
 def updateLandBattleWindow(battle):
 	global players
-	app.setImage("sea_attacking_nation", battle.attacker + ".gif")
-	app.setImage("sea_defending_nation", battle.defender + ".gif")
+	app.setImage("attacking_nation", battle.attacker + ".gif")
+	app.setImage("defending_nation", battle.defender + ".gif")
 	attacker = players[battle.attacker]
 	defender = players[battle.defender]
-	app.setLabel("att_infantry", "%.2f / %.2f" % (battle.initial_attacker_forces["infantry"], battle.attacker_forces["infantry"]))
-	app.setLabel("def_infantry", "%.2f / %.2f" % (battle.initial_defender_forces["infantry"], defender.military["infantry"]))
-	app.setLabel("att_cavalry", "%.2f / %.2f" % (battle.initial_attacker_forces["cavalry"], battle.attacker_forces["cavalry"]))
-	app.setLabel("def_cavalry", "%.2f / %.2f" % (battle.initial_defender_forces["cavalry"], defender.military["cavalry"]))
-	app.setLabel("att_artillery", "%.2f / %.2f" % (battle.initial_attacker_forces["artillery"], battle.attacker_forces["artillery"]))
-	app.setLabel("att_artillery", "%.2f / %.2f" % (battle.initial_defender_forces["artillery"], defender.military["artillery"]) )
-	app.setLabel("att_fighter", "%.2f / %.2f" % (battle.initial_attacker_forces["fighter"], battle.attacker_forces["fighter"]))
-	app.setLabel("def_fighter", "%.2f / %.2f" % (battle.initial_defender_forces["fighter"], defender.military["fighter"]))
-	app.setLabel("att_tank", "%.2f / %.2f" % (battle.initial_attacker_forces["tank"], battle.attacker_forces["tank"]))
-	app.setLabel("def_tank", "%.2f / %.2f" % (battle.initial_defender_forces["tank"], defender.military["tank"]))
+	app.setLabel("att_Infantry", "%.2f / %.2f" % (battle.initial_attacker_forces["infantry"], battle.attacker_forces["infantry"]))
+	app.setLabel("def_Infantry", "%.2f / %.2f" % (battle.initial_defender_forces["infantry"], defender.military["infantry"]))
+	app.setLabel("att_Cavalry", "%.2f / %.2f" % (battle.initial_attacker_forces["cavalry"], battle.attacker_forces["cavalry"]))
+	app.setLabel("def_Cavalry", "%.2f / %.2f" % (battle.initial_defender_forces["cavalry"], defender.military["cavalry"]))
+	app.setLabel("att_Artillery", "%.2f / %.2f" % (battle.initial_attacker_forces["artillery"], battle.attacker_forces["artillery"]))
+	app.setLabel("def_Artillery", "%.2f / %.2f" % (battle.initial_defender_forces["artillery"], defender.military["artillery"]) )
+	app.setLabel("att_Fighter", "%.2f / %.2f" % (battle.initial_attacker_forces["fighter"], battle.attacker_forces["fighter"]))
+	app.setLabel("def_Fighter", "%.2f / %.2f" % (battle.initial_defender_forces["fighter"], defender.military["fighter"]))
+	app.setLabel("att_Tank", "%.2f / %.2f" % (battle.initial_attacker_forces["tank"], battle.attacker_forces["tank"]))
+	app.setLabel("def_Tank", "%.2f / %.2f" % (battle.initial_defender_forces["tank"], defender.military["tank"]))
 
 	app.setLabel("att_ammo_info", "Ammo: %.2f, Need: %.2f, Penalty: %.2f" % \
 		(battle.attacker_ammo, battle.attacker_ammo_needed, battle.attacker_ammo_penalty))
@@ -1508,16 +1707,16 @@ def updateLandBattleWindow(battle):
 		(battle.attacker_oil, battle.attacker_oil_needed, battle.attacker_oil_penalty))
 	app.setLabel("def_oil_info", "Oil: %.2f, Need: %.2f, Penalty: %.2f" % \
 		(battle.defender_oil, battle.defender_oil_needed, battle.defender_oil_penalty))
-	app.setLabel("att_dog_fight_losses", battle.att_fighters_lost)
-	app.setLabel("def_dog_fight_losses", battle.def_fighters_lost)
-	app.setLabel("att_recon", battle.att_recon)
-	app.setLabel("def_recon", battle.def_recon)
-	app.setLabel("att_art_losses", battle.att_art_losses)
-	app.setLabel("def_art_losses", battle.def_art_losses)
-	app.setLabel("att_manouver", battle.att_manouver)
-	app.setLabel("def_manouver", battle.def_manouver)
-	app.setLabel("att_engagement_losses", battle.att_engagement_losses)
-	app.setLabel("def_engagement_losses", battle.def_engagement_losses)
+	app.setLabel("att_dog_fight_losses", "%.2f" % battle.att_fighters_lost)
+	app.setLabel("def_dog_fight_losses", "%.2f" % battle.def_fighters_lost)
+	app.setLabel("att_recon", "%.2f" % battle.att_recon)
+	app.setLabel("def_recon", "%.2f" % battle.def_recon)
+	app.setLabel("att_art_losses", "%.2f" % battle.att_art_losses)
+	app.setLabel("def_art_losses", "%.2f" % battle.def_art_losses)
+	app.setLabel("att_manouver", "%.2f" % battle.att_manouver)
+	app.setLabel("def_manouver", "%.2f" % battle.def_manouver)
+	app.setLabel("att_engagement_losses", "%.2f" % battle.att_eng_losses)
+	app.setLabel("def_engagement_losses", "%.2f" % battle.def_eng_losses)
 	app.setImage("battle_winner", battle.winner + ".gif")
 
 
@@ -1590,7 +1789,10 @@ def update_military_tab():
 	for cb in player.CB.values():
 		addition = "%s: %s, %d" % (cb.opponent, cb.province, cb.time)
 		cb_list.append(addition)
-	app.changeOptionBox("CB List:", cb_list)
+	if len(player.CB.keys()) == 0:
+		app.changeOptionBox("CB List:", [" "])
+	else:
+		app.changeOptionBox("CB List:", cb_list)
 
 	for k in player.military.keys():
 		if k == "irregulars":
@@ -1610,6 +1812,7 @@ def update_military_tab():
 
 		if k == "cavalry":
 			app.setLabel("att_" + k, "%.2f" % player.cavalry["attack"])
+			print("att_infantry\n")
 			app.setLabel("def_" + k, "%.2f" % player.cavalry["defend"])
 			app.setLabel("man_" + k, "%.2f" % player.cavalry["manouver"])
 			app.setLabel("ammo_use_" + k, "%.2f" % player.cavalry["ammo_use"])
@@ -2502,26 +2705,57 @@ def load_basic_widgets():
 	app.addNamedButton("land_sea", "OK", attack1)
 	app.stopSubWindow()
 
+	app.startSubWindow("Select Land Forces")
+	app.addLabel("select_forces", "Please Select Forces for the Coming Battle")
+	app.addLabel("carry_limit", 0)
+	app.addLabelScale("Infantry")
+	app.setScaleRange("Infantry", 0, 0)
+	app.setScaleIncrement("Infantry", 1)
+	app.showScaleIntervals("Infantry", 1)
+	app.addLabelScale("Cavalry")
+	app.setScaleRange("Cavalry", 0, 0)
+	app.setScaleIncrement("Cavalry", 1)
+	app.showScaleIntervals("Cavalry", 1)
+	app.addLabelScale("Artillery")
+	app.setScaleRange("Artillery", 0, 0)
+	app.setScaleIncrement("Artillery", 1)
+	app.showScaleIntervals("Artillery", 1)
+	app.addLabelScale("Fighter")
+	app.setScaleRange("Fighter", 0, 0)
+	app.setScaleIncrement("Fighter", 1)
+	app.showScaleIntervals("Fighter", 1)
+	app.addLabelScale("Tank")
+	app.setScaleRange("Tank", 0, 0)
+	app.setScaleIncrement("Tank", 1)
+	app.showScaleIntervals("Tank", 1)
+	app.addNamedButton("OK", "confirm_forces", attack1b)
+	app.stopSubWindow()
+
 	app.startSubWindow("Land Battle")
 	app.addImage("attacking_nation", "crown.gif", 1, 2)
 	app.addImage("defending_nation", "crown.gif", 1, 4)
 	app.addImage("infantry_pic", "infantry.gif", 2, 3)
+	app.shrinkImage("infantry_pic", 2)
 	app.addImage("cavalry_pic", "cavalry.gif", 3, 3)
+	app.shrinkImage("cavalry_pic", 2)
 	app.addImage("artillery_pic", "artillery.gif", 4, 3)
+	app.shrinkImage("artillery_pic", 2)
 	app.addImage("fighter_pic", "fighter.gif", 5, 3)
+	app.shrinkImage("fighter_pic", 2)
 	app.addImage("tank_pic", "tank.gif", 6, 3)
+	app.shrinkImage("tank_pic", 2)
 	#app.addLabel("total_att_str",  1, 1)
 	#app.addLabel("total_def_str", 1, 5)
-	app.addLabel("att_infantry", " ", 2, 2)
-	app.addLabel("att_cavalry", " ", 3, 2)
-	app.addLabel("att_artillery", " ", 4, 2)
-	app.addLabel("att_fighter", " ", 5, 2)
-	app.addLabel("att_tank", " ", 6, 2)
-	app.addLabel("def_infantry", " ", 2, 4)
-	app.addLabel("def_cavalry", " ", 3, 4)
-	app.addLabel("def_artillery", " ", 4, 4)
-	app.addLabel("def_fighter", " ", 5, 4)
-	app.addLabel("def_tank", " ", 6, 4)
+	app.addLabel("att_Infantry", " ", 2, 2)
+	app.addLabel("att_Cavalry", " ", 3, 2)
+	app.addLabel("att_Artillery", " ", 4, 2)
+	app.addLabel("att_Fighter", " ", 5, 2)
+	app.addLabel("att_Tank", " ", 6, 2)
+	app.addLabel("def_Infantry", " ", 2, 4)
+	app.addLabel("def_Cavalry", " ", 3, 4)
+	app.addLabel("def_Artillery", " ", 4, 4)
+	app.addLabel("def_Fighter", " ", 5, 4)
+	app.addLabel("def_Tank", " ", 6, 4)
 	app.addImage("battle_ammo", "ammo.gif", 7, 3)
 	app.shrinkImage("battle_ammo", 2)
 	app.addImage("battle_oil", "oil.gif", 8, 3)
@@ -2541,18 +2775,18 @@ def load_basic_widgets():
 	app.addLabel("att_oil_info", " ", 8, 1, 2)
 	app.addLabel("att_dog_fight_losses", " ", 9, 1, 2)
 	app.addLabel("att_recon", " ", 10, 1, 2)
-	app.addLabel("att_art_losses", 11, 1, 2)
-	app.addLabel("att_manouver", 12, 1, 2)
-	app.addLabel("att_engagement_losses", 13, 1, 2)
+	app.addLabel("att_art_losses", " ", 11, 1, 2)
+	app.addLabel("att_manouver", " ", 12, 1, 2)
+	app.addLabel("att_engagement_losses", " ", 13, 1, 2)
 	app.addImage("battle_winner", "crown.gif", 14, 3)
 
 	app.addLabel("def_ammo_info", " ", 7, 4, 2)
 	app.addLabel("def_oil_info", " ", 8, 4, 2)
 	app.addLabel("def_dog_fight_losses", " ", 9, 4, 2)
 	app.addLabel("def_recon", " ", 10, 4, 2)
-	app.addLabel("def_art_losses", 11, 4, 2)
-	app.addLabel("def_manouver", 12, 4, 2)
-	app.addLabel("def_engagement_losses", 13, 4, 2)
+	app.addLabel("def_art_losses", " ", 11, 4, 2)
+	app.addLabel("def_manouver", " ", 12, 4, 2)
+	app.addLabel("def_engagement_losses", " ", 13, 4, 2)
 
 	app.stopSubWindow()
 
@@ -2562,12 +2796,12 @@ def load_basic_widgets():
 	app.addImage("frigate_pic", "frigates.gif", 3, 3)
 	app.addImage("iron_clad_pic", "frigates.gif", 4, 3)
 	app.addImage("battle_ship_pic", "battle_ship.gif", 5, 3)
-	app.addLabel("att_frigate", " ", 3, 1, 2)
-	app.addLabel("def_frigate", " ", 3, 4, 2)
-	app.addLabel("att_ironclad", " ", 4, 1, 2)
-	app.addLabel("def_ironclad", " ", 4, 4, 2)
-	app.addLabel("att_battleship", " ", 5, 1, 2)
-	app.addLabel("def_battleship", " ", 5, 4, 2)
+	app.addLabel("att_Frigate", " ", 3, 1, 2)
+	app.addLabel("def_Frigate", " ", 3, 4, 2)
+	app.addLabel("att_Ironclad", " ", 4, 1, 2)
+	app.addLabel("def_Ironclad", " ", 4, 4, 2)
+	app.addLabel("att_Battleship", " ", 5, 1, 2)
+	app.addLabel("def_Battleship", " ", 5, 4, 2)
 
 	app.addImage("sea_battle_ammo", "ammo.gif", 6, 3)
 	app.addImage("sea_battle_oil", "oil.gif", 7, 3)

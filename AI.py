@@ -473,20 +473,20 @@ class AI(Player):
                         return
             options = []
             for md in military_doctrines:
-            if md == "SeaII" or md == "SeaI":
-                continue
-            if "mobile_warfare" not in self.technologies and md = "CombinedArms":
-                continue 
-            if "flight" not in self.technologies and md == "CombinedArms":
-                continue
-            if "machine_guns" not in self.technologies and md == "Entrenchment":
-                continue
-            if "ManouverI" not in self.doctrines and md == "ManouverII":
-                continue
-            if "SeaI" not in self.doctrines and md == "SeaII":
-                continue
-            if md not in self.doctrines:
-                options.append(md)
+                if md == "SeaII" or md == "SeaI":
+                    continue
+                if "mobile_warfare" not in self.technologies and md == "CombinedArms":
+                    continue 
+                if "flight" not in self.technologies and md == "CombinedArms":
+                    continue
+                if "machine_guns" not in self.technologies and md == "Entrenchment":
+                    continue
+                if "ManouverI" not in self.doctrines and md == "ManouverII":
+                    continue
+                if "SeaI" not in self.doctrines and md == "SeaII":
+                    continue
+                if md not in self.doctrines:
+                    options.append(md)
             doct = choice(options)
             self.choose_doctrine(doct)
 
