@@ -83,7 +83,7 @@ def war_after_math(player, target, players, relations, prov, provinces):
 				if relations[frozenset([player.name, p])].relationship < 2:
 					new = CB(p, player.name, "annex", prov.name, 5)
 					pl.CB["opponent"] = new
-					pl.CB.add(new)
+					pl.CB[new.opponent] = new
 				else:
 					relations[frozenset([player.name, p])].relationship -= 1
 
@@ -332,8 +332,10 @@ class LandBattle(Battle):
 
 	def distribute_losses_amph(self, players, losses):
 		player = players[self.attacker]
+		count = 0
 		num_units = self.calculate_amphib_num_units(players)
-		while(losses > 0.5 and num_units >= 0.5):
+		while(losses > 0.5 and num_units >= 0.5 and count < 25):
+			count += 1
 			pick = uniform(0, 1)
 			print("att loss pick %.2f" % pick)
 			if pick <= 0.30:
@@ -370,7 +372,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif pick > 0.75 and pick <= 0.90:
+			elif pick > 0.77 and pick <= 0.90:
 				if(self.attacker_forces["artillery"]):
 					player.military["artillery"] -= 0.5
 					self.attacker_forces["artillery"] -= 0.5
@@ -397,7 +399,9 @@ class LandBattle(Battle):
 	def distribute_losses(self, players, losses):
 		player = players[self.defender]
 		num_units = player.calculate_number_of_units()
-		while(losses >= 0.5 and num_units >= 0.5):
+		count = 0
+		while(losses >= 0.5 and num_units >= 0.5 and count < 25):
+			count += 1
 			pick = uniform(0, 1)
 			print("def loss pick %.2f" % pick)
 			if pick <= 0.30:
@@ -420,7 +424,7 @@ class LandBattle(Battle):
 					losses -= 0.5
 				else:
 					continue
-			elif pick > 0.55 and pick <= 0.75:
+			elif pick > 0.55 and pick <= 0.77:
 				if(player.military["tank"] >= 0.5):
 					player.military["tank"] -= 0.5
 					num_units -= 0.5
@@ -587,12 +591,12 @@ class SeaBattle(Battle):
 		self.defender_ammo = p2.goods["cannons"]
 		self.attacker_oil = p1.resources["oil"]
 		self.defender_oil = p2.resources["oil"]
-		self.initial_attacker_forces["frigates"] = attacker.military["frigates"]
-		self.initial_attacker_forces["iron_clad"] = attacker.military["iron_clad"]
-		self.initial_attacker_forces["battle_ship"] = attacker.military["battle_ship"]
-		self.initial_defender_forces["frigates"] = defender.military["frigates"]
-		self.initial_defender_forces["iron_clad"] = defender.military["iron_clad"]
-		self.initial_defender_forces["battle_ship"] = defender.military["battle_ship"]
+		self.initial_attacker_forces["frigates"] = p1.military["frigates"]
+		self.initial_attacker_forces["iron_clad"] = p1.military["iron_clad"]
+		self.initial_attacker_forces["battle_ship"] = p1.military["battle_ship"]
+		self.initial_defender_forces["frigates"] = p2.military["frigates"]
+		self.initial_defender_forces["iron_clad"] = p2.military["iron_clad"]
+		self.initial_defender_forces["battle_ship"] = p2.military["battle_ship"]
 		market.report.append("A naval battle is being fought between %s and %s !! \n" % (p1.name, p2.name))
 		winner = ""
 		market.report.append("%s has a fleet size of %s, %s has a fleet size of %s \n" % (p1.name, att_initial_navy, p2.name, def_initial_navy))

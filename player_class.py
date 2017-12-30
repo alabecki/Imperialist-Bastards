@@ -210,7 +210,7 @@ class Player(object):
 
 		#Industry
 		self.new_development = 0.0
-		self.number_developments = 0.0
+		self.number_developments = 0
 
 		self.factories = {
 			"tank": {"number":0, "used": False},
@@ -379,17 +379,17 @@ class Player(object):
 	def determine_middle_class_need(self):
 		requirement = ["paper"]
 		if self.development_level > 0:
-			requirement.append("furniture")
-		if self.development_level > 1:
 			requirement.append("spice")
+		if self.development_level > 1:
+			requirement.append("furniture")
 		if self.development_level > 2:
 			requirement.append("clothing")
 		if self.development_level > 3:
 			requirement.append("paper")
 		if self.development_level > 4:
-			requirement.append("furniture")
-		if self.development_level > 5:
 			requirement.append("spice")
+		if self.development_level > 5:
+			requirement.append("furniture")
 		if self.development_level > 6:
 			requirement.append("clothing")
 		if self.development_level > 7:
@@ -433,9 +433,6 @@ class Player(object):
 			requirement.append("furniture")
 			requirement.append("clothing")
 		return requirement
-
-
-	
 
 	#	requirement = ["paper"]
 	#	if self.numMidPOP >= 1 and self.numMidPOP < 2:
@@ -649,7 +646,7 @@ class Player(object):
 		for k, v in self.supply.items():
 			#print("Market Supply: %s" % (len(market.market[k])))
 			for i in market.market[k]:
-				print(i.owner)
+				#print(i.owner)
 				if i.owner in self.embargo:
 			#		print("Blocked by %s" % (i))
 					continue
@@ -657,7 +654,7 @@ class Player(object):
 			#print("Your supply: %s" % (self.supply[k]))
 
 	def turn(self, market):
-		self.crafted == False
+		self.crafted = False
 		self.POP_increased = 0
 		if self.stability < -3: 
 			self.stability = - 3
@@ -714,8 +711,8 @@ class Player(object):
 		for k, v in self.CB.items():
 			cb_keys.append(v.opponent)
 		for cb in cb_keys:
-			cb.time -= 1
-			if cb.time < 0:
+			self.CB[cb].time -= 1
+			if self.CB[cb].time < 0:
 				del self.CB[cb]
 		return [research_gain, culture_gain, col_gain, diplo_gain]
 	
@@ -900,8 +897,6 @@ class Player(object):
 		return forces
 
 
-
-
 	def check_for_sea_invasion(self):
 		res = False
 		for prov in self.provinces.values():
@@ -915,7 +910,6 @@ class Player(object):
 		count += self.military["infantry"] + self.military["cavalry"] + self.military["artillery"] + \
 		 self.military["irregulars"] + self.military["tank"] + self.military["fighter"]
 		return count
-
 
 
 	def amount_can_manif(self, _type):
@@ -1019,16 +1013,12 @@ class Player(object):
 
 
 	def manifacture_good(self, _type, amount):
-		print(_type)
-		print(amount)
-		print("manifacture_good...")
+		
 		self.AP -= 1
 		if self.factories[_type]["number"] == 0:
 			for i in craft[_type]:
 				self.resources[i] -= craft[_type][i]
-			print("Should produce %d %s" % (amount, _type))
 			self.goods_produced[_type] += amount
-			print(self.goods_produced[_type])
 			return
 
 		else:
@@ -1038,9 +1028,7 @@ class Player(object):
 					self.resources[i] -= manufacture[_type][i] * amount * material_mod
 				else:
 					self.goods[i] -= manufacture[_type][i] * amount * material_mod
-			print("Should produce %d %s" % (amount, _type))
 			self.goods_produced[_type] += amount
-			print(self.goods_produced[_type])
 			
 			self.factories[_type]["used"] = True
 			return
@@ -1197,7 +1185,7 @@ class Player(object):
 
 	def ammo_penalty(self, ammo_needed):
 		if ammo_needed > self.goods["cannons"]:
-			AmmoPenalty = self.goods["cannon"]/ammo_needed
+			AmmoPenalty = self.goods["cannons"]/ammo_needed
 			AmmoPenalty = AmmoPenalty + (1 - AmmoPenalty)/2
 			self.goods["cannons"] = 0
 		else:

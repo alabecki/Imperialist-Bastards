@@ -46,7 +46,7 @@ def initialize_major_power(player):
 	player.shipyard = 1
 
 
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies", "flintlock" }
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry", "professional_armies"}
 	#player.technologies.add("pre_industry_3")
 	#player.technologies.add("pre_industry_2")
 	#player.technologies.add("flintlock")
@@ -59,7 +59,7 @@ def initialize_major_power(player):
 	#player.midPOP["artists"]["number"] = 0.2
 
 	#player.numMidPOP = 0.8
-	player.development_level = 2
+	player.development_level = 1
 	player.developments["research"] = 1
 	player.numMidPOP = 0.5
 
@@ -90,7 +90,7 @@ def initialize_modern_minor(player):
 	player.goods["cannons"] = 1.0
 	
 
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1", "professional_armies"}
+	player.technologies = {"basic_civ", "pre_modern", "pre_industry", "professional_armies"}
 
 
 
@@ -119,7 +119,7 @@ def initialize_oldempire(player):
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+	player.technologies = {"basic_civ", "pre_modern"}
 
 
 	player.techModifier = 0.75
@@ -139,7 +139,7 @@ def initialize_old_minor(player):
 	player.POP = 3.6
 	player.numLowerPOP = 3.6
 	player.freePOP = 3
-	player.technologies = {"basic_civ", "pre_modern", "pre_industry_1"}
+	player.technologies = {"basic_civ", "pre_modern"}
 
 
 	player.resources["gold"] = 6.0

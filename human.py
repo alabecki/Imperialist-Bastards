@@ -175,6 +175,7 @@ class Human(Player):
 		#self.midPOP[m_selection]["number"] += 0.2
 		self.developments[_type] += 1
 		self.freePOP -= 0.5
+		self.new_development += 1
 		if _type == "management" or _type == "government": 
 			self.new_development += 1
 		if _type == "military":

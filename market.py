@@ -17,7 +17,10 @@ class Market(object):
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
 		self.landBattle = 0
-		self.seaBattle = 0 
+		self.seaBattle = 0
+
+		self.landBattleAgainstPlayer = 0
+		self.seaBattleAgainstPlayer = 0 
 
 		self.market_keys = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
@@ -181,7 +184,7 @@ class Market(object):
 		price = self.buy_price(_type, player.supply[_type])
 		player.resources["gold"] -= price
 		other.resources["gold"] += price
-		other.new_development +=  0.2
+		#other.new_development +=  0.1
 		#self.market[_type].remove(s)
 		player.supply[_type] -= 1
 		relations[frozenset({other.name, player.name})].relationship + 0.015
@@ -189,7 +192,7 @@ class Market(object):
 			player.resources[_type] += 1
 		else:
 			player.goods[_type] +=1
-			other.new_development +=  0.2
+			other.new_development +=  0.1
 
 		player.calculate_access_to_goods(self)
 

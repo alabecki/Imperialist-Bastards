@@ -188,6 +188,20 @@ def update_culture_tab():
 	else:
 		app.enableButton("Consume Spice")
 
+	mFood = (player.numLowerPOP * 0.2) + (player.numMidPOP * 0.3) + player.military["cavalry"] * 0.1
+	mCoal = 0.1 * player.number_developments
+	mOil = 0
+	if player.development_level > 14:
+		oil_need = (player.development_level - 15) * 0.2
+	app.setLabel("food/turn", "%.2f" % mFood)
+	app.setLabel("coal/turn", "%.2f" % mCoal)
+	app.setLabel("oil/turn", "%.2f" % mOil)
+
+	requirements = player.determine_middle_class_need()
+	message = " "
+	for r in requirements:
+		message = message + r + " "
+	app.setMessage("Development_Requirements", message)
 
 def update_diplomacy_tab():
 	global players, human_player, relations
@@ -235,6 +249,7 @@ def update_diplomacy_tab():
 			app.enableButton("war_on" + k)
 		else:
 			app.disableButton("war_on" + k)
+
 		count += 1
 
 
@@ -286,7 +301,8 @@ def nation_type_press(btn):
 def nation_press(btn):
 	player = app.getOptionBox("nation")
 	scen = app.getRadioButton("Scen")
-	global initial
+	global initial, human_player
+	human_player = player
 
 	print("Human Nation %s" % (player))
 	app.hideSubWindow("Choose_Nation")
@@ -380,27 +396,18 @@ def show_player_gains(gains):
 
 def start_main_screen():
 	global auto_save, players, human_player, market, relations
-	#load_basic_widgets()
-	nation = human_player
-	player = players[nation]
-	#app.hideSubWindow("auto_save_name")
+	player = players[human_player]
 	if auto_save != "":
 		app.hideSubWindow("saving")
 	app.showSubWindow("loading new game")
 	#app.playSound("Grand March from Aida.wav", wait=False)
-	
 	app.startTabbedFrame("GameGUI")
-	
 	app.startTab("MainTab")
 	app.setPadding(2)
 	#app.setExpand("none")
-
 	app.startPanedFrameVertical("info")
 	app.setBg("khaki")
-	#app.startFrame("info")
-	#app.setExpand("all")
-	#app.setFrameHeight("info", 20)
-	#app.setExpand("none")
+
 	app.setFont(10)
 	app.addImage("player_flag", player.name + ".gif", 1, 1)
 	app.addLabel("l0", player.name, 1, 2, 2)
@@ -410,7 +417,6 @@ def start_main_screen():
 	app.addLabel("t1", "Turn:" +  str(market.turn), 1, 5)
 	app.setLabelBg("t1", "peru")
 	app.getLabelWidget("t1").config(font="Times 13 bold underline")
-
 
 	app.addLabel("l1", "Gold:", 2, 1)
 	app.addImage("l1", "coins.gif", 2, 1)
@@ -498,16 +504,11 @@ def start_main_screen():
 		app.setLabelRelief(sz, "ridge")
 		app.setLabelAlign(sz, "left")
 
-	#app.addButton("Next Turn", next_turn, 2, 15)
 	app.addImageButton("New Turn", next_turn, "turn.gif", 2, 15)
 	app.setButtonTooltip("New Turn", "Next Turn")
 	#app.setButtonBg("Next Turn", "dark green")
 	app.setSticky("w")
-	#app.setPadding(2, 2)
-	#app.setInPadding(2,2)
 
-	#app.addButton("POP UP", increase_population, 3, 15)
-	#app.setButtonBg("POP UP", "orange")
 	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 3, 15)
 	app.setButtonTooltip("POP UP", "Increase Population")
 	if(player.POP_increased > 1):
@@ -519,7 +520,6 @@ def start_main_screen():
 	else:
 		app.enableButton("POP UP")
 
-	#app.addButton("Develop", dev_type, 4, 15)
 	app.addImageButton("Develop", dev_type, "develop.gif", 4, 15)
 	app.setButtonTooltip("Develop", "Increase Development Level")
 	#app.setPadding(2, 2)
@@ -546,7 +546,6 @@ def start_main_screen():
 			app.setButtonWidth(nm, 4)
 			app.setButtonBg(nm , "blue")
 			app.setButtonFg(nm, "blue")			
-		
 	for p in provinces.values():
 		temp = p.owner
 		owner = players[temp]
@@ -624,7 +623,6 @@ def start_main_screen():
 	app.setSticky("nw")
 
 	i = 1
-
 	app.addLabel("resources_", "Invent  |   Market   |   Price", 0, 1, 3, 1)
 	for k, v in player.resources.items():
 		if k in ["gold", "/", "//"]:
@@ -785,7 +783,6 @@ def start_main_screen():
 	else:
 		app.enableButton("upgrade_shipyard")
 
-
 	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1:
 		app.disableButton("upgrade_shipyard")
 	else:
@@ -862,13 +859,13 @@ def start_main_screen():
 	app.stopLabelFrame()
 	app.stopScrollPane()
 	#app.startPanedFrame("Tech Descriptions")
-	
+	app.setSticky("nw")
 	app.startLabelFrame("  ")
 	app.setSticky("nw")
 	app.addImage("tech_image", "default_tech_pic.gif", 1, 1)
 	app.setSticky("ne")
-	app.startLabelFrame("Technology Description")
-	app.addMessage("tech_description", "    Technology Descriptions go here    ", 1, 2)
+	app.startLabelFrame(" Technology Description  ")
+	app.addMessage("tech_description", "    Technology Descriptions go here    ", 1, 3)
 	app.setMessageBg("tech_description", "DarkSeaGreen1")
 	app.stopLabelFrame()
 	app.stopLabelFrame()
@@ -896,17 +893,41 @@ def start_main_screen():
 	app.addImage("managers", "manager.gif", 0, 4)
 	app.setImageTooltip("managers", "Managers")
 	app.addLabel("num_managers", "%.2f" % player.developments["management"], 1, 4)
+
+
+	mFood = (player.numLowerPOP * 0.2) + (player.numMidPOP * 0.3) + player.military["cavalry"] * 0.1
+	mCoal = 0.1 * player.number_developments
+	mOil = 0
+	if player.development_level > 14:
+		oil_need = (player.development_level - 15) * 0.2
+	app.startLabelFrame("Consumption Per Turn")
+	app.addImage("food_p_turn", "food.gif", 1, 0)
+	app.shrinkImage("food_p_turn", 2)
+	app.addLabel("food/turn", "%.2f" % mFood, 1, 1)
+
+	app.addImage("coal_p_turn", "coal.gif", 2, 0)
+	app.shrinkImage("coal_p_turn", 2)
+	app.addLabel("coal/turn", "%.2f" % mCoal, 2, 1)
+
+	app.addImage("oil_p_turn", "oil.gif", 3, 0)
+	app.shrinkImage("oil_p_turn", 2)
+	app.addLabel("oil/turn", "%.2f" % mOil, 3, 1)
+
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Cost For Next Development Level")
 	requirements = player.determine_middle_class_need()
+	app.addMessage("Development_Requirements", " ")
+	#count = 1
+	message = " "
 	for r in requirements:
-		count = 1
-		ID = uniform(2, 3)*count
-		img = r + ".gif"
-		app.addImage(ID, img, 1, count)
-		app.shrinkImage(ID, 2)
-		count += 1
+		message = message + r + " "
+		#ID = uniform(2, 4)*count
+		#img = r + ".gif"
+		#app.addImage(ID, img, 1, count)
+		#app.shrinkImage(ID, 2)
+		#count += 1
+	app.setMessage("Development_Requirements", message)
 	app.stopLabelFrame()
 	
 	app.startLabelFrame("Culture Commands")
@@ -941,7 +962,7 @@ def start_main_screen():
 
 	#######################################################################################################
 	app.startTab("Military")
-	app.setBg("OrangeRed2")
+	app.setBg("indian red")
 	app.setStretch("all")
 	app.startScrollPane("military")
 
@@ -954,22 +975,12 @@ def start_main_screen():
 	app.addLabel("total_naval_str", "Naval Strength: %.2f" % (naval), 1, 3)
 	app.stopLabelFrame()
 
+	app.setSticky("ne")
 	app.startLabelFrame("Casus Belli")
 	app.addLabelOptionBox("CB List:", [" "])
 	app.stopLabelFrame()
 
-	app.startLabelFrame("Claims")
-	count = 1
-	for obj in player.objectives:
-		if obj not in player.provinces.keys():
-			ID = uniform(1,2) * count
-			obj = provinces[obj]	
-			app.addLabel(ID, "%s: %s %.2f" % (obj.name, obj.resource, obj.quality), count, 1)		
-			app.addImage(ID, obj.owner + ".gif", count, 2)
-			app.setImageTooltip(ID, obj.owner)
-			count += 1
-	app.stopLabelFrame()
-
+	app.setSticky("nw")
 	app.startLabelFrame("Army")
 	row = 1
 	app.addLabel("army_breakdown", " Type          Number     Att.       Def.   Man.    AmmoUse   OilUse", 0, 0, 9, 1)
@@ -1073,6 +1084,20 @@ def start_main_screen():
 			row += 1
 	app.stopLabelFrame()
 
+	app.setSticky("ne")
+	app.startLabelFrame("Claims")
+	count = 1
+	for obj in player.objectives:
+		if obj not in player.provinces.keys():
+			ID = uniform(1,2) * count
+			obj = provinces[obj]	
+			app.addLabel(ID, "%s: %s %.2f" % (obj.name, obj.resource, obj.quality), count, 1)		
+			app.addImage(ID, obj.owner + ".gif", count, 2)
+			app.setImageTooltip(ID, obj.owner)
+			count += 1
+	app.stopLabelFrame()
+
+	app.setSticky("nw")
 	app.startLabelFrame("Navy")
 	row = 1
 	app.addLabel("navy_breakdown", "  Type        Number     Att.      HP     AmmoUse     OilUse", 0, 0, 8)
@@ -1133,12 +1158,14 @@ def start_main_screen():
 			app.enableButton("disband_" + k)
 		row += 1
 	app.stopLabelFrame()
+
+
 	app.stopScrollPane()
 	app.stopTab()
 	############################################################################################
+	app.setSticky("nw")
 	app.startTab("Diplomacy")
 	app.setBg("RoyalBlue1")
-
 	
 	app.startScrollPane("diplomacy")
 	app.startLabelFrame("Nations")
@@ -1202,7 +1229,12 @@ def start_main_screen():
 			app.disableButton("embargo" + k)
 		else:
 			app.enableButton("embargo" + k)
+		if k not in player.CB.keys():
+			app.disableButton("war_on" + k)
+		else:
+			app.enableButton("war_on" + k)
 		count += 1
+
 
 	app.stopLabelFrame()
 	app.stopScrollPane()
@@ -1315,14 +1347,9 @@ def gain_casus_belli(btn):
 		app.setLabel("l24", "%.2f" % round(player.reputation, 2))
 
 
-
-
 def cb_2(btn):
-	print("1276")
 	prov = app.getOptionBox("prov_to_annex")
-	print("1278")
 	app.hideSubWindow("Province to Annex")
-	print("1280")
 	app.hideSubWindow("Message_")
 	global players, human_player, provinces
 	player = players[human_player]
@@ -1486,6 +1513,7 @@ def add_player_prov_gui(prov):
 	app.stopLabelFrame()
 	app.stopSubWindow()
 
+
 def wage_war(btn):
 	global players, human_player, provinces, market, relations
 	app.hideSubWindow("Message_")
@@ -1621,8 +1649,8 @@ def attack1b(btn):
 			app.showSubWindow("Message_")
 			ID = "%d %s %s - sea" % (market.turn, player.name, defender.name)
 			seaBattle = SeaBattle(ID, player.name, defender.name, "")
-			seaBattle.naval_battle(players, market, relations, provinces)
 			market.seaBattle = seaBattle 
+			seaBattle.naval_battle(players, market, relations, provinces)
 			victor = seaBattle.winner
 			app.updateSeaBattleWindow(seaBattle)
 			app.hideSubWindow("Select Land Forces")
@@ -1718,7 +1746,6 @@ def updateLandBattleWindow(battle):
 	app.setLabel("att_engagement_losses", "%.2f" % battle.att_eng_losses)
 	app.setLabel("def_engagement_losses", "%.2f" % battle.def_eng_losses)
 	app.setImage("battle_winner", battle.winner + ".gif")
-
 
 
 def update_production_gui():
@@ -2007,6 +2034,71 @@ def AI_turnS(auto_save):
 	app.setLabel("t1", "Turn:" +  str(market.turn))
 	update_gui()
 	update_diplomacy_tab()
+	if market.landBattleAgainstPlayer != 0 or market.seaBattleAgainstPlayer != 0:
+		if market.landBattleAgainstPlayer != 0 and market.seaBattleAgainstPlayer != 0:
+			app.showSubwindow("Naval Intercept")
+		elif market.landBattleAgainstPlayer != 0:
+			land_defense()
+
+
+
+def inform_player_amphib_assult():
+	global players, market, relations, provinces
+	player = players[human_player]
+	landBattle = market.landBattleAgainstPlayer
+	seaBattle = market.seaBattleAgainstPlayer
+	other = players[seaBattle.attacker]
+	player_naval_strength = player.calculate_naval_strength()
+	other_naval_strength = other.calculate_naval_strength()
+	incercpet_message  = "That dastardly %s is sending an armada filled with soldiers to your homeland! \
+	His naval strength is %.2f, while yours is %.2f. Do you wish to intercept?" % (other.name, other_naval_strength, player_naval_strength)
+	app.setMessage("decide_intercept", incercpet_message)
+	app.showSubwindow("Naval Intercept")
+
+def intercept(btn):
+	global players, market, relations, provinces
+	app.hideSubWindow("Naval Intercept")
+	seaBattle = market.seaBattleAgainstPlayer
+	seaBattle.naval_battle(players, market, relations, "")
+	app.updateSeaBattleWindow(seaBattle)
+	app.showSubWindow("Sea Battle")
+	if seaBattle.winner == seaBattle.defender:
+		return
+	else:
+		land_defense()
+
+def do_nothing(btn):
+	land_defense()
+
+def land_defense():
+	global players, market, relations, provinces
+	player = players[landBattle.defender]
+	other = players[landBattle.attacker]
+	landBattle = market.landBattleAgainstPlayer
+	landBattle.landCombat(players, market, relations, provinces)
+	p = provinces.landBattle.prov
+	if p in player.provinces.keys():
+		if landBattle.winner != player.name:
+			app.removeSubWindow("human" + p.position)
+			app.setButtonBg(p.position, other.colour)
+			app.setButtonFg(p.position, other.colour)
+	updateLandBattleWindow(landBattle)
+	app.showSubWindow("Land Battle")
+
+def sea_defense():
+	global players, market, relations, provinces
+	player = players[seaBattle.defender]
+	other = players[seaBattle.attacker]
+	seaBattle = market.seaBattleAgainstPlayer
+	seaBattle.naval_battle(players, market, relations, provinces)
+	p = provinces.seaBattle.prov
+	if p in player.provinces.keys():
+		if seaBattle.winner != player.name:
+			app.removeSubWindow("human" + p.position)
+			app.setButtonBg(p.position, other.colour)
+			app.setButtonFg(p.position, other.colour)
+	updateLandBattleWindow(seaBattle)
+	app.showSubWindow("Sea Battle")
 
 
 def increase_stability(btn):
@@ -2815,7 +2907,11 @@ def load_basic_widgets():
 	app.addImage("sea_battle_winner", "crown.gif", 9, 3)
 	app.stopSubWindow()
 
-
+	app.startSubWindow("Naval Intercept")
+	app.addMessage("decide_intercept", " ", 1, 1)
+	app.addNamedButton(" Yes ", "yes_intercept",  intercept, 2, 1)
+	app.addNamedButton(" No  ", "no_intercpt ",  do_nothing, 2, 2)
+	app.stopSubWindow()
 
 	#app.startSubWindow("chem_growth", modal = True)
 	#app.yesNoBox("chem_for_growth", "Increasing Your Pop again this turn will require 1 chemical", parent= None)

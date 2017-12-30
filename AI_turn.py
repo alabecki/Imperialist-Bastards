@@ -15,10 +15,12 @@ def AI_turn(players, player, market, relations, provinces):
 
 	if type(player) == Human:
 		return
-	#print("___________________________________________________________________")
-	#print("It is now %s's turn \n" % (player.name))
-
-	#print("___________________________________________________________________")
+	#if player.name == "England":
+	#	player.general_priority = ""
+	print("___________________________________________________________________")
+	print("It is now %s's turn \n" % (player.name))
+	print("General priority: %s" % player.general_priority)
+	print("___________________________________________________________________")
 
 	for k in player.goods_produced.keys():
 			player.goods_produced[k] = 0

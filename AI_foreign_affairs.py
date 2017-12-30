@@ -3,7 +3,6 @@
 from AI import*
 from combat import*
 from combat2 import*
-
 from player_class import*
 from globe import*
 
@@ -305,7 +304,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 				o_def_str = other.calculate_base_defense_strength()
 				if p_navy_str > o_navy_str * 1.25 and self_naval_projection_strength > o_def_str * 1.25:
 					relata = frozenset({player.name, other.name})
-					#print("Does this happen (243?")
+					#("Does this happen (243?")
 					if relations[relata].relationship < 1.75:
 						other_strength = other.calculate_base_defense_strength()
 						pro_choices = list(other.provinces.values())
@@ -433,7 +432,7 @@ def gain_cb(player, players, relations):
 	#	print("Relations too good to gain CB")
 		return
 	annex_key = []
-	for k, v in player.CB:
+	for k, v in player.CB.items():
 		if prov.name == v.province:
 			return
 
@@ -485,40 +484,68 @@ def ai_select_ground_forces(player, target):
 			tries += 1
 	return forces
 
+def naval_transport(player, target):
+	forces = {
+		"infantry": 0,
+		"cavalry": 0,
+		"artillery": 0,
+		"tank": 0,
+		"fighter": 0
+	}
+	if player.military["infantry"] < 1:
+		return forces
+	forces["infantry"] += 1
+	transport_limit = player.calculate_transport_limit()
+	target_strength = target.calculate_base_defense_strength()
+	#print("Target strength: %s" % (target_strength))
+	self_strength = 0
+	number_units = player.num_army_units()
+	tries = 0
+	number = 0
+	while (self_strength < (target_strength * 1.8) and number_units > 0.99 and tries < 128 and number <= transport_limit):
+		pick = choice(["infantry", "artillery", "cavalry", "fighter", "tank"])
+		if (player.military[pick] - forces[pick]) >= 1:
+		#	print("Adds %s " % (pick))
+			forces[pick] += 1
+			if pick == "infantry":
+				self_strength += player.infantry["attack"]
+			elif pick == "cavalry":
+				self_strength += player.cavalry["attack"]
+			elif pick == "artillery":
+				self_strength += player.artillery["attack"]
+			elif pick == "tank":
+				self_strength += player.tank["attack"]
+			elif pick == "fighter":
+				self_strength += player.fighter["attack"]
+			tries += 1
+			number_units -= 1
+			#print("Tries: %s" % (tries))
+			number += 1
+		else:
+			tries += 1
 
+	return forces
 
 
 def attack_target(player, players, relations, provinces, market):
 	#print("AAAAAAAAAAAAAAAAAAAATACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
-	transport_limit = ((player.military["frigates"] + player.military["iron_clad"]) * 2 + player.military["battle_ship"] * 3) 
+	transport_limit = player.calculate_transport_limit()
 	ammo_needed	= player.calculate_land_ammo_needed()
 	if player.goods["cannons"] < (ammo_needed * 2):
 		player.ai_buy("oil", 6, market, relations, players)
-
 	if player.goods["cannons"] < (ammo_needed * 2):
-	#	print("Not enough ammo")
 		return
-
 	oil_needed = player.calculate_oil_needed()
-
 	if player.resources["oil"] < (oil_needed * 2):
-	#	print("Not enough oil")
 		player.ai_buy("oil", 6, market, relations, players)
-
 	if player.resources["oil"] < (oil_needed * 2):
-	#	print("Not enough oil")
 		return
-
-
 	if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
 		try_total_war(player, players, market, relations, provinces)
 		return
-	if player.colonization < player.num_colonies * 1.5:
-		return
-
+	#if player.colonization < player.num_colonies * 1.5:
+	#	return
 	if len(player.CB.keys()) <= 0:
-	#	print("Check 457")
 		return
 	check = False
 	cb = " "
@@ -527,17 +554,14 @@ def attack_target(player, players, relations, provinces, market):
 		cb = sample(list(player.CB.values()), 1)
 		cb = cb[0]	
 		prov = provinces[cb.province]
-
 		if cb.opponent != prov.owner:
-			#print("Check 468")
-			del player.CB[cd.opponent]
+			del player.CB[cb.opponent]
 			player.rival_target = []
 			if len(player.CB.keys()) <= 0:
 				return
 			else:
 				continue
 		if cb.opponent not in players.keys():
-			#print("Check 478")
 			del player.CB[cb.opponent]
 			player.rival_target = []
 			if len(player.CB.keys()) <= 0:
@@ -559,18 +583,17 @@ def attack_target(player, players, relations, provinces, market):
 
 	target = cb.opponent
 	target = players[target]
+	annex = cb.province
+
 
 	if target.just_attacked > 0 or (cb.action == "annex" and player.reputation <= 0.2):
 		return
-
 	if (target.type == "old_empire" or target.type == "old_minor" or  prov.colony == True)  \
 	and player.check_for_ground_invasion(cb.province, provinces) == False \
 	and player.colonization < (1 + player.num_colonies *1.5):
 		return
-
-	if (target.type == "major" or target.type == "minor") and cb.action == "annex" and player.reputation < 0.5:
+	if (target.type == "major" or target.type == "minor") and cb.action == "annex" and player.reputation < 0.4:
 		return
- 
 	self_strength = player.calculate_base_attack_strength()
 	other_strength = target.calculate_base_defense_strength()
 	self_naval_projection_strength = player.ai_naval_projection(target)
@@ -581,87 +604,104 @@ def attack_target(player, players, relations, provinces, market):
 			if player.colonization < 1.5 * player.num_colonies * 1.5:
 				return
 			if self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 4:
-				amphib_prelude(player, target, prov, players, market, relations)
-				#war_after_math(player,  target, players, relations)
+				amphib_assult(player.name, target.name, annex, players, market, relations, provinces)
+				return
 			else:
 				player.rival_target = []
 		else:
 			#print("Border")
 			if self_strength > other_strength * 1.2:
-				forces = ai_select_ground_forces(player, target)
-				if forces["infantry"] == 0:
-					return
-				#amph_combat(player, target, forces, prov, players, market, relations)
-				landBattle = LandBattle(ID, player.name, owner.name, annex.name)
-				landBattle.attacker_forces = forces
-				market.landBattle = landBattle
-				landBattle.landCombat(self, players, market, relations, provinces):
-
-				#combat(player, target, prov, players, market, relations)
-				#war_after_math(player, target, players, relations)
+				ground_assult(player.name, target.name, annex, players, market, relations, provinces)
+				return
 			else:
 				player.rival_target = []
 
 	else:
-		player_naval_strength = calculate_naval_strength(player)
-		target_naval_strength = calculate_naval_strength(target)
+		player_naval_strength = player.calculate_naval_strength()
+		target_naval_strength = target.calculate_naval_strength()
 		cores = target.core_provinces()
 		#print("%s Cores:" % (target.name))
 		#for c in cores:
 		#	print(c.name)
 		if prov not in cores and target.name in player.borders:
 			if player_naval_strength > target_naval_strength * 1.25 and transport_limit >= 4:
-				victor = naval_battle(player, target, market, relations, prov)
-				if victor == player.name:
-					gain_province(player, target, prov, players, market, relations)
-				#	war_after_math(player,  target, players, relations)
-					return
-			if self_strength > other_strength * 1.22:
-				forces = ai_select_ground_forces(player, target)
-				amph_combat(player, target, forces, prov, players, market, relations)
-
-#				combat(player, target, prov, players, market, relations)
-					#	war_after_math(player,  target, players, relations)
+				naval_assult(player.name, target.name, annex, players, market, relations, provinces)
+				return
+			elif self_strength > other_strength * 1.2:
+				ground_assult(player.name, target.name, annex, players, market, relations, provinces)
 				return
 			else:
+				player.rival_target = []
 				return
 		elif prov not in cores and prov.ocean == True:
 		#	print("If NOT in cores!!!")
 			if player_naval_strength > target_naval_strength * 1.25 and transport_limit >= 4:
-				victor = naval_battle(player, target, market, relations, prov)
-				if victor == player.name:
-					gain_province(player, target, prov, players, market, relations)
-				else:
-					player.war_after_math(target, players, relations, prov)
+				naval_assult(player.name, target.name, annex, players, market, relations, provinces)
 
 
 		elif target.name in player.borders and self_strength > other_strength * 1.2:
-			forces = ai_select_ground_forces(player, target)
-			amph_combat(player, target, forces, prov, players, market, relations)
-
-			#combat(player, target, prov, players, market, relations)
-			#war_after_math(player, target, players, relations)
+			ground_assult(player.name, target.name, annex, players, market, relations, provinces)
 		else:
-			if calculate_naval_strength(player) > (calculate_naval_strength(target) * 1.2) and self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 4:
-				amphib_prelude(player, target, prov, players, market, relations)
-				#war_after_math(player, target, players, relations)
+			if player.calculate_naval_strength() > (target.calculate_naval_strength() * 1.2) and self_naval_projection_strength > other_strength * 1.2 and transport_limit >= 4:
+				amphib_assult(player.name, target.name, annex, players, market, relations, provinces)
 
-	#for r in relations:
-	#	re = list(r)
-	#	if target.name in re and relations[r].relationship >= 1:
-	#		if re[0] == target.name:
-	#			o = re[1]
-	#		else:
-	#			o = re[0]
-	#		hurt = frozenset([player.name, o])
-	#		relations[hurn].relationship -= 0.2
-	#	if target.name in re and relations[r].relationship >= 2:
-	#		if re[0] == target.name:
-	#			o = re[1]
-	#		else:
-	#			o = re[0]
-	#		hurt = frozenset(player.name, o)
-	#		relations[hurn].relationship -= 0.2
+
+
+def amphib_assult(player, target, annex, players, market, relations, provinces):
+	player = players[player]
+	target = players[target]
+	annex = provinces[annex]
+	forces = naval_transport(player, target)
+	if forces["infantry"] == 0:
+		return
+	ID = "%d %s %s" % (market.turn, player.name, target.name)
+	landBattle = LandBattle(ID, player.name, target.name, annex.name)
+	landBattle.attacker_forces = forces
+
+	ID = "%d %s %s" % (market.turn, player.name, target.name)
+	seaBattle = SeaBattle(ID, player.name, target.name, annex.name)
+	seaBattle.attacker_forces = forces
+
+	if type(target) == Human:
+		if market.landBattleAgainstPlayer == 0 and market.seaBattleAgainstPlayer == 0:
+			market.landBattleAgainstPlayer = landBattle
+			market.seaBattleAgainstPlayer = seaBattle
+		else:
+			return
+	else:
+		market.landBattle = landBattle
+		landBattle.landCombat(players, market, relations, provinces)
+
+def ground_assult(player, target, annex, players, market, relations, provinces):
+	player = players[player]
+	target = players[target]
+	annex = provinces[annex]
+	forces = ai_select_ground_forces(player, target)
+	if forces["infantry"] == 0:
+		return
+	ID = "%d %s %s" % (market.turn, player.name, target.name)
+	landBattle = LandBattle(ID, player.name, target.name, annex.name)
+	landBattle.attacker_forces = forces
+	if type(target) == Human:
+		if market.landBattleAgainstPlayer == 0 and market.seaBattleAgainstPlayer == 0:
+			market.landBattleAgainstPlayer = landBattle
+	else:
+		market.landBattle = landBattle
+		landBattle.landCombat(players, market, relations, provinces)
+		#war_after_math(player, target, players, relations)
+
+
+def naval_assult(player, target, annex, players, market, relations, provinces):
+	player = players[player]
+	target = players[target]
+	annex = provinces[annex]
+	ID = "%d %s %s" % (market.turn, player.name, target.name)
+	seaBattle = SeaBattle(ID, player.name, target.name, annex.name)
+	if type(target) == Human:
+		market.seaBattleAgainstPlayer = seaBattle
+	else:
+		market.seaBattle = seaBattle
+		seaBattle.naval_battle(players, market, relations, provinces)
 
 
 
