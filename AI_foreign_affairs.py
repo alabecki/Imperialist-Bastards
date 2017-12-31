@@ -371,7 +371,7 @@ def	decide_rival_target(player, players, market, provinces, relations):
 	return
 					#p_options.add(pr)
 
-def worsen_relations(player, players, relations, provinces):
+def worsen_relations(player, players, relations, provinces, market):
 	if player.diplo_action < 1:
 		return
 	target = ""
@@ -399,6 +399,7 @@ def worsen_relations(player, players, relations, provinces):
 		player.diplo_action -=1
 		amount = min(1, 10/(target.POP + 0.001))
 		relations[relata].relationship -= amount
+		market.report.append(" %s worsens relations with %s by %s" % (player.name, target.name, amount))
 		#print("Worsens relations with %s by %s" % (target.name, amount))
 		#print("Relations with %s are now: %s" % (target.name, relations[relata].relationship))
 
@@ -421,7 +422,7 @@ def damage_relations(player, players, relations):
 
 
 def gain_cb(player, players, relations):
-	if player.diplo_action < 1.5:
+	if player.diplo_action < 1:
 		return
 	if player.rival_target == []:
 		return
@@ -435,14 +436,11 @@ def gain_cb(player, players, relations):
 	for k, v in player.CB.items():
 		if prov.name == v.province:
 			return
-
-		####
 	
-	else:
-		player.diplo_action -= 1
-		new = CB(player.name, target.name, "annex", prov.name, 5)
-		player.CB[target.name] = new
-	#	print("Gain a CB against %s !!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
+	player.diplo_action -= 1
+	new = CB(player.name, target.name, "annex", prov.name, 5)
+	player.CB[target.name] = new
+	print("Gain a CB against %s !!!!!!!!!!!!!!!!!!!!!!!" % (target.name))
 
 
 def ai_select_ground_forces(player, target):

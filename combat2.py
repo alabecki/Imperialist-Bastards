@@ -9,43 +9,49 @@ from random import*
 from pprint import pprint
 from copy import deepcopy
 
-def delete_nation(player, players, market, relations):
-	print("%s no longer exists as a nation!" % (player.name))
-	market.report.append("%s no longer exists as a nation!" % (player.name))
-	for k, v in player.resources.items():
-		player.resources[k] += v
-	for k, v in player.goods.items():
-		player.goods[k] += v
+def delete_nation(attacker, defender, players, market, relations):
+	attacker = players[attacker]
+	defender = players[defender]
+	print("%s no longer exists as a nation!" % (defender.name))
+	market.report.append("%s no longer exists as a nation!" % (defender.name))
+	for k, v in defender.resources.items():
+		attacker.resources[k] += v
+	for k, v in defender.goods.items():
+		attacker.goods[k] += v
 	for k, v in market.market.items():
 		for i in v:
-			if i.owner == player.name:
+			if i.owner == defender.name:
 				if k in attacker.resources.keys():
 					attacker.resources[k] += 1
 				if k in attacker.goods.keys():
-					p1.goods[k] +=1
+					attacker.goods[k] +=1
 				market.market[k].remove(i)
 			#	print("removed %s %s"% (i.owner, i.kind))
 				del i
+	attacker.POP += 1
+	attacker.numLowerPOP += 1
+	attacker.freePOP += 1
 	relkeys = list(relations.keys())
 	for r in relkeys:
-		if player.name in relations[r].relata:
+		if defender.name in relations[r].relata:
 			del relations[r]
 	for pl in players.values():
 		if type(pl) == AI:
-			if player.name in pl.sphere_targets:
-				pl.sphere_targets.remove(player.name)
-			if player.name in pl.allied_target:
-				pl.allied_targets.remove(player.name)
+			if defender.name in pl.sphere_targets:
+				pl.sphere_targets.remove(defender.name)
+			if defender.name in pl.allied_target:
+				pl.allied_targets.remove(defender.name)
 			if pl.rival_target != []:
-				if player.name == pl.rival_target[0].name:
+				if defender.name == pl.rival_target[0].name:
 					pl.rival_target = []
-		if player.name in pl.objectives:
-				pl.objectives.remove(player.name)
-		if player.name in pl.embargo:
-			pl.embargo.remove(player.name)
-	del players[player.name]
+		if defender.name in pl.objectives:
+				pl.objectives.remove(defender.name)
+		if defender.name in pl.embargo:
+			pl.embargo.remove(defender.name)
+	del players[defender.name]
+	#Remember to do something delete player in UI
 
-def war_after_math(player, target, players, relations, prov, provinces):
+def war_after_math(player, target, players, relations, prov, provinces, market):
 	print("War Aftermath")
 	prov = provinces[prov]
 	player = players[player]
@@ -95,7 +101,7 @@ def war_after_math(player, target, players, relations, prov, provinces):
 			relations[frozenset([player.name, p])].relationship -= 0.2
 
 	if len(target.provinces.keys()) == 0:
-		delete_nation(target.name, players, market, relations)
+		delete_nation(player.name, target.name, players, market, relations)
 	else:
 		p2_borders = set()
 		for k, v in players.items():
@@ -141,11 +147,12 @@ class Battle(object):
 		attacker.rival_target = []
 		relations[relata].relationship += 1
 		cb_keys = []
-		for cb in attacker.CB.values():
+		for cb in attacker.CB.keys():
 			cb_keys.append(cb)
 		for cb in cb_keys:
-			if cb.province == prov.name:
-				del attacker.CB[cb.opponent]
+			if attacker.CB[cb].province == prov.name:
+					if cb in attacker.CB.keys():
+						del attacker.CB[cb]
 		if self.winner == attacker.name:
 			market.report.append("%s has successfully invaded %s ! \n" % (attacker.name, defender.name))
 			print("%s has successfully invaded %s ! \n" % (attacker.name, defender.name))
@@ -161,10 +168,12 @@ class Battle(object):
 					selection.development_level -= 1
 			if prov.name in defender.provinces.keys():
 				self.gain_province(players, market, relations, provinces)
-			loot = attacker.resources["gold"]/3.33
-			attacker.resources["gold"] += loot
-			defender.resources["gold"] -= loot
-			market.report.append("%s loots %s gold from %s \n" % (attacker.name, loot, defender.name))
+			else:
+				loot = attacker.resources["gold"]/3
+				attacker.resources["gold"] += loot
+				defender.resources["gold"] -= loot
+				market.report.append("%s loots %.2f gold from %s \n" % (attacker.name, loot, defender.name))
+			war_after_math(attacker.name, defender.name, players, relations, prov.name, provinces, market)
 			if defender.type == "major" and attacker.military["tank"] > 0 and prov.culture == defender.culture:
 				defender.defeated == True
 				market.report.append("%s has been defeated by %s! " % (defender.name, attacker.name))
@@ -181,7 +190,7 @@ class Battle(object):
 		prov = provinces[self.prov]
 		attacker = players[self.attacker]
 		defender = players[self.defender]
-		war_after_math(attacker.name, defender.name, players, relations, prov.name, provinces)
+		war_after_math(attacker.name, defender.name, players, relations, prov.name, provinces, market)
 		market.report.append("%s has defeated %s for the province of %s \n" % (attacker.name, defender.name, prov.name))
 		print("%s has defeated %s for the province of %s \n" % (attacker.name, defender.name, prov.name))
 		if prov.culture == defender.culture or prov.type == "civilized":
@@ -263,7 +272,7 @@ class LandBattle(Battle):
 		self.winner = ""
 
 
-	def dogFight(self, players):
+	def dogFight(self, players, market):
 		AirAttRoll = uniform(1.0, 1.2)
 		AirDefRoll = uniform(1.0, 1.2)
 		attacker = players[self.attacker]
@@ -283,6 +292,8 @@ class LandBattle(Battle):
 
 		self.att_fighters_lost = total_losses * DefAirStrN
 		self.def_fighters_lost = total_losses * AttAirStrN
+		market.report.append("Def Fighter Losees %s" % (self.att_fighters_lost))
+		market.report.append("Att Fighter Losses %s" % (self.att_fighter_losses))
 
 		self.attacker_forces["fighter"] -= min(self.att_fighters_losts, self.attacker_forces["fighter"])
 		attacker.military["fighter"] -= min(self.att_fighters_lost, attacker.military["fighter"])
@@ -298,7 +309,7 @@ class LandBattle(Battle):
 		return artFactor/total
 
 
-	def artillery_phase(self, players):
+	def artillery_phase(self, players, market):
 		AttRoll = uniform(1, 1.2)
 		DefRoll = uniform(1, 1.2)
 		AttMod = 1.0
@@ -315,10 +326,14 @@ class LandBattle(Battle):
 		AttArtStrN = AttArtStr / (AttArtStr + DefArtStr)
 		DefArtStrN = DefArtStr / (AttArtStr + DefArtStr)
 
-		losses = self.artilleryPhaseLosses(players)
-		self.att_art_losses = losses * DefArtStrN
-		self.def_art_losses = losses * AttArtStrN
-		print("Def_art_losses: %s", self.def_art_losses)
+		#losses = self.artilleryPhaseLosses(players)
+		total = attacker.calculate_amphib_strength(self.attacker_forces) + defender.calculate_base_defense_strength()
+		artFactor = (self.attacker_forces["artillery"] * attacker.artillery["attack"])/total
+		num_units = self.calculate_amphib_num_units(players) + defender.calculate_number_of_units()
+		self.att_art_losses = artFactor * DefArtStrN * num_units * 0.5
+		self.def_art_losses = artFactor * AttArtStrN * num_units * 0.5
+		market.report.append("Def Art Losees %s" % (self.def_art_losses))
+		market.report.append("Att Art Losses %s" % (self.att_art_losses))
 
 		self.distribute_losses_amph(players, self.att_art_losses)
 		self.distribute_losses(players, self.def_art_losses)
@@ -477,7 +492,7 @@ class LandBattle(Battle):
 		self.def_manouver = DefManouver/(AttManouver + DefManouver)
 
 
-	def direct_engagement(self, players):
+	def direct_engagement(self, players, market):
 		attacker = players[self.attacker]
 		defender = players[self.defender]
 		AttRoll = uniform(1, 1.2)
@@ -498,13 +513,15 @@ class LandBattle(Battle):
 		AttStrN = AttStr/(AttStr + DefStr)
 		DefStrN = DefStr/(AttStr + DefStr)
 
+		artFactor = (self.attacker_forces["artillery"] * attacker.artillery["attack"]) + (defender.military["artillery"] * defender.artillery["defend"])
 		total = attacker.calculate_amphib_strength(self.attacker_forces) + defender.calculate_base_defense_strength()
-		losses = total/3
+		losses = (total - artFactor)/total 
+		num_units = self.calculate_amphib_num_units(players) + defender.calculate_number_of_units()
 
-		self.att_eng_losses = losses * DefStrN
-		self.def_eng_losses = losses * AttStrN
-		print("Att engagement losses: %.2f" % self.att_eng_losses)
-		print("Def engagement losses: %.2f" % self.def_eng_losses)
+		self.att_eng_losses = losses * DefStrN * num_units * 0.25
+		self.def_eng_losses = losses * AttStrN * num_units * 0.25
+		market.report.append("Def engagement losses: %.2f" % self.def_eng_losses)
+		market.report.append("Att engagement losses: %.2f" % self.att_eng_losses)
 
 		self.distribute_losses_amph(players, self.att_eng_losses)
 		self.distribute_losses(players, self.def_eng_losses)
@@ -541,17 +558,17 @@ class LandBattle(Battle):
 		self.defender_oil_penalty = defender.oil_penalty(self.defender_oil_needed)
 
 		if self.attacker_forces["fighter"] > 0.2 and defender.military["fighter"] > 0.2:
-			self.dogFight(players)
+			self.dogFight(players, market)
 		AttRecon = attacker.recon()
 		DefRecon = defender.recon()
 		self.att_recon = AttRecon/(AttRecon + DefRecon)
 		self.def_recon = DefRecon/(AttRecon + DefRecon) 
 		#Phase Two: Artillery Barrage 
-		self.artillery_phase(players)
+		self.artillery_phase(players, market)
 		#Phase Three: Manouver 
 		self.determine_manouver(players)
 		# Phase Three: Engagement
-		self.direct_engagement(players)
+		self.direct_engagement(players, market)
 		if self.calculate_attacker_strength(players) > defender.calculate_base_defense_strength():
 			self.winner = self.attacker
 		else:
@@ -648,7 +665,7 @@ class SeaBattle(Battle):
 				if p2.stability > 3.0:
 					p2.stability = 3.0
 				self.gain_province(players, market, relations, provinces)
-				war_after_math(p1.name, p2.name, players, relations, prov, provinces)
+				war_after_math(p1.name, p2.name, players, relations, prov, provinces, market)
 			return 
 		else:
 			p1.stability -= 0.5
@@ -658,7 +675,7 @@ class SeaBattle(Battle):
 			if p2.stability > 3.0:
 				p2.stability = 3.0
 			market.report.append("%s has defeated %s at sea! \n"% (p2.name, p1.name))
-			war_after_math(p1.name, p2.name, players, relations, prov, provinces)
+			war_after_math(p1.name, p2.name, players, relations, prov, provinces, market)
 			return 
 
 	

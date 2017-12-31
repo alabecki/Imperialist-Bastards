@@ -357,9 +357,9 @@ def create_auto_save(btn):
 	app.hideSubWindow("auto_save_name")
 	global auto_save, players, relations, market, provinces
 	auto_save = app.getEntry("auto_save")
-	if auto_save != "":
-		auto_save = app.getEntry("auto_save")
-		auto_save = create_new_save_game(auto_save, players, relations, market, provinces)
+	#if auto_save != "":
+	#	auto_save = app.getEntry("auto_save")
+	#	auto_save = create_new_save_game(auto_save, players, relations, market, provinces)
 	start_main_screen()
 	#start_game_tread()
 
@@ -1463,9 +1463,9 @@ def update_Nation_Info(other):
 	app.setLabel("NationMiddleCLass", "Scientists: %.2f,  Officers: %.2f,  Bureaucrats: %.2f,  Artists: %.2f,  Managers: %.2f " % \
 		(other.developments["research"], other.developments["military"], other.developments["government"], \
 		other.developments["culture"], other.developments["management"]))
-	app.setLabel("other_other_stuff", "Stability: %.2f, col. points: %.2f, num colonies: %.2f" % (other.colonization, other.num_colonies))
+	app.setLabel("other_other_stuff", "Stability: %.2f, col. points: %.2f, num colonies: %.2f" % (other.stability, other.colonization, other.num_colonies))
 	if len(other.rival_target) == 2:
-		app.setLabel("other_objectives", "Rival Target: %d: %d" % (other.rival_target[0],other.rival_target[1]))
+		app.setLabel("other_objectives", "Rival Target: %s: %s" % (other.rival_target[0].name, other.rival_target[1].name))
 	else:
 		app.setLabel("other_objectives", "No current Targets")
 	app.setLabel("factories_1", "Parts: %d,  Cannons: %d,  Clothing: %d,  Paper: %d,  Furniture: %d, Chemicals: %d" % \
@@ -2779,7 +2779,7 @@ def load_basic_widgets():
 	app.addLabel("PrimaryStats", " ")
 	app.addLabel("OtherDemographics", " ")
 	app.addLabel("other_other_stuff", " ")
-	app.setLabel("other_objectives", " ")
+	app.addLabel("other_objectives", " ")
 	#Primary Stats: Gold, DevelopmentLevel, NumTechnologies, NumDevelopments, NumFactories
 	app.addLabel("NationMiddleCLass", " ")
 	app.addLabel("factories_1", " ")

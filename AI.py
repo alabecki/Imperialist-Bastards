@@ -135,9 +135,7 @@ class AI(Player):
 			"flint_lock": 2.5,
 			"basic_civ": 3,
 			"pre_modern": 3,
-			"pre_industry_1": 5,
-			"pre_industry_2": 5,
-			"pre_industry_3": 5,
+			"pre_industry": 5,
 			"professional_armies": 7,
 			"high_pressure_steam_engine": 7,
 			"square_timbering": 4,
@@ -340,8 +338,8 @@ class AI(Player):
 
 	def ai_increase_middle_class(self, market, relations, players):
 		print("Try to increase middle class____________________")
-		#if "pre_industry" not in self.technologies:
-		#	return
+		if "pre_industry" not in self.technologies:
+			return
 		if self.type != "major" and self.POP <= 6:
 			if self.POP <= self.numMidPOP * 8:
 				return
@@ -1646,17 +1644,17 @@ class AI(Player):
 			self.technology_priority["oil_drilling"] += 0.5
 
 	def choose_technology(self, market):
+		print("Choose Technology")
 		options = []
-		# print("Current Techs:")
-		# for t in self.technologies:
-		#	print(t)
-
+		print("Current Techs:")
+		for t in self.technologies:
+			print(t)
+		print("Research: %.2f" % self.research)
 		for k, t in technology_dict.items():
-			if k not in self.technologies and t["requirement"] <= self.technologies \
-					and self.development_level >= t["min_mid"] and t["cost"] <= self.research:
-				#		print(k, t)
-				options.append(k)
-		# print("Options: %s \n" % (options))
+			if k not in self.technologies and t["requirement"] <= self.technologies and self.development_level >= t["min_mid"] and t["cost"] <= self.research:
+					print(k, t)
+					options.append(k)
+		print("Options: %s \n" % (options))
 		if len(options) == 0:
 			return None
 		# priorities = sorted([self.technology_priority(v,k) for (k,v) in self.technology_priority], reverse=True)
@@ -1666,6 +1664,7 @@ class AI(Player):
 			if p in options:
 				# priorities = sorted(self.technology_priority, key=my_dict.get)
 				self.ai_research_tech(p, market)
+				print("Wants to research %s" % p)
 				return
 
 	def ai_research_tech(self, choice, market):

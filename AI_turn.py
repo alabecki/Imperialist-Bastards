@@ -32,13 +32,10 @@ def AI_turn(players, player, market, relations, provinces):
 	player.AP += 1
 	#print("AP = %s" % (player.AP))
 
-
 	player.calculate_access_to_goods(market)
 
 	player.calculate_resource_base()
 	player.update_priorities(market)
-
-
 
 	player.calculate_resource_production()
 	player.calculate_resource_need()
@@ -131,7 +128,7 @@ def AI_turn(players, player, market, relations, provinces):
 		decide_target(player, players, market, provinces, relations)
 	else:
 		decide_rival_target(player, players, market, provinces, relations)
-	worsen_relations(player, players, relations, provinces)
+	worsen_relations(player, players, relations, provinces, market)
 	gain_cb(player, players, relations)
 	attack_target(player, players, relations, provinces, market)
 	ai_bribe(player, players, relations)
@@ -141,7 +138,7 @@ def AI_turn(players, player, market, relations, provinces):
 	count = 0
 	while player.diplo_action >= 2 and count < 12:
 		if player.rival_target == [] or len(player.CB) < 2:
-			worsen_relations(player, players, relations, provinces)
+			worsen_relations(player, players, relations, provinces, market)
 		if len(player.embargo) > 0:
 			improve = sample(player.embargo, 1)
 			improve = improve[0]

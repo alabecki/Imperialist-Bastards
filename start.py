@@ -119,7 +119,7 @@ def initialize_oldempire(player):
 	player.military["cavalry"] = 1.0
 	player.military["frigates"] = 0.0
 
-	player.technologies = {"basic_civ", "pre_modern"}
+	player.technologies = {"basic_civ"}
 
 
 	player.techModifier = 0.75
@@ -139,7 +139,7 @@ def initialize_old_minor(player):
 	player.POP = 3.6
 	player.numLowerPOP = 3.6
 	player.freePOP = 3
-	player.technologies = {"basic_civ", "pre_modern"}
+	player.technologies = {"basic_civ"}
 
 
 	player.resources["gold"] = 6.0

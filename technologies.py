@@ -9,10 +9,10 @@
 
 technology_dict = {
 	"basic_civ": {"requirement": {}, "cost": 1, "min_mid": 0},
-	"pre_modern": {"requirement": {"basic_civ"}, "cost": 1, "min_mid": 0},
+	"pre_modern": {"requirement": {"basic_civ"}, "cost": 2, "min_mid": 0},
 	"professional_armies": {"requirement": {"pre_modern"}, "cost": 1, "min_mid": 0},
 	"flint_lock": {"requirement": {"pre_industry"}, "cost": 1, "min_mid": 0},
-	"pre_industry": { "requirement": {"pre_modern"}, "cost": 2, "min_mid": 0},
+	"pre_industry": {"requirement": {"pre_modern"}, "cost": 2, "min_mid": 0},
 	"high_pressure_steam_engine": {"requirement": {"pre_industry"}, "cost": 1, "min_mid": 1},
 	"square_timbering": {"requirement": {"high_pressure_steam_engine"}, "cost": 2, "min_mid": 1},
 	"cotton_gin": {"requirement": {"high_pressure_steam_engine"}, "cost": 2, "min_mid": 1},
