@@ -198,10 +198,11 @@ def update_culture_tab():
 	app.setLabel("oil/turn", "%.2f" % mOil)
 
 	requirements = player.determine_middle_class_need()
-	message = " "
-	for r in requirements:
-		message = message + r + " "
-	app.setMessage("Development_Requirements", message)
+	app.changeOptionBox("Requirement List: ", requirements)
+	#message = " "
+	#for r in requirements:
+	#	message = message + r + " "
+	#app.setMessage("Development_Requirements", message)
 
 def update_diplomacy_tab():
 	global players, human_player, relations
@@ -359,8 +360,8 @@ def create_auto_save(btn):
 	if auto_save != "":
 		auto_save = app.getEntry("auto_save")
 		auto_save = create_new_save_game(auto_save, players, relations, market, provinces)
-	#start_main_screen()
-	start_game_tread()
+	start_main_screen()
+	#start_game_tread()
 
 
 def saving(bn):
@@ -756,16 +757,13 @@ def start_main_screen():
 	#app.stopLabelFrame()
 
 	#app.startLabelFrame("Infrastructure")
-
 	app.addImage("fort", "fort.gif", 1, 9, 3, 3)
 	app.addLabel("upgrade_fortification", "Fortification Level: %.2f" % player.fortification, 2, 12, 2, 1)
-	#app.addNamedButton("Upgrade", "upgrade_fort", upgrade_fort, 2, 14, 1)
 	app.addImageButton("upgrade_fort", upgrade_fort, "upgrade.gif", 2, 14, 1)
 	app.setButtonTooltip("upgrade_fort", "Upgrade Fortifications")
 
 	app.addImage("shipyard", "shipyard.gif", 4, 9, 3, 3)
 	app.addLabel("upgrade_shipyard", "shipyard Level: %d" % player.shipyard, 5, 12, 2, 1)
-	#app.addNamedButton("Upgrade", "upgrade_shipyard", upgrade_shipyard, 5, 14, 1)
 	app.addImageButton("upgrade_shipyard", upgrade_shipyard, "upgrade.gif", 5, 14, 1)
 	app.setButtonTooltip("upgrade_shipyard", "Upgrade shipyard")
 	if player.goods["cannons"] < 1 or player.AP < 1 or (player.fortification >= 1.1 and "cement" \
@@ -774,16 +772,9 @@ def start_main_screen():
 	else:
 		app.enableButton("upgrade_fort")
 	
-	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1:
-		app.disableButton("upgrade_shipyard")
-	elif player.shipyard == 1 and "ironclad" not in player.technologies:
-		app.disableButton("upgrade_shipyard")
-	elif player.shipyard == 2 and oil_powered_ships not in player.technologies:
-		app.disableButton("upgrade_shipyard")
-	else:
-		app.enableButton("upgrade_shipyard")
-
-	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1:
+	if (player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1) \
+	or (player.shipyard == 1 and "ironclad" not in player.technologies) \
+	or (player.shipyard == 2 and oil_powered_ships not in player.technologies):
 		app.disableButton("upgrade_shipyard")
 	else:
 		app.enableButton("upgrade_shipyard")
@@ -821,24 +812,22 @@ def start_main_screen():
 	######################################################################################################
 	app.startTab("Technology")
 	app.setExpand("all")
+	app.startPanedFrame("tech_list")
 	app.setBg("chartreuse")
 	app.startScrollPane("technologies")
-	#app.startPanedFrame("tech_divider")
 	app.startLabelFrame("Research Status")
 	stab_rounds = round(player.stability * 2) / 2
 	research_per_turn = 0.25 + ((player.developments["research"] + player.developments["management"]/6) * \
 		government_map[player.government] * stability_map[stab_rounds])
 	app.addLabel("research_status", "      Current Research Points: %.2f    Research Points Per Turn: %.2f      "  % (round(player.research, 2), round(research_per_turn, 2)), 1, 1, 8, 2)
 	app.stopLabelFrame()
-
 	#app.startScrollPane("technologies")
 	app.startLabelFrame("Technology List")
 	#app.addImage()
 	app.add
 	row = 1
 	for k, v in technology_dict.items():
-		app.addLabel("tech_" + k, "%s: requires: %s, cost: %.2f, min dev: %d" % \
-		 (k, v["requirement"], v["cost"], v["min_mid"]), row, 1, 6, 1)
+		app.addLabel("tech_" + k, "%s, cost: %.2f, min dev: %d" % (k, v["cost"], v["min_mid"]), row, 1, 6, 1)
 		app.addImageButton("sel_" + k, select_technology, "report.gif", row, 7, 1, 1)
 		app.addImageButton("res_" + k, research_technology, "research.gif", row, 8, 1, 1)
 		app.setButtonTooltip("sel_" + k, "Get Description")
@@ -858,18 +847,20 @@ def start_main_screen():
 		row += 1
 	app.stopLabelFrame()
 	app.stopScrollPane()
+
+	app.startPanedFrame("tech_description")
+	app.setBg("chartreuse")
 	#app.startPanedFrame("Tech Descriptions")
-	app.setSticky("nw")
-	app.startLabelFrame("  ")
-	app.setSticky("nw")
-	app.addImage("tech_image", "default_tech_pic.gif", 1, 1)
-	app.setSticky("ne")
+	#app.startLabelFrame("  ")
+	app.addImage("tech_image", "default_tech_pic.gif")
 	app.startLabelFrame(" Technology Description  ")
-	app.addMessage("tech_description", "    Technology Descriptions go here    ", 1, 3)
+	app.addMessage("tech_description", "    Technology Descriptions go here    ")
 	app.setMessageBg("tech_description", "DarkSeaGreen1")
-	app.stopLabelFrame()
+	#app.stopLabelFrame()
 	app.stopLabelFrame()
 	#app.stopScrollPane()
+	app.stopPanedFrame()
+	app.stopPanedFrame()
 
 	app.stopTab()
 	####################################################################################################
@@ -893,6 +884,7 @@ def start_main_screen():
 	app.addImage("managers", "manager.gif", 0, 4)
 	app.setImageTooltip("managers", "Managers")
 	app.addLabel("num_managers", "%.2f" % player.developments["management"], 1, 4)
+	app.stopLabelFrame()
 
 
 	mFood = (player.numLowerPOP * 0.2) + (player.numMidPOP * 0.3) + player.military["cavalry"] * 0.1
@@ -905,29 +897,31 @@ def start_main_screen():
 	app.shrinkImage("food_p_turn", 2)
 	app.addLabel("food/turn", "%.2f" % mFood, 1, 1)
 
-	app.addImage("coal_p_turn", "coal.gif", 2, 0)
+	app.addImage("coal_p_turn", "coal.gif", 1, 2)
 	app.shrinkImage("coal_p_turn", 2)
-	app.addLabel("coal/turn", "%.2f" % mCoal, 2, 1)
+	app.addLabel("coal/turn", "%.2f" % mCoal, 1, 3)
 
-	app.addImage("oil_p_turn", "oil.gif", 3, 0)
+	app.addImage("oil_p_turn", "oil.gif", 1, 4)
 	app.shrinkImage("oil_p_turn", 2)
-	app.addLabel("oil/turn", "%.2f" % mOil, 3, 1)
-
+	app.addLabel("oil/turn", "%.2f" % mOil, 1, 5)
 	app.stopLabelFrame()
+
 
 	app.startLabelFrame("Cost For Next Development Level")
 	requirements = player.determine_middle_class_need()
-	app.addMessage("Development_Requirements", " ")
+	app.addLabelOptionBox("Requirement List: ", requirements)
+	app.stopLabelFrame
+	#app.addMessage("Development_Requirements", " ")
 	#count = 1
-	message = " "
+	message = ""
 	for r in requirements:
-		message = message + r + " "
+		message = message + r
 		#ID = uniform(2, 4)*count
 		#img = r + ".gif"
 		#app.addImage(ID, img, 1, count)
 		#app.shrinkImage(ID, 2)
 		#count += 1
-	app.setMessage("Development_Requirements", message)
+	#app.setMessage("Development_Requirements", message)
 	app.stopLabelFrame()
 	
 	app.startLabelFrame("Culture Commands")
@@ -962,8 +956,9 @@ def start_main_screen():
 
 	#######################################################################################################
 	app.startTab("Military")
-	app.setBg("indian red")
 	app.setStretch("all")
+	app.startPanedFrame("military_left")
+	app.setBg("indian red")
 	app.startScrollPane("military")
 
 	app.startLabelFrame("Total Strength")
@@ -975,12 +970,6 @@ def start_main_screen():
 	app.addLabel("total_naval_str", "Naval Strength: %.2f" % (naval), 1, 3)
 	app.stopLabelFrame()
 
-	app.setSticky("ne")
-	app.startLabelFrame("Casus Belli")
-	app.addLabelOptionBox("CB List:", [" "])
-	app.stopLabelFrame()
-
-	app.setSticky("nw")
 	app.startLabelFrame("Army")
 	row = 1
 	app.addLabel("army_breakdown", " Type          Number     Att.       Def.   Man.    AmmoUse   OilUse", 0, 0, 9, 1)
@@ -998,11 +987,11 @@ def start_main_screen():
 			app.addLabel("num_" + k, player.military[k], row, 1, 1)
 			app.setLabelRelief("num_" + k, "sunken")
 			if k == "irregulars":
-				app.addLabel("att_" + k, player.irregulars["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.irregulars["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.irregulars["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.irregulars["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.irregulars["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.irregulars["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.irregulars["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.irregulars["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.irregulars["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.irregulars["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				#app.addNamedButton(" Build ", "build_" + k, build_army, row, 7, 1)
@@ -1010,11 +999,11 @@ def start_main_screen():
 					app.disableButton("build_" + k)
 
 			if k == "infantry":
-				app.addLabel("att_" + k, player.infantry["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.infantry["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.infantry["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.infantry["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.infantry["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.infantry["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.infantry["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.infantry["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.infantry["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.infantry["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
@@ -1024,11 +1013,11 @@ def start_main_screen():
 					app.enableButton("build_"+ k)
 
 			if k == "cavalry":
-				app.addLabel("att_" + k, player.cavalry["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.cavalry["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.cavalry["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.cavalry["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.cavalry["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.cavalry["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.cavalry["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.cavalry["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.cavalry["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.cavalry["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
@@ -1037,11 +1026,11 @@ def start_main_screen():
 				else:
 					app.enableButton("build_"+ k)
 			if k == "artillery":
-				app.addLabel("att_" + k, player.artillery["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.artillery["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.artillery["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.artillery["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.artillery["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.artillery["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.artillery["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.artillery["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.artillery["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.artillery["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				if player.freePOP < 0.2 or player.goods["cannons"] < 2.5:
@@ -1050,11 +1039,11 @@ def start_main_screen():
 					app.enableButton("build_"+ k)
 
 			if k == "tank":
-				app.addLabel("att_" + k, player.tank["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.tank["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.tank["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.tank["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.tank["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.tank["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.tank["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.tank["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.tank["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.tank["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				if player.freePOP < 0.2 or player.goods[k] < 1:
@@ -1063,11 +1052,11 @@ def start_main_screen():
 					app.enableButton("build_"+ k)
 
 			if k == "fighter":
-				app.addLabel("att_" + k, player.fighter["attack"], row, 2, 1)
-				app.addLabel("def_" + k, player.fighter["defend"], row, 3, 1)
-				app.addLabel("man_" + k, player.fighter["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, player.fighter["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, player.fighter["oil_use"], row, 6, 1)
+				app.addLabel("att_" + k, "%.1f" % player.fighter["attack"], row, 2, 1)
+				app.addLabel("def_" + k, "%.1f" % player.fighter["defend"], row, 3, 1)
+				app.addLabel("man_" + k, "%.1f" % player.fighter["manouver"], row, 4, 1)
+				app.addLabel("ammo_use_" + k, "%.1f" % player.fighter["ammo_use"], row, 5, 1)
+				app.addLabel("oil_use_" + k, "%.1f" % player.fighter["oil_use"], row, 6, 1)
 				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
 				app.setButtonTooltip("build_" + k, "Build " + k)
 				if player.freePOP < 0.2 or player.goods[k] < 1:
@@ -1084,20 +1073,6 @@ def start_main_screen():
 			row += 1
 	app.stopLabelFrame()
 
-	app.setSticky("ne")
-	app.startLabelFrame("Claims")
-	count = 1
-	for obj in player.objectives:
-		if obj not in player.provinces.keys():
-			ID = uniform(1,2) * count
-			obj = provinces[obj]	
-			app.addLabel(ID, "%s: %s %.2f" % (obj.name, obj.resource, obj.quality), count, 1)		
-			app.addImage(ID, obj.owner + ".gif", count, 2)
-			app.setImageTooltip(ID, obj.owner)
-			count += 1
-	app.stopLabelFrame()
-
-	app.setSticky("nw")
 	app.startLabelFrame("Navy")
 	row = 1
 	app.addLabel("navy_breakdown", "  Type        Number     Att.      HP     AmmoUse     OilUse", 0, 0, 8)
@@ -1113,10 +1088,10 @@ def start_main_screen():
 			app.addLabel("num_" + k, player.military[k], row, 1, 1, 1)
 			app.setLabelRelief("num_" + k, "sunken")
 		if k == "frigates":
-			app.addLabel("att_" + k, player.frigates["attack"], row, 2, 1, 1)
-			app.addLabel("HP_" + k, player.frigates["HP"], row, 3, 1, 1)
-			app.addLabel("ammo_use_" + k, player.frigates["ammo_use"], row, 4, 1, 1)
-			app.addLabel("oil_use_" + k, player.frigates["oil_use"], row, 5, 1, 1)
+			app.addLabel("att_" + k, "%.1f" % player.frigates["attack"], row, 2, 1, 1)
+			app.addLabel("HP_" + k, "%.1f" % player.frigates["HP"], row, 3, 1, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.frigates["ammo_use"], row, 4, 1, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.frigates["oil_use"], row, 5, 1, 1)
 			#app.addNamedButton("Build", "build_" + k, build_army, row, 6, 1, 1)
 			app.addImageButton("build_" + k, build_army, "add.gif", row, 6, 1, 1)
 			app.setButtonTooltip("build_" + k, "Build " + k)
@@ -1126,10 +1101,10 @@ def start_main_screen():
 			else:
 				app.enableButton("build_" + k)
 		if k == "iron_clad":
-			app.addLabel("att_" + k, player.iron_clad["attack"], row, 2, 1, 1)
-			app.addLabel("HP_" + k, player.iron_clad["HP"], row, 3, 1, 1)
-			app.addLabel("ammo_use_" + k, player.iron_clad["ammo_use"], row, 4, 1, 1)
-			app.addLabel("oil_use_" + k, player.iron_clad["oil_use"], row, 5, 1, 1)
+			app.addLabel("att_" + k, "%.1f" % player.iron_clad["attack"], row, 2, 1, 1)
+			app.addLabel("HP_" + k, "%.1f" % player.iron_clad["HP"], row, 3, 1, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.iron_clad["ammo_use"], row, 4, 1, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.iron_clad["oil_use"], row, 5, 1, 1)
 			#app.addNamedButton("Build", "build_" + k, build_army, row, 6, 1, 1)
 			app.addImageButton("build_" + k, build_army, "add.gif", row, 6, 1, 1)
 			app.setButtonTooltip("build_" + k, "Build " + k)
@@ -1139,10 +1114,10 @@ def start_main_screen():
 			else:
 				app.enableButton("build_" + k)
 		if k == "battle_ship":
-			app.addLabel("att_" + k, player.battle_ship["attack"], row, 2, 1, 1)
-			app.addLabel("HP_" + k, player.battle_ship["HP"], row, 3, 1, 1)
-			app.addLabel("ammo_use_" + k, player.battle_ship["ammo_use"], row, 4, 1, 1)
-			app.addLabel("oil_use_" + k, player.battle_ship["oil_use"], row, 5, 1, 1)
+			app.addLabel("att_" + k, "%.1f" % player.battle_ship["attack"], row, 2, 1, 1)
+			app.addLabel("HP_" + k, "%.1f" % player.battle_ship["HP"], row, 3, 1, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.battle_ship["ammo_use"], row, 4, 1, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.battle_ship["oil_use"], row, 5, 1, 1)
 			#app.addNamedButton("Build", "build_" + k, build_army, row, 6, 1, 1)
 			app.addImageButton("build_" + k, build_army, "add.gif", row, 6, 1, 1)
 			app.setButtonTooltip("build_" + k, "Build " + k)
@@ -1158,9 +1133,30 @@ def start_main_screen():
 			app.enableButton("disband_" + k)
 		row += 1
 	app.stopLabelFrame()
-
-
 	app.stopScrollPane()
+
+	app.startPanedFrame("military_right")
+	app.setBg("indian red")
+	
+	app.startLabelFrame("Casus Belli")
+	app.addLabelOptionBox("CB List:", [" "])
+	app.stopLabelFrame()
+
+	app.startLabelFrame("Claims")
+	count = 1
+	for obj in player.objectives:
+		if obj not in player.provinces.keys():
+			ID = uniform(1,2) * count
+			obj = provinces[obj]	
+			app.addLabel(ID, "%s: %s %.2f" % (obj.name, obj.resource, obj.quality), count, 1)		
+			app.addImage(ID, obj.owner + ".gif", count, 2)
+			app.setImageTooltip(ID, obj.owner)
+			count += 1
+	app.stopLabelFrame()
+
+	app.stopPanedFrame()
+	app.stopPanedFrame()
+	
 	app.stopTab()
 	############################################################################################
 	app.setSticky("nw")
@@ -1463,9 +1459,15 @@ def update_Nation_Info(other):
 	fact_level = other.get_fact_level()
 	app.setLabel("PrimaryStats", "Gold: %.2f  DevLevel: %d  Number Tech: %d  ProvinceDevs: %d  Number Factory-Levels: %d" % \
 		(other.resources["gold"], other.development_level, len(other.technologies), other.number_developments, fact_level))
+	app.setLabel("OtherDemographics", "Total POP: %.2f, Free POP: %.2f, Urban POP: %.2f" % (other.POP, other.freePOP, other.proPOP))
 	app.setLabel("NationMiddleCLass", "Scientists: %.2f,  Officers: %.2f,  Bureaucrats: %.2f,  Artists: %.2f,  Managers: %.2f " % \
 		(other.developments["research"], other.developments["military"], other.developments["government"], \
 		other.developments["culture"], other.developments["management"]))
+	app.setLabel("other_other_stuff", "Stability: %.2f, col. points: %.2f, num colonies: %.2f" % (other.colonization, other.num_colonies))
+	if len(other.rival_target) == 2:
+		app.setLabel("other_objectives", "Rival Target: %d: %d" % (other.rival_target[0],other.rival_target[1]))
+	else:
+		app.setLabel("other_objectives", "No current Targets")
 	app.setLabel("factories_1", "Parts: %d,  Cannons: %d,  Clothing: %d,  Paper: %d,  Furniture: %d, Chemicals: %d" % \
 		(other.factories["parts"]["number"], other.factories["cannons"]["number"], other.factories["clothing"]["number"], \
 		other.factories["paper"]["number"], other.factories["furniture"]["number"], other.factories["chemicals"]["number"]))
@@ -1774,11 +1776,9 @@ def update_production_gui():
 		app.enableButton("upgrade_fort")
 
 	app.setLabel("upgrade_shipyard", "shipyard Level: %d" % player.shipyard)
-	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1:
-		app.disableButton("upgrade_shipyard")
-	elif player.shipyard == 1 and "ironclad" not in player.technologies:
-		app.disableButton("upgrade_shipyard")
-	elif player.shipyard == 2 and oil_powered_ships not in player.technologies:
+	if (player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1) \
+	or (player.shipyard == 1 and "ironclad" not in player.technologies) \
+	or (player.shipyard == 2 and oil_powered_ships not in player.technologies):
 		app.disableButton("upgrade_shipyard")
 	else:
 		app.enableButton("upgrade_shipyard")
@@ -2777,6 +2777,9 @@ def load_basic_widgets():
 	app.addLabel("Nation_Name", " ")
 	app.getLabelWidget("Nation_Name").config(font="Times 13 bold underline")
 	app.addLabel("PrimaryStats", " ")
+	app.addLabel("OtherDemographics", " ")
+	app.addLabel("other_other_stuff", " ")
+	app.setLabel("other_objectives", " ")
 	#Primary Stats: Gold, DevelopmentLevel, NumTechnologies, NumDevelopments, NumFactories
 	app.addLabel("NationMiddleCLass", " ")
 	app.addLabel("factories_1", " ")

@@ -280,7 +280,8 @@ class Player(object):
 			"manouver": 0.5,
 			"recon": 0.2,
 			"ammo_use": 0.05,
-			"oil_use": 0.0
+			"oil_use": 0.0,
+			"weight:": 1
 			}
 
 		self.artillery = {
@@ -289,7 +290,8 @@ class Player(object):
 			"manouver": 0.0,
 			"recon": 0.0,
 			"ammo_use": 0.1,
-			"oil_use": 0.0
+			"oil_use": 0.0,
+			"weight": 2
 			}
 
 		self.cavalry = {
@@ -298,7 +300,8 @@ class Player(object):
 			"manouver": 1.0,
 			"recon": 1.0,
 			"ammo_use": 0.05,
-			"oil_use": 0.0
+			"oil_use": 0.0,
+			"weight": 2
 		}
 
 		self.fighter = {
@@ -307,7 +310,8 @@ class Player(object):
 			"manouver": 1.0,
 			"recon": 2.0,
 			"ammo_use": 0.75,
-			"oil_use": 0.1
+			"oil_use": 0.1,
+			"weight": 3
 		}
 
 		self.tank = {
@@ -316,14 +320,16 @@ class Player(object):
 			"manouver": 1.0,
 			"recon": 0.2,
 			"ammo_use": 0.75,
-			"oil_use": 0.1
+			"oil_use": 0.1,
+			"weight": 3
 		}
 		
 		self.frigates = {
 			"attack": 1.0,
 			"HP": 1.0,
 			"ammo_use": 0.1,
-			"oil_use": 0.0
+			"oil_use": 0.0,
+			"capacity": 2
 		}
 
 		self.iron_clad = {
@@ -331,13 +337,15 @@ class Player(object):
 			"HP": 2.0,
 			"ammo_use": 0.1,
 			"oil_use": 0.0,
+			"capacity": 3
 			}
 
 		self.battle_ship = {
 			"attack": 4.0,
 			"HP": 4.0,
 			"ammo_use": 0.3,
-			"oil_use": 0.2
+			"oil_use": 0.2,
+			"capacity": 6
 		}
 
 		self.military_produced = {
@@ -711,9 +719,10 @@ class Player(object):
 		for k, v in self.CB.items():
 			cb_keys.append(v.opponent)
 		for cb in cb_keys:
-			self.CB[cb].time -= 1
-			if self.CB[cb].time < 0:
-				del self.CB[cb]
+			if cb in self.CB.keys():
+				self.CB[cb].time -= 1
+				if self.CB[cb].time < 0:
+					del self.CB[cb]
 		return [research_gain, culture_gain, col_gain, diplo_gain]
 	
 
@@ -1185,7 +1194,7 @@ class Player(object):
 
 	def ammo_penalty(self, ammo_needed):
 		if ammo_needed > self.goods["cannons"]:
-			AmmoPenalty = self.goods["cannons"]/ammo_needed
+			AmmoPenalty = self.goods["cannons"]/(ammo_needed + 0.001)
 			AmmoPenalty = AmmoPenalty + (1 - AmmoPenalty)/2
 			self.goods["cannons"] = 0
 		else:
@@ -1196,7 +1205,7 @@ class Player(object):
 
 	def oil_penalty(self, oil_needed):
 		if oil_needed > self.resources["oil"]:
-			OilPenalty = self.resources["oil"]/oil_needed
+			OilPenalty = self.resources["oil"]/(oil_needed + 0.001)
 			self.resources["oil"] = 0
 		else:
 			self.resources["oil"] -= oil_needed

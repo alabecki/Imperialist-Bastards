@@ -340,15 +340,15 @@ class AI(Player):
 
 	def ai_increase_middle_class(self, market, relations, players):
 		print("Try to increase middle class____________________")
-		if "pre_industry" not in self.technologies:
-			return
+		#if "pre_industry" not in self.technologies:
+		#	return
 		if self.type != "major" and self.POP <= 6:
 			if self.POP <= self.numMidPOP * 8:
 				return
 		if self.midGrowth == False:
-		  #  print("Cannot increase development because did not pay all food last turn")
+			print("Cannot increase development because did not pay all food last turn")
 			return
-	  #  print("Trying to increase middle class.........")
+		print("Trying to increase middle class.........")
 		check = self.try_middle_class(market, relations, players)
 		if check == False:
 			return
@@ -366,20 +366,7 @@ class AI(Player):
 				continue
 			if self.developments[d] < least_dev * 2:
 				d_options.append(d)
-				# print("Appended %s" % (d))
-
-		# for m, mid in self.midPOP.items():
-		#	if self.midPOP[m]["number"] < least_mid:
-		#		least_mid = self.midPOP[m]["number"]
-		# least_mid = max(0.2, least_mid)
-		# m_options = []
-		# for m, mid in self.midPOP.items():
-		#	if self.midPOP[m]["number"] >= 2:
-		#		continue
-		#	if self.midPOP[m]["number"] < least_mid * 2:
-		#		m_options.append(m)
-		# for mo in m_options:
-		#	print(mo)
+		
 		d_selection = ""
 		if self.stability < -1.2 and "culture" in d_options:
 			# print("pick culture")
@@ -447,16 +434,8 @@ class AI(Player):
 					self.iron_clad["attack"] += 0.3
 					self.battle_ship["attack"] += 0.8
 					return
-				else:
-					roll = random()
-					if roll < 0.2:
-						self.doctrines.add("SeaI")
-						self.frigates["attack"] += 0.3
-						self.iron_clad["attack"] += 0.32
-						self.battle_ship["attack"] += 1
-						return
 
-			if "SeaI" in self.doctrines and "SeaII" not in self.doctrines:
+			elif "SeaI" in self.doctrines and "SeaII" not in self.doctrines:
 				roll = random()
 				if self.personality["Navy"] > 0.75:
 					if roll < 0.5:
@@ -465,18 +444,11 @@ class AI(Player):
 						self.iron_clad["attack"] += 0.4
 						self.battle_ship["attack"] += 1.0
 						return
-				else:
-					if roll < 0.15:
-						self.doctrines.add("SeaII")
-						self.frigates["attack"] += 0.3
-						self.iron_clad["attack"] += 0.4
-						self.battle_ship["attack"] += 1.0
-						return
+		
 
 			options = []
 			for md in military_doctrines:
-				print(md)
-				if md == "SeaII" or md == "SeaI":
+				if md == "SeaI" not in self.doctrines and md == "SeaII":
 					continue
 				if "mobile_warfare" not in self.technologies and md == "CombinedArms":
 					continue 
@@ -490,7 +462,11 @@ class AI(Player):
 					continue
 				if md not in self.doctrines:
 					options.append(md)
+					print("Adding %s" % md)
 					print(md)
+				if len(options) == 0:
+					print("No doctrine options left!")
+					return
 			doct = choice(options)
 			self.choose_doctrine(doct)
 
@@ -1989,9 +1965,9 @@ class AI(Player):
 		market.report.append("%s build Battle_ship" % (self.name))
 
 	def decide_build_navy(self, market, relations, players):
-		# print("Decide on navy__###############################################################")
+		print("Decide on navy__###############################################################")
 		if self.AP < 1:
-			# print("No AP left")
+			print("No AP left")
 			return
 		transport_limit = 0
 		transport_limit += self.military["frigates"] * 2
@@ -1999,16 +1975,16 @@ class AI(Player):
 		transport_limit += self.military["battle_ship"] * 3
 		
 		num_units = self.num_army_units()
-		#	print("Number of Army Units: %s" % (num_units))
-		#	print("Transport Limit %s" % (transport_limit))
-		# print("num units * per.navy %s" % (num_units*self.personality["Navy"]) )
-		# print("Personality.navy: %s" % (self.personality["Navy"]))
-		# print("Number of units: %s" % (num_units))
-		# print("Num_units times pers.Navy: %s" %(num_units * self.personality["Navy"]))
-		# print("Transpot Limit: %s" % (transport_limit))
+		print("Number of Army Units: %s" % (num_units))
+		print("Transport Limit %s" % (transport_limit))
+		print("num units * per.navy %s" % (num_units*self.personality["Navy"]) )
+		print("Personality.navy: %s" % (self.personality["Navy"]))
+		print("Number of units: %s" % (num_units))
+		print("Num_units times pers.Navy: %s" %(num_units * self.personality["Navy"]))
+		print("Transpot Limit: %s" % (transport_limit))
 		if transport_limit > num_units * self.personality["Navy"]:
 			return
-		# print("Wants to build navy ***********************************************")
+		print("Wants to build navy ***********************************************")
 		if self.AP >= 2 and "oil_powered_ships" in self.technologies and self.shipyard == 3:
 			if self.goods["cannons"] < 5:
 				self.ai_buy("cannons", 3, market, relations, players)
@@ -2022,8 +1998,7 @@ class AI(Player):
 							self.goods["gear"] >= 1:
 				self.ai_build_battle_ship(market)
 
-
-		elif "oil_powered_ships" not in self.technologies and "iron_clad" in self.technologies and self.shipyard == 2:
+		elif "oil_powered_ships" not in self.technologies and "ironclad" in self.technologies and self.shipyard == 2:
 			if self.goods["parts"] < 1 and market.buy_price("parts", self.supply["parts"]) < self.resources[
 				"gold"] * 1.75:
 				self.ai_buy("parts", 1, market, relations, players)
@@ -2037,7 +2012,7 @@ class AI(Player):
 				self.ai_build_iron_clad(market)
 
 		elif self.goods["cannons"] >= 2 and self.resources["wood"] >= 1 and self.shipyard >= 1 and self.resources[
-			"cotton"] >= 1 and self.AP >= 1 and "iron_clad" not in self.technologies:
+			"cotton"] >= 1 and self.AP >= 1 and "ironclad" not in self.technologies:
 			self.ai_build_frigates(market)
 
 	def ai_build_factory(self, _type, market, players):
@@ -2165,7 +2140,8 @@ class AI(Player):
 		market.report.append("%s has completed a shipyard for %s ships" % (self.name, blank))
 
 
-	def build_army(self, market, relations, players):
+	def AIbuild_army(self, market, relations, players):
+		print("AI Build Army________________________________-")
 		if self.proPOP > 4 and self.freePOP < 0.3:
 			self.proPOP -= 1
 			self.freePOP += 1
@@ -2174,16 +2150,16 @@ class AI(Player):
 			return
 		if num_units > self.POP * self.personality["Army"] and "mobile_warfare" not in self.technologies:
 			return
-	   # print("Wants to build army___________________________________________-")
+		print("Wants to build army___________________________________________-")
 		if self.can_train < 1:
-			# print("Cannot further train")
+			print("Cannot further train")
 			return
 		ammo_needed = self.calculate_ammo_needed()
 		cans = self.goods["cannons"] - ammo_needed
 		if cans < 1:
 			self.ai_buy("cannons", 4, market, relations, players)
 		if self.goods["cannons"] - ammo_needed < 1:
-		#    print("Not enough cannons")
+			print("Not enough cannons")
 			return
 
 		tries = 0
@@ -2224,9 +2200,7 @@ class AI(Player):
 					if self.goods["fighter"] >= 1:
 						self.ai_build_fighter(market)
 					else:
-						if self.supply["fighter"] > 2 and self.resources["gold"] > market.buy_price("fighter",
-																									self.supply[
-																										"fighter"]) * 2:
+						if self.supply["fighter"] > 2 and self.resources["gold"] > market.buy_price("fighter", self.supply["fighter"]) * 2:
 							self.ai_buy("fighter", 1, market, relations, players)
 
 				tries += 1
@@ -2243,7 +2217,7 @@ class AI(Player):
 		self.military_priority["tank"] -= 0.3
 		for k in self.military_priority.keys():
 			self.military_priority[k] += 0.1
-		# print(self.military_priority[k])
+		#print(self.military_priority[k])
 		print("%s has compleated a tank unit" % (self.name))
 		market.report.append("%s has completed a tank unit" % (self.name))
 
@@ -2271,8 +2245,9 @@ class AI(Player):
 		self.military_priority["infantry"] -= 0.45
 		for k in self.military_priority.keys():
 			self.military_priority[k] += 0.1
-		# print(self.military_priority[k])
-	   # print("%s has completed an infantry unit" % (self.name))
+		print("%s has completed an infantry unit" % (self.name))
+		market.report.append("%s has completed an infantry unit" % (self.name))
+
 	def ai_build_cavalry(self, market):
 		self.resources["food"] -= 1.0
 		self.can_train -= 1
