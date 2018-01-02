@@ -614,14 +614,16 @@ class SeaBattle(Battle):
 		self.initial_defender_forces["frigates"] = p2.military["frigates"]
 		self.initial_defender_forces["iron_clad"] = p2.military["iron_clad"]
 		self.initial_defender_forces["battle_ship"] = p2.military["battle_ship"]
+		att_number_units_navy = p1.calculate_number_of_ships()
+		def_number_units_navy = p2.calculate_number_of_ships()
+
 		market.report.append("A naval battle is being fought between %s and %s !! \n" % (p1.name, p2.name))
 		winner = ""
-		market.report.append("%s has a fleet size of %s, %s has a fleet size of %s \n" % (p1.name, att_initial_navy, p2.name, def_initial_navy))
+		market.report.append("%s has a fleet size of %s, %s has a fleet size of %s \n" % (p1.name, att_number_units_navy, p2.name, def_number_units_navy))
 		self.attacker_ammo_needed = p1.calculate_ammo_needed_navy()
 		self.defender_ammo_needed = p2.calculate_ammo_needed_navy()
 		self.attacker_oil_needed = p1.calculate_oil_needed_navy()
 		self.defender_oil_needed = p2.calculate_oil_needed_navy()
-		market.report.append("%s has naval strength of %s, %s has naval strength of %s \n" % (p1.name, att_str, p2.name, def_str))
 		
 		p1_roll = uniform(1, 1.2)
 		p2_roll = uniform(1, 1.2)
@@ -630,13 +632,15 @@ class SeaBattle(Battle):
 		self.atttacker_oil_penalty = p1.oil_penalty(self.attacker_oil_needed)
 		self.defender_oil_penalty = p2.oil_penalty(self.defender_oil_needed)
 
-		att_str = (p1_roll * self.att_ammo_penalty) * ((p1.military["frigates"] * p1.frigates["strength"]) + \
-		(p1.military["iron_clad"] * p1.iron_clad["attack"]) + (p1.military["battle_ship"] * p1.battle_ship[attack] \
+
+		att_str = (p1_roll * self.attacker_ammo_penalty) * ((p1.military["frigates"] * p1.frigates["attack"]) + \
+		(p1.military["iron_clad"] * p1.iron_clad["attack"]) + (p1.military["battle_ship"] * p1.battle_ship["attack"] \
 		 * self.attacker_oil_penalty))
 
-		def_str = (p2_roll * self.defender_ammo_penalt) * ((p2.military["frigates"] * p2.frigates["strength"]) + \
-		(p2.military["iron_clad"] * p2.iron_clad["attack"] ) + (p2.military["battle_ship"] * p2.battle_ship[attack] \
+		def_str = (p2_roll * self.defender_ammo_penalty) * ((p2.military["frigates"] * p2.frigates["attack"]) + \
+		(p2.military["iron_clad"] * p2.iron_clad["attack"] ) + (p2.military["battle_ship"] * p2.battle_ship["attack"] \
 		 * self.defender_oil_penalty))
+		market.report.append("%s has naval strength of %s, %s has naval strength of %s \n" % (p1.name, att_str, p2.name, def_str))
 
 		self.att_str = att_str/(att_str + def_str)
 		self.def_str = def_str/(att_str + def_str)
@@ -646,9 +650,9 @@ class SeaBattle(Battle):
 		self.att_losses = total_losses * self.def_str
 		self.def_losses = total_losses * self.att_str
 
-		market.report.append("%s takes %s losses, %s takes %s losses \n" % (p1.name, self.att_losse, p2.name, self.def_losses))
-		att_number_units_navy = distribute_naval_losses(p1, att_losses, att_number_units_navy)
-		def_number_units_navy = distribute_naval_losses(p2, def_losses, def_number_units_navy)
+		market.report.append("%s takes %s losses, %s takes %s losses \n" % (p1.name, self.att_losses, p2.name, self.def_losses))
+		att_number_units_navy = distribute_naval_losses(p1, self.att_losses, att_number_units_navy)
+		def_number_units_navy = distribute_naval_losses(p2, self.def_losses, def_number_units_navy)
 		market.report.append("%s has %s units remaining, %s has %s units remaining \n" % (p1.name, att_number_units_navy, p2.name, def_number_units_navy))
 		
 		att_str_remaining = p1.calculate_naval_strength()

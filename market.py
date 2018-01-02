@@ -184,6 +184,8 @@ class Market(object):
 		price = self.buy_price(_type, player.supply[_type])
 		player.resources["gold"] -= price
 		other.resources["gold"] += price
+		print("%s gains %.2f gold from player" % (other.name, price))
+		print("%s now has %s gold" % (other.name, other.resources["gold"]))
 		#other.new_development +=  0.1
 		#self.market[_type].remove(s)
 		player.supply[_type] -= 1

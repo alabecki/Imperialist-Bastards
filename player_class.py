@@ -402,42 +402,42 @@ class Player(object):
 			requirement.append("clothing")
 		if self.development_level > 7:
 			requirement.append("paper")
-		if self.development_level > 8:
+		if self.development_level > 9:
 			requirement.append("telephone")
 			requirement.append("telephone")
 			requirement.append("telephone")
 			requirement.remove("paper")
 			requirement.remove("clothing")
-		if self.development_level > 9:
+		if self.development_level > 10:
 			requirement.remove("telephone")
 			requirement.append("paper")
 			requirement.append("clothing")
 			requirement.remove("furniture")
-		if self.development_level > 10:
-			requirement.append("furniture")
 		if self.development_level > 11:
+			requirement.append("furniture")
+		if self.development_level > 12:
 			requirement.append("radio")
 			requirement.append("radio")
 			requirement.append("radio")
 			requirement.remove("paper")
 			requirement.remove("clothing")
-		if self.development_level > 12:
+		if self.development_level > 13:
 			requirement.remove("radio")
 			requirement.append("paper")
 			requirement.append("clothing")
 			requirement.remove("furniture")
-		if self.development_level > 13:
-			requirement.append("furniture")
 		if self.development_level > 14:
+			requirement.append("furniture")
+		if self.development_level > 15:
 			requirement.append("auto")
 			requirement.append("auto")
 			requirement.append("auto")
 			requirement.remove("paper")
 			requirement.remove("clothing")
 			requirement.remove("furniture")
-		if self.development_level > 15:
-			requirement.append("paper")
 		if self.development_level > 16:
+			requirement.append("paper")
+		if self.development_level > 17:
 			requirement.append("furniture")
 			requirement.append("clothing")
 		return requirement
@@ -490,13 +490,13 @@ class Player(object):
 		#		return False
 		#if self.numMidPOP >= 3 and self.goods["paper"] < 2:
 		#	return False
-		if self.freePOP < 0.5 and self.proPOP < 2:
+		if self.freePOP < 0.2 and self.proPOP < 2:
 			return False
 		return True
 
 	def check_development(self):
 		requirement = self.determine_middle_class_need()
-		if self.check_mid_requirement(requirement) == True and self.freePOP >= 0.5:
+		if self.check_mid_requirement(requirement) == True and self.freePOP >= 0.2:
 			return True
 		else:
 			return False

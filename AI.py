@@ -177,8 +177,8 @@ class AI(Player):
 			"rockets": 1,
 			"early_computers": 2.3,
 			"atomic_bomb": 5
-
 		}
+
 
 		self.resource_priority = {
 			"food": 1.0,
@@ -405,12 +405,12 @@ class AI(Player):
 			else:
 				self.goods[r] -= 1.0
 				# print("Pays 1 %s" % (r))
-		self.numLowerPOP -= 0.5
-		self.numMidPOP += 0.5
+		self.numLowerPOP -= 0.2
+		self.numMidPOP += 0.2
 		self.development_level += 1
 		# self.midPOP[m_selection]["number"] += 0.2
 		self.developments[d_selection] += 1
-		self.freePOP -= 0.5
+		self.freePOP -= 0.2
 		self.mid_class_priority[d_selection] -= 0.1
 		self.new_development += 1
 		if d_selection == "management" or d_selection == "government":
@@ -1950,7 +1950,7 @@ class AI(Player):
 		print("%s builds an Ironclad" % (self.name))
 		market.report.append("%s builds an Ironclad" % (self.name))
 
-	def ai_build_battle_ship(self):
+	def ai_build_battle_ship(self, market):
 		self.AP -= 2
 		self.goods["cannons"] -= 3
 		self.resources["iron"] -= 3

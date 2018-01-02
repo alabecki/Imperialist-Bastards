@@ -169,12 +169,12 @@ class Human(Player):
 				self.resources["spice"] -= 1
 			else:
 				self.goods[r] -= 1.0
-		self.numLowerPOP -= 0.5
-		self.numMidPOP += 0.5
+		self.numLowerPOP -= 0.2
+		self.numMidPOP += 0.2
 		self.development_level += 1
 		#self.midPOP[m_selection]["number"] += 0.2
 		self.developments[_type] += 1
-		self.freePOP -= 0.5
+		self.freePOP -= 0.2
 		self.new_development += 1
 		if _type == "management" or _type == "government": 
 			self.new_development += 1
