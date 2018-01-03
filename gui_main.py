@@ -1464,9 +1464,9 @@ def update_Nation_Info(other):
 		other.developments["culture"], other.developments["management"]))
 	app.setLabel("other_other_stuff", "Stability: %.2f, col. points: %.2f, num colonies: %.2f" % (other.stability, other.colonization, other.num_colonies))
 	if len(other.rival_target) == 2:
-		relata = frozenset({other.name, other.rival_target[0].name})
-		app.setLabel("other_objectives", "Rival Target: %s: %s - relations: %.2f" % \
-		(other.rival_target[0].name, other.rival_target[1].name, relations[relata].relationship))
+			relata = frozenset({other.name, other.rival_target[0].name})
+		#if relations[relata].relationship > -2.5:
+			app.setLabel("other_objectives", "Rival Target: %s: %s - relations: %.2f" % (other.rival_target[0].name, other.rival_target[1].name, relations[relata].relationship))
 	else:
 		app.setLabel("other_objectives", "No current Targets")
 	app.setLabel("factories_1", "Parts: %d,  Cannons: %d,  Clothing: %d,  Paper: %d,  Furniture: %d, Chemicals: %d" % \

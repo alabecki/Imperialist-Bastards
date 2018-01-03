@@ -42,7 +42,7 @@ def delete_nation(attacker, defender, players, market, relations):
 			if defender.name in pl.allied_target:
 				pl.allied_targets.remove(defender.name)
 			if pl.rival_target != []:
-				if defender.name == pl.rival_target[0].name:
+				if defender.name == pl.rival_target[0]:
 					pl.rival_target = []
 		if defender.name in pl.objectives:
 				pl.objectives.remove(defender.name)
@@ -168,11 +168,10 @@ class Battle(object):
 					selection.development_level -= 1
 			if prov.name in defender.provinces.keys():
 				self.gain_province(players, market, relations, provinces)
-			else:
-				loot = attacker.resources["gold"]/3
-				attacker.resources["gold"] += loot
-				defender.resources["gold"] -= loot
-				market.report.append("%s loots %.2f gold from %s \n" % (attacker.name, loot, defender.name))
+			loot = attacker.resources["gold"]/3
+			attacker.resources["gold"] += loot
+			defender.resources["gold"] -= loot
+			market.report.append("%s loots %.2f gold from %s \n" % (attacker.name, loot, defender.name))
 			war_after_math(attacker.name, defender.name, players, relations, prov.name, provinces, market)
 			if defender.type == "major" and attacker.military["tank"] > 0 and prov.culture == defender.culture:
 				defender.defeated == True
@@ -669,7 +668,7 @@ class SeaBattle(Battle):
 				if p2.stability > 3.0:
 					p2.stability = 3.0
 				self.gain_province(players, market, relations, provinces)
-				war_after_math(p1.name, p2.name, players, relations, prov, provinces, market)
+				war_after_math(p1.name, p2.name, players, relations, self.prov, provinces, market)
 			return 
 		else:
 			p1.stability -= 0.5
@@ -679,7 +678,47 @@ class SeaBattle(Battle):
 			if p2.stability > 3.0:
 				p2.stability = 3.0
 			market.report.append("%s has defeated %s at sea! \n"% (p2.name, p1.name))
-			war_after_math(p1.name, p2.name, players, relations, prov, provinces, market)
+			war_after_math(p1.name, p2.name, players, relations, self.prov, provinces, market)
 			return 
 
+
+
+def distribute_naval_losses(player, losses, num_units):
+	limit = 0
+	while(losses > 0.2 and num_units >= 0.2):
+		while(player.military["frigates"] > 0.2 and losses > 0.2):
+		#	print("Losses %s, num_units %s \n" % (losses, num_units))
+			player.military["frigates"] -=0.5
+			player.POP -= 0.1
+			player.milPOP -= 0.1
+			player.numLowerPOP -= 0.1
+			num_units -= 0.5
+			losses -= 0.5
+			limit += 1
+			if limit > 20:
+				break
+		while(player.military["iron_clad"] >= 0.2 and losses > 0.2):
+			player.military["iron_clad"] -= 0.25
+			player.POP -= 0.05
+			player.milPOP -= 0.05
+			player.numLowerPOP -= 0.05
+			num_units -= 0.25
+			losses -= 0.5
+			limit += 1
+			if limit > 30:
+				break
+		while(player.military["battle_ship"] >= 0.2 and losses > 0.2):
+			player.military["battle_ship"] -= 0.125
+			player.POP -= 0.025
+			player.milPOP -= 0.025
+			player.numLowerPOP -= 0.025
+			num_units -= 0.125
+			losses -= 0.5
+			limit += 1
+			if limit > 40:
+				break
+		limit += 1
+		if limit > 60:
+			return num_units
+	return num_units
 	

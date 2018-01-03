@@ -1073,6 +1073,8 @@ class AI(Player):
 	 #   print("Wants to buy %s" % (kind))
 		# if len(market.market[kind]) < 1:
 		#	return
+		if self.resources["gold"] <= 0:
+			return
 		price = market.buy_price(kind, self.supply[kind])
 	  #  print("Price: %s" % (price))
 		p_relations = [r for r in relations.values() if self.name in r.relata]
@@ -1728,7 +1730,7 @@ class AI(Player):
 			self.iron_clad["attack"] += 0.25
 		if (choice == "bombers"):
 			self.fighter["attack"] += 1.2
-			self.fighter["ammo"] += 0.1
+			self.fighter["ammo_use"] += 0.1
 		if (choice == "radar"):
 			self.fighter["defend"] += 1.2
 			self.battle_ship["attack"] += 1
