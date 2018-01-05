@@ -22,6 +22,8 @@ def AI_turn(players, player, market, relations, provinces):
 	print("General priority: %s" % player.general_priority)
 	print("___________________________________________________________________")
 
+	player.has_obliterated = ""
+
 	for k in player.goods_produced.keys():
 			player.goods_produced[k] = 0
 

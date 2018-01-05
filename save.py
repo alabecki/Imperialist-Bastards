@@ -32,7 +32,6 @@ def save_game(save_path, players, relations, market, provinces):
 
 	state = dict()
 	jsonpickle.set_preferred_backend('simplejson')
-
 	#save = shelve.open(file_name, flag = "n", writeback = False)
 	for p, player in players.items():
 		state[p] = player
@@ -65,15 +64,12 @@ def load_game(save_path):
 	#print("State:")
 	#for s in state:
 	#	print(s)
-	
-
 	#save = shelve.open(file_name, writeback = False)
 	#state = dict()
 	#for k, v in save.items():
 	#	state[k] = v
 	#save.close()
 	#save = shelve.open(file_name, flag = "n", writeback = False)
-
 	return state
 
 def compile_loaded_game(state):
@@ -100,7 +96,6 @@ def compile_loaded_game(state):
 		del state[k]
 	del state
 	del copy_state
-
 	initial = {"players": players, "provinces": provinces, "relations": relations, "market": market}
 	return initial
 

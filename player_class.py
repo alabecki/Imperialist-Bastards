@@ -1290,11 +1290,11 @@ class Player(object):
 
 	def calculate_army_weight(self):
 		weight = 0
-		weight += self.military["infantry"]
-		weight += (self.military["cavalry"] * 2)
-		weight += (self.military["artillery"] * 2)
-		weight += (self.military["tank"] * 3)
-		weight += (self.military["fighter"] * 3)
+		weight += forces["infantry"]
+		weight += (forces["cavalry"] * 2)
+		weight += (forces["artillery"] * 2)
+		weight += (forces["tank"] * 3)
+		weight += (forces["fighter"] * 3)
 		print("weight %s" % weight)
 		return weight
 

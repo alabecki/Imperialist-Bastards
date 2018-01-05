@@ -10,6 +10,7 @@ class Market(object):
 	def __init__ (self):
 
 		self.turn = 0
+		self.auto_save = ""
 
 		self.defeated = []
 

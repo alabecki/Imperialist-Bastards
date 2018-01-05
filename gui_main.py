@@ -28,9 +28,7 @@ from Scenarios.historical.Scenario import*
 from Scenarios.BalanceScenario.Scenario import*
 
 
-
-
-auto_save = ""
+#auto_save = ""
 initial = dict()
 players = dict()
 market = dict()
@@ -222,7 +220,8 @@ def update_diplomacy_tab():
 			app.disableButton("dmg_rel_w" + k)
 		else:
 			app.enableButton("dmg_rel_w" + k)
-		if player.diplo_action < 1 or relations[relata].relationship >= -2.5:
+		other = players[k]	
+		if player.diplo_action < 1 or (relations[relata].relationship >= -2.5 and other.type != "old_minor"):
 			app.disableButton("CB_" + k)
 		else:
 			app.enableButton("CB_" + k)
@@ -355,8 +354,8 @@ def get_auto_save_name(bn):
 
 def create_auto_save(btn):
 	app.hideSubWindow("auto_save_name")
-	global auto_save, players, relations, market, provinces
-	auto_save = app.getEntry("auto_save")
+	global players, relations, market, provinces
+	market.auto_save = app.getEntry("auto_save")
 	#if auto_save != "":
 	#	auto_save = app.getEntry("auto_save")
 	#	auto_save = create_new_save_game(auto_save, players, relations, market, provinces)
@@ -365,14 +364,13 @@ def create_auto_save(btn):
 
 
 def saving(bn):
-	global auto_save
-
+	global market
 	app.hideSubWindow("auto_save_name")
-	save_game(auto_save, players, relations, market, provinces)
+	save_game(market.auto_save, players, relations, market, provinces)
 	app.showSubWindow("saving")
 
 def next_turn(bn):
-	global auto_save, players, human_player
+	global market, players, human_player
 	#player = app.getOptionBox("nation")
 	player = players[human_player]
 	gains = player.turn(market)
@@ -384,8 +382,8 @@ def next_turn(bn):
 	app.hideSubWindow("AI turn")
 
 def turn_thread():
-	global auto_save
-	app.thread(AI_turnS, auto_save)
+	global market
+	app.thread(AI_turnS, market.auto_save)
 
 def show_player_gains(gains):
 	app.setLabel("RG", "Research Gain: %s" % (gains[0]))
@@ -396,9 +394,9 @@ def show_player_gains(gains):
 
 
 def start_main_screen():
-	global auto_save, players, human_player, market, relations
+	global market, players, human_player, market, relations
 	player = players[human_player]
-	if auto_save != "":
+	if market.auto_save != "":
 		app.hideSubWindow("saving")
 	app.showSubWindow("loading new game")
 	#app.playSound("Grand March from Aida.wav", wait=False)
@@ -725,7 +723,7 @@ def start_main_screen():
 	i = 2
 	fact_options = player.factory_optons()
 	app.startLabelFrame("Manufacture Goods")
-	app.addLabel("production_"," Fact. Type     Level  Used?    Upgrade    Invent. Can Prod. Producing  Produce", 1, 0, 9)
+	app.addLabel("production_"," Fact. Type  Level Used?  Upgrade    Invent. Can Prod. Producing  Produce", 1, 0, 9)
 	for f in player.goods.keys():
 		app.addLabel("p_" + f, " ", i, 0, 1, 1)
 		app.addImage("p_" + f, f +".gif", i, 0, 1, 1)
@@ -741,9 +739,9 @@ def start_main_screen():
 			app.disableButton("upgrade_" + f)
 		else:
 			enableButton("upgrade_" + f)
-		app.addLabel("iamount_" + f, player.goods[f], i, 4, 1, 1)
-		app.addLabel("producing_" + f, player.goods_produced[f], i, 6, 1, 1)
-		app.addLabel("abprod_" + f, player.amount_can_manif(f), i, 5, 1, 1)
+		app.addLabel("iamount_" + f, "%.2f" % player.goods[f], i, 4, 1, 1)
+		app.addLabel("producing_" + f, "%.2f" % player.goods_produced[f], i, 6, 1, 1)
+		app.addLabel("abprod_" + f, "%.2f" % player.amount_can_manif(f), i, 5, 1, 1)
 		app.addImageButton("produce_" + f, manifacture_good_1, "build.gif", i, 7, 1, 1)
 		app.setButtonTooltip("produce_" + f, "Produce " + f)
 		#app.addNamedButton("Produce", "produce_" + f, manifacture_good_1, i, 7, 1, 1)
@@ -941,7 +939,7 @@ def start_main_screen():
 	if player.culture_points < 1 or player.diplo_action < 1:
 		app.disableButton("Improve Reputation")
 	else:
-		app.enableButton("Improve Relations")
+		app.enableButton("Improve Reputation")
 	others = player.check_for_non_accepted_cultures()
 	if len(others) == 0 or player.culture_points < 1:
 		app.disableButton("Integrate Culture")
@@ -971,7 +969,7 @@ def start_main_screen():
 
 	app.startLabelFrame("Army")
 	row = 1
-	app.addLabel("army_breakdown", " Type          Number     Att.       Def.   Man.    AmmoUse   OilUse", 0, 0, 9, 1)
+	app.addLabel("army_breakdown", " Type        Number     Att.      Def.   Man.  AmmoUse  OilUse", 0, 0, 9, 1)
 	for k in player.military.keys():
 		if k == "irregulars":
 			continue
@@ -1074,7 +1072,7 @@ def start_main_screen():
 
 	app.startLabelFrame("Navy")
 	row = 1
-	app.addLabel("navy_breakdown", "  Type        Number     Att.      HP     AmmoUse     OilUse", 0, 0, 8)
+	app.addLabel("navy_breakdown", " Type      Number    Att.      HP    AmmoUse   OilUse", 0, 0, 8)
 
 	for k in player.military.keys():
 		if 	k not in ["frigates", "iron_clad", "battle_ship"]:
@@ -1203,7 +1201,8 @@ def start_main_screen():
 			app.disableButton("dmg_rel_w" + k)
 		else:
 			app.enableButton("dmg_rel_w" + k)
-		if player.diplo_action < 1 or relations[relata].relationship >= -2.5:
+		other = players[k]
+		if player.diplo_action < 1 or (relations[relata].relationship >= -2.5 and other.type != "old_minor"):
 			app.disableButton("CB_" + k)
 		else:
 			app.enableButton("CB_" + k)
@@ -1225,7 +1224,7 @@ def start_main_screen():
 		else:
 			app.enableButton("embargo" + k)
 		if k not in player.CB.keys():
-			app.disableButton("war_on" + k)
+			app.disableButton("war_on" + k) 
 		else:
 			app.enableButton("war_on" + k)
 		count += 1
@@ -1635,10 +1634,10 @@ def attack1b(btn):
 	forces["artillery"] = app.getScale("Artillery")
 	forces["tank"] = app.getScale("Tank")
 	forces["fighter"] = app.getScale("Fighter")
-	weight = player.calculate_army_weight()
+	weight = player.calculate_army_weight(forces)
 	if weight > limit:
 		message = "Your force selection exceeds your carry limit. Please try again."
-		app.setLabel("general_message")
+		app.setLabel("general_message", message)
 		app.showSubWindow("Message_")
 		return
 	else:
@@ -1675,6 +1674,10 @@ def attack1b(btn):
 				updateLandBattleWindow(landBattle)
 				app.hideSubWindow("Select Land Forces")
 				app.showSubWindow("Land Battle")
+				defender = players[landBattle.defender]
+				if len(defender.provinces.keys()) == 0:
+					deleteNationGUI(defender.name)
+					del players[defender.name]
 				return
 		else:
 			landBattle.attacker_forces = forces
@@ -1687,6 +1690,10 @@ def attack1b(btn):
 			updateLandBattleWindow(landBattle)
 			app.hideSubWindow("Select Land Forces")
 			app.showSubWindow("Land Battle")
+			defender = players[landBattle.defender]
+			if len(defender.provinces.keys()) == 0:
+				deleteNationGUI(defender.name)
+				del players[defender.name]
 
 
 def updateSeaBattleWindow(battle):
@@ -1749,6 +1756,20 @@ def updateLandBattleWindow(battle):
 	app.setLabel("att_engagement_losses", "%.2f" % battle.att_eng_losses)
 	app.setLabel("def_engagement_losses", "%.2f" % battle.def_eng_losses)
 	app.setImage("battle_winner", battle.winner + ".gif")
+
+	
+def deleteNationGUI(deleted):
+	app.removeImage(deleted + " flag")
+	app.removeLabel("relations_with_" + deleted)
+	app.removeButton("imp_rel_w" + deleted)
+	app.removeButton("dmg_rel_w" + deleted)
+	app.removeButton("CB_" + deleted)
+	app.removeButton("destab" + deleted)
+	app.removeButton("bribe" + deleted)
+	app.removeButton("sab_rel" + deleted)
+	app.removeButton("embargo" + deleted)
+	app.removeButton("war_on" + deleted)
+	app.removeButton("info" + deleted)
 
 
 def update_production_gui():
@@ -2005,20 +2026,24 @@ def AI_turnS(auto_save):
 				del i
 	for o in order:
 		if o not in players.keys():
-			continue
+			continue	
 		if type(players[o]) == AI:
 			AI_turn(players, players[o], market, relations, provinces)
+			if players[o].has_obliterated != "":
+				deleted = players[o].has_obliterated
+				deleteNationGUI(deleted)
+				del players[deleted]
 		else:
 			for k in players[o].goods_produced.keys():
 				players[o].goods_produced[k] = 0
 	gc.collect()
 	
-	if auto_save != "":
+	if market.auto_save != "":
 
 		#if market.turn % 2 == 1:
 		app.showSubWindow("saving")
 		print("Saving....\n")
-		save_game(auto_save, players, relations, market, provinces)
+		save_game(market.auto_save, players, relations, market, provinces)
 		app.hideSubWindow("saving")
 	for p in provinces.values():
 		temp = p.owner
@@ -2606,7 +2631,7 @@ def menuPress(command):
 	
 		initial = {"players": players, "provinces": provinces, "relations": relations, "market": market}
 	elif command == "Save":
-		save_game(auto_save, players, relations, market, provinces)
+		save_game(market.auto_save, players, relations, market, provinces)
 	elif command == "Save as...":
 		print("Please provide a name for the save")
 		name = input()
@@ -2644,8 +2669,8 @@ def gui_load_game(btn):
 	save_path = save_path.name
 	state = load_game(save_path)
 	initial = compile_loaded_game(state)
-
-	global players, relations, provinces, market
+	global players, relations, provinces, market, save_game
+	save_game = market.save_game
 	players = initial["players"]
 	relations = initial["relations"]
 	provinces = initial["provinces"]
@@ -2656,6 +2681,7 @@ def gui_load_game(btn):
 			global human_player
 			human_player = p.name
 			break
+	load_basic_widgets()
 	start_main_screen()
 	#start_game_tread()
 
@@ -2690,7 +2716,7 @@ def load_basic_widgets():
 	app.addRadioButton("Scen", "Semi-Historical")
 	app.addRadioButton("Scen", "Fictional")
 	#app.setRadioButton("Scen", "None", callFunction = True)
-	#app.setRadioButtonFunction("Scen", gameChoice)   # call this funciton, whenever the RadioButton changes
+	#app.setRadioButtonFunction("Scen", gameChoice)   # call this function, whenever the RadioButton changes
 	#app.setRadioButtonChangeFunction("Scen", gameChoice)
 	app.addButton("Cont", scen_press)
 	app.stopSubWindow()

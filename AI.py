@@ -49,6 +49,8 @@ class AI(Player):
 			"Offensive": 0.5
 		}
 
+		self.has_obliterated = ""
+
 		self.general_priority = ""
 
 		self.rival_target = []
