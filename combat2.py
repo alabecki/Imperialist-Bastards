@@ -48,8 +48,7 @@ def delete_nation(attacker, defender, players, market, relations):
 				pl.objectives.remove(defender.name)
 		if defender.name in pl.embargo:
 			pl.embargo.remove(defender.name)
-	del players[defender.name]
-	#Remember to do something delete player in UI
+
 
 def war_after_math(player, target, players, relations, prov, provinces, market):
 	print("War Aftermath")
@@ -202,6 +201,7 @@ class Battle(object):
 				loss = choice(possibilities)
 				defender.developments[loss] -= 1
 		prov.owner = attacker.name
+		print("%s is now owned by %s" % (prov.name, attacker.name))
 		#new = deepcopy(p2.provinces[prov.name])
 		attacker.number_developments += prov.development_level 
 		#maybe add an option for sorchered earth 
@@ -348,65 +348,43 @@ class LandBattle(Battle):
 		player = players[self.attacker]
 		count = 0
 		num_units = self.calculate_amphib_num_units(players)
-		while(losses > 0.5 and num_units >= 0.5 and count < 25):
+		while(losses >= 0.25 and num_units >= 0.5 and count < 64):
 			count += 1
 			pick = uniform(0, 1)
 			print("att loss pick %.2f" % pick)
+			num_units -= 0.25
+			player.POP -= 0.05
+			player.milPOP -= 0.05
+			player.numLowerPOP -= 0.05
+			losses -= 0.25
 			if pick <= 0.30:
-				if(self.attacker_forces["infantry"] >= 0.5):
-					self.attacker_forces["infantry"] -= 0.5
-					player.military["infantry"] -=0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(self.attacker_forces["infantry"] >= 0.25):
+					self.attacker_forces["infantry"] -= 0.25
+					player.military["infantry"] -=0.25
 				else:
 					continue
 			elif pick > 0.25 and pick <= 0.55:
-				if(self.attacker_forces["cavalry"] >= 0.5):
-					self.attacker_forces["cavalry"] -= 0.5
-					player.military["cavalry"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(self.attacker_forces["cavalry"] >= 0.25):
+					self.attacker_forces["cavalry"] -= 0.25
+					player.military["cavalry"] -= 0.25
 				else:
 					continue
-
 			elif pick > 0.55 and pick <= 0.75:
-				if(self.attacker_forces["tank"] >= 0.5):
-					player.military["tank"] -= 0.5
-					num_units -= 0.5
-					self.attacker_forces["tank"] -= 0.5					
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(self.attacker_forces["tank"] >= 0.25):
+					player.military["tank"] -= 0.25
+					self.attacker_forces["tank"] -= 0.25					
 				else:
 					continue
 			elif pick > 0.77 and pick <= 0.90:
 				if(self.attacker_forces["artillery"]):
-					player.military["artillery"] -= 0.5
-					self.attacker_forces["artillery"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+					player.military["artillery"] -= 0.25
+					self.attacker_forces["artillery"] -= 0.25
 				else:
 					continue
 			elif pick > 0.90:
-				if(self.attacker_forces["fighter"] >= 0.5):
-					player.military["fighter"] -= 0.5
-					num_units -= 0.5
-					self.attacker_forces["fighter"] -= 0.5
-					#player.num_units -=0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(self.attacker_forces["fighter"] >= 0.25):
+					player.military["fighter"] -= 0.25
+					self.attacker_forces["fighter"] -= 0.25
 				else:
 					continue
 
@@ -414,61 +392,40 @@ class LandBattle(Battle):
 		player = players[self.defender]
 		num_units = player.calculate_number_of_units()
 		count = 0
-		while(losses >= 0.5 and num_units >= 0.5 and count < 25):
+		while(losses >= 0.5 and num_units >= 0.5 and count < 64):
 			count += 1
 			pick = uniform(0, 1)
+			num_units -= 0.25
+			player.POP -= 0.05
+			player.milPOP -= 0.05
+			player.numLowerPOP -= 0.05
+			losses -= 0.25
 			print("def loss pick %.2f" % pick)
 			if pick <= 0.30:
-				if(player.military["infantry"] >= 0.5):
-					player.military["infantry"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(player.military["infantry"] >= 0.25):
+					player.military["infantry"] -= 0.25
 				else:
 					continue
 			elif pick > 0.30 and pick <= 0.55:
-				if(player.military["cavalry"] >= 0.5):
-					player.military["cavalry"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(player.military["cavalry"] >= 0.25):
+					player.military["cavalry"] -= 0.25
 				else:
 					continue
 			elif pick > 0.55 and pick <= 0.77:
-				if(player.military["tank"] >= 0.5):
-					player.military["tank"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(player.military["tank"] >= 0.25):
+					player.military["tank"] -= 0.25
 				else:
 					continue
 
 			elif pick > 0.77 and pick <= 0.9:
-				if(player.military["artillery"] >= 0.5):
-					player.military["artillery"] -= 0.5
-					num_units -= 0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(player.military["artillery"] >= 0.25):
+					player.military["artillery"] -= 0.25
 				else:
 					continue
 
 			elif pick > 0.9:
-				if(player.military["fighter"] >= 0.5):
-					player.military["fighter"] -= 0.5
-					num_units -= 0.5
-					#player.num_units -=0.5
-					player.POP -= 0.1
-					player.milPOP -= 0.1
-					player.numLowerPOP -= 0.1
-					losses -= 0.5
+				if(player.military["fighter"] >= 0.25):
+					player.military["fighter"] -= 0.25
 				else:
 					continue
 		return num_units
@@ -685,40 +642,29 @@ class SeaBattle(Battle):
 
 def distribute_naval_losses(player, losses, num_units):
 	limit = 0
-	while(losses > 0.2 and num_units >= 0.2):
-		while(player.military["frigates"] > 0.2 and losses > 0.2):
+	while(losses >= 0.25 and num_units >= 0.25 and limit < 128):
+		limit += 1
+		losses -= 0.25
+		while(player.military["frigates"] >= 0.25 and losses >= 0.25):
 		#	print("Losses %s, num_units %s \n" % (losses, num_units))
-			player.military["frigates"] -=0.5
-			player.POP -= 0.1
-			player.milPOP -= 0.1
-			player.numLowerPOP -= 0.1
-			num_units -= 0.5
-			losses -= 0.5
-			limit += 1
-			if limit > 20:
-				break
-		while(player.military["iron_clad"] >= 0.2 and losses > 0.2):
-			player.military["iron_clad"] -= 0.25
+			player.military["frigates"] -= 0.25
 			player.POP -= 0.05
 			player.milPOP -= 0.05
 			player.numLowerPOP -= 0.05
 			num_units -= 0.25
-			losses -= 0.5
-			limit += 1
-			if limit > 30:
-				break
-		while(player.military["battle_ship"] >= 0.2 and losses > 0.2):
-			player.military["battle_ship"] -= 0.125
-			player.POP -= 0.025
-			player.milPOP -= 0.025
-			player.numLowerPOP -= 0.025
+		while(player.military["iron_clad"] >= 0.125 and losses > 0.125):
+			player.military["iron_clad"] -= 0.125
+			player.military["frigates"] -= 0.25
+			player.POP -= 0.125
+			player.milPOP -= 0.125
+			player.numLowerPOP -= 0.125
 			num_units -= 0.125
-			losses -= 0.5
-			limit += 1
-			if limit > 40:
-				break
-		limit += 1
-		if limit > 60:
-			return num_units
+		while(player.military["battle_ship"] >= 0.0625 and losses > 0.0625):
+			player.military["battle_ship"] -= 0.0625
+			player.POP -= 0.0625
+			player.milPOP -= 0.0625
+			player.numLowerPOP -= 0.0625
+			num_units -= 0.0625
+			losses -= 0.0625
 	return num_units
 	

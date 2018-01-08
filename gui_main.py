@@ -70,12 +70,12 @@ def update_market_tab():
 	for k, v in player.resources.items():
 		if k in ["gold", "/", "//"]:
 			continue
-		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+		app.setLabel("i_" + k + "_value", "%.1f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
 			(round(player.resources[k]), len(market.market[k]), player.supply[k], \
 			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
 
 	for k, v in player.goods.items():
-		app.setLabel("i_" + k + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
+		app.setLabel("i_" + k + "_value", "%.1f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
 			(round(player.goods[k]), len(market.market[k]), player.supply[k], \
 			market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])))
 	update_buy_button()
@@ -85,20 +85,20 @@ def update_main_tab():
 	global players, human_player, market
 	player = players[human_player]
 	#Update Main Tab (except map)
-	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
-	app.setLabel("l5", "%.2f" % round(player.culture_points, 2))
-	app.setLabel("l6",  "%.2f" % round(player.POP, 2))
-	app.setLabel("l10", "%.2f" % round(player.stability, 2))
-	app.setLabel("l11", "%.2f" % round(player.diplo_action, 2))
-	app.setLabel("l12", "%.2f" % round(player.freePOP, 2))
-	app.setLabel("l16", "%.2f" % round(player.AP, 2))
-	app.setLabel("l17", "%.2f" % round(player.research, 2))
-	app.setLabel("l18", "%.2f" % round(player.numMidPOP, 2))
-	app.setLabel("l22", "%s" % (player.development_level))
-	app.setLabel("l23", "%.2f" % round(player.new_development, 2))
-	app.setLabel("l24", "%.2f" % round(player.reputation, 2))
+	app.setLabel("l4", "%.1f" % player.resources["gold"])
+	app.setLabel("l5", "%.1f" % player.culture_points)
+	app.setLabel("l6",  "%.1f" % player.POP)
+	app.setLabel("l10", "%.1f" % player.stability)
+	app.setLabel("l11", "%.1f" % player.diplo_action)
+	app.setLabel("l12", "%.1f" % player.freePOP)
+	app.setLabel("l16", "%.1f" % player.AP)
+	app.setLabel("l17", "%.1f" % player.research)
+	app.setLabel("l18", "%.1f" % player.numMidPOP)
+	app.setLabel("l22", "%d" % player.development_level)
+	app.setLabel("l23", "%.1f" % player.new_development)
+	app.setLabel("l24", "%.1f" % player.reputation)
 	app.setLabel("l27", player.num_colonies)
-	app.setLabel("l28", "%.2f / %.2f" % (round(player.colonization), 1 + round(player.num_colonies * 1.5)))
+	app.setLabel("l28", "%.1f / %.1f" % (player.colonization, 1 + player.num_colonies * 1.5))
 	
 	if player.check_development() == False:
 		app.disableButton("Develop")
@@ -206,6 +206,7 @@ def update_diplomacy_tab():
 	global players, human_player, relations
 	player = players[human_player]
 	count = 1
+	player_keys = players.keys()
 	for k, v in players.items():
 		if k == player.name:
 			continue
@@ -399,6 +400,7 @@ def start_main_screen():
 	if market.auto_save != "":
 		app.hideSubWindow("saving")
 	app.showSubWindow("loading new game")
+	#app.setBgImage("simple_background.gif")
 	#app.playSound("Grand March from Aida.wav", wait=False)
 	app.startTabbedFrame("GameGUI")
 	app.startTab("MainTab")
@@ -429,9 +431,9 @@ def start_main_screen():
 	app.addImage("l3", "POP.gif", 4, 1)
 	app.setImageTooltip("l3", "Population")
 	app.shrinkImage("l3", 2)
-	app.addLabel("l4", "%.2f" % round(player.resources["gold"], 2), 2, 2)
-	app.addLabel("l5", "%.2f" % round(player.culture_points, 2), 3, 2)
-	app.addLabel("l6",  "%.2f" % round(player.POP, 2), 4, 2)
+	app.addLabel("l4", "%.1f" % (player.resources["gold"]), 2, 2)
+	app.addLabel("l5", "%.1f" % (player.culture_points), 3, 2)
+	app.addLabel("l6",  "%.1f" % (player.POP), 4, 2)
 	
 	app.addLabel("l7", "Stability", 2, 3)
 	app.addImage("l7", "stability.gif", 2, 3)
@@ -445,9 +447,9 @@ def start_main_screen():
 	app.addImage("l9", "freePOP.gif", 4,3)
 	app.setImageTooltip("l9", "Free POPs")
 	app.shrinkImage("l9", 2)
-	app.addLabel("l10", "%.2f" % round(player.stability, 2), 2, 4)
-	app.addLabel("l11", "%.2f" % round(player.diplo_action, 2), 3, 4)
-	app.addLabel("l12", "%.2f" % round(player.freePOP, 2), 4, 4)
+	app.addLabel("l10", "%.1f" % (player.stability), 2, 4)
+	app.addLabel("l11", "%.1f" % (player.diplo_action), 3, 4)
+	app.addLabel("l12", "%.1f" % (player.freePOP), 4, 4)
 	app.addLabel("l13", "AP", 2, 5)
 	app.addImage("l13", "AP.gif", 2, 5)
 	app.setImageTooltip("l13", "Action Points")
@@ -461,9 +463,9 @@ def start_main_screen():
 	app.setImageTooltip("l15", "Middle POP")
 
 	app.shrinkImage("l15", 2)
-	app.addLabel("l16", "%.2f" % round(player.AP, 2), 2, 6)
-	app.addLabel("l17", "%.2f" % round(player.research, 2), 3, 6)
-	app.addLabel("l18", "%.2f" % round(player.numMidPOP, 2), 4, 6)
+	app.addLabel("l16", "%.1f" % (player.AP), 2, 6)
+	app.addLabel("l17", "%.1f" % (player.research), 3, 6)
+	app.addLabel("l18", "%.1f" % (player.numMidPOP), 4, 6)
 
 	app.addLabel("l19", "Dev Level", 2, 7)
 	app.addImage("l19", "dev_level.gif", 2, 7)
@@ -479,8 +481,8 @@ def start_main_screen():
 
 	app.shrinkImage("l21", 2)
 	app.addLabel("l22", "%s" % (player.development_level), 2, 8)
-	app.addLabel("l23", "%.2f" % round(player.new_development, 2), 3, 8)
-	app.addLabel("l24", "%.2f" % round(player.reputation, 2), 4, 8)
+	app.addLabel("l23", "%.1f" % (player.new_development), 3, 8)
+	app.addLabel("l24", "%.1f" % (player.reputation), 4, 8)
 
 	app.addLabel("l25", "Colonial", 2, 10)
 	app.addImage("l25", "flag.gif", 2, 10)
@@ -493,7 +495,7 @@ def start_main_screen():
 	app.shrinkImage("l26", 4)
 	
 	app.addLabel("l27", player.num_colonies, 2, 11)
-	app.addLabel("l28", "%.2f / %.2f" % (round(player.colonization), 1 + round(player.num_colonies * 1.5)), 3, 11)
+	app.addLabel("l28", "%.1f / %.1f" % (player.colonization, 1 + player.num_colonies), 3, 11)
 
 	for i in range(1, 29):
 		sz = "l" + str(i)
@@ -502,12 +504,11 @@ def start_main_screen():
 		app.setLabelRelief(sz, "ridge")
 		app.setLabelAlign(sz, "left")
 
-	app.addImageButton("New Turn", next_turn, "turn.gif", 2, 15)
+	app.addImageButton("New Turn", next_turn, "turn.gif", 2, 13, 2, 2)
 	app.setButtonTooltip("New Turn", "Next Turn")
-	#app.setButtonBg("Next Turn", "dark green")
 	app.setSticky("w")
 
-	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 3, 15)
+	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 4, 13, 2, 2)
 	app.setButtonTooltip("POP UP", "Increase Population")
 	if(player.POP_increased > 1):
 		app.disableButton("POP UP")
@@ -518,7 +519,7 @@ def start_main_screen():
 	else:
 		app.enableButton("POP UP")
 
-	app.addImageButton("Develop", dev_type, "develop.gif", 4, 15)
+	app.addImageButton("Develop", dev_type, "develop.gif", 4, 15, 2, 2)
 	app.setButtonTooltip("Develop", "Increase Development Level")
 	#app.setPadding(2, 2)
 	#app.setInPadding(2,2)
@@ -576,7 +577,6 @@ def start_main_screen():
 			app.addLabel("dev" + p.name, "Ind. Development: ", 1, 1)
 			app.addLabel("worked" + p.name, "Worked? ", 2, 1)
 			app.addLabel("cult"+ p.name, "Culture: ", 2, 2 )
-			
 			#app.addButton("Work "+p.name + "?", work_prov)
 			app.addImageButton("Work " + p.name +"?", work_prov, "work.gif", 3, 0)
 			app.setButtonTooltip("Work " + p.name +"?", "Work " + p.name +"?")
@@ -632,7 +632,7 @@ def start_main_screen():
 		app.shrinkImage("i_" + k, 2)
 		app.setLabelWidth("i_" + k, 1)
 		app.addLabel("i_" + k + "_value", "%.2f     %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
-			(round(player.resources[k]), len(market.market[k]), player.supply[k], \
+			(player.resources[k], len(market.market[k]), player.supply[k], \
 				market.buy_price(k, len(market.market[k])), market.buy_price(k, player.supply[k])), i, 1)
 		app.setLabelRelief("i_" + k + "_value", "ridge")
 		app.setLabelAlign("i_" + k + "_value", "left")
@@ -738,10 +738,10 @@ def start_main_screen():
 		if f not in fact_options:
 			app.disableButton("upgrade_" + f)
 		else:
-			enableButton("upgrade_" + f)
-		app.addLabel("iamount_" + f, "%.2f" % player.goods[f], i, 4, 1, 1)
-		app.addLabel("producing_" + f, "%.2f" % player.goods_produced[f], i, 6, 1, 1)
-		app.addLabel("abprod_" + f, "%.2f" % player.amount_can_manif(f), i, 5, 1, 1)
+			app.enableButton("upgrade_" + f)
+		app.addLabel("iamount_" + f, "%.1f" % player.goods[f], i, 4, 1, 1)
+		app.addLabel("producing_" + f, "%.1f" % player.goods_produced[f], i, 6, 1, 1)
+		app.addLabel("abprod_" + f, "%.1f" % player.amount_can_manif(f), i, 5, 1, 1)
 		app.addImageButton("produce_" + f, manifacture_good_1, "build.gif", i, 7, 1, 1)
 		app.setButtonTooltip("produce_" + f, "Produce " + f)
 		#app.addNamedButton("Produce", "produce_" + f, manifacture_good_1, i, 7, 1, 1)
@@ -1123,7 +1123,7 @@ def start_main_screen():
 				app.disableButton("build_" + k)
 			else:
 				enableButton("build_" + k)
-		app.addNamedButton("Disband", "disband_" + k, disband_army, row, 7, 1, 1)
+		app.addImageButton("disband_" + k, disband_army, "red_x.gif", row, 7, 1, 1)
 		if player.military[k] < 1:
 			app.disableButton("disband_" + k)
 		else:
@@ -1390,7 +1390,7 @@ def bribe(btn):
 		update_diplomacy_tab()
 	else:
 		update_diplo_tab_singular(other)
-	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
+	app.setLabel("l4", "%.1f" % (player.resources["gold"]))
 	app.showSubWindow("Message_")
 
 
@@ -1526,7 +1526,7 @@ def wage_war(btn):
 	annex = provinces[annex]
 	owner = players[other]
 	if owner.type == "major" and annex.colony == True:
-		if player.check_for_border(owner.name):
+		if player.check_for_border(owner.name, players):
 			message = "Since %s is a colony and you border %s, you may take it\
 			either by establishing naval domination or by direct land invasion" % (annex.name, owner.name)
 			app.showSubWindow("Land_or_Sea")
@@ -2055,7 +2055,8 @@ def AI_turnS(auto_save):
 	app.setMessage("turn_market_report", market.market_report)
 
 	player = players[human_player]
-	print("____________________________________________________________________________________")
+	
+
 	player.calculate_access_to_goods(market)
 	app.setLabel("t1", "Turn:" +  str(market.turn))
 	update_gui()
@@ -2065,6 +2066,15 @@ def AI_turnS(auto_save):
 			app.showSubwindow("Naval Intercept")
 		elif market.landBattleAgainstPlayer != 0:
 			land_defense()
+	if len(player.provinces.keys()) == 0:
+		message = "My lord, your nation is no longer in possession of any provinces! I am afraid it is not longer possible to continue your global exploits \n"
+		app.setLabel("general_message", message)
+		app.showSubwindow("Message_")
+		#app.removeAllWidgets()
+		return
+	market.landBattleAgainstPlayer = 0
+	market.seaBattleAgainstPlayer = 0
+
 
 
 
@@ -2098,11 +2108,11 @@ def do_nothing(btn):
 
 def land_defense():
 	global players, market, relations, provinces
+	landBattle = market.landBattleAgainstPlayer
 	player = players[landBattle.defender]
 	other = players[landBattle.attacker]
-	landBattle = market.landBattleAgainstPlayer
 	landBattle.landCombat(players, market, relations, provinces)
-	p = provinces.landBattle.prov
+	p = provinces[landBattle.prov]
 	if p in player.provinces.keys():
 		if landBattle.winner != player.name:
 			app.removeSubWindow("human" + p.position)
@@ -2113,11 +2123,11 @@ def land_defense():
 
 def sea_defense():
 	global players, market, relations, provinces
+	seaBattle = market[seaBattleAgainstPlayer]
 	player = players[seaBattle.defender]
 	other = players[seaBattle.attacker]
-	seaBattle = market.seaBattleAgainstPlayer
 	seaBattle.naval_battle(players, market, relations, provinces)
-	p = provinces.seaBattle.prov
+	p = provinces[seaBattle.prov]
 	if p in player.provinces.keys():
 		if seaBattle.winner != player.name:
 			app.removeSubWindow("human" + p.position)
@@ -2147,7 +2157,7 @@ def integrate_culture(btn):
 	global players, human_player, market
 	player = players[human_player]
 	opts = player.check_for_non_accepted_cultures()
-	app.changeOptionBox("prov_to_integrate", opts)
+	app.changeOptionBox("prov_to_int", opts)
 	app.showSubWindow("Province to Integrate")
 
 
@@ -2155,7 +2165,7 @@ def integrate_culture_2(btn):
 	app.hideSubWindow("Message_")
 	global players, human_player
 	player = players[human_player]
-	app.hideSubWindow("Provinces to Integrate")
+	app.hideSubWindow("Province to Integrate")
 	prov = app.getOptionBox("prov_to_int")
 	if player.integrate_Culture(prov):
 		message = "The people of %s have been 'integrated' into our superior culture!" % prov
@@ -2456,16 +2466,14 @@ def free_prov(btn):
 
 def dev_prov(btn):
 	global players, human_player
-	print("Button before: %s" % (btn))
 	btn = btn[8:]
-	print("Button after %s" % (btn))
 	player = players[human_player]
 	player.dev_p(btn)
 	p = player.provinces[btn]
 	app.setLabel("dev" + p.name, str(p.development_level))
 	app.setLabel("l16", player.AP)
 	app.setLabel("l23", player.new_development)
-	if player.can_improve_prov(p) == False:
+	if player.can_improve_prov(p.name) == False:
 		app.disableButton("Develop " + p.name)
 	else:
 		app.enableButton("Develop " + p.name)
@@ -2562,7 +2570,7 @@ def _buy(btn):
 		app.setLabel("i_" + _type + "_value", "%.2f    %-6.1f (%-6.1f)  %-6.1f (%-6.1f)" % \
 			(round(player.goods[_type]), len(market.market[_type]), player.supply[_type], \
 			market.buy_price(_type, len(market.market[_type])), market.buy_price(_type, player.supply[_type])))
-	app.setLabel("l4", "%.2f" % round(player.resources["gold"], 2))
+	app.setLabel("l4", "%.1f" % player.resources["gold"])
 	app.hideSubWindow("chose_seller")
 	update_buy_button()
 
@@ -2669,12 +2677,12 @@ def gui_load_game(btn):
 	save_path = save_path.name
 	state = load_game(save_path)
 	initial = compile_loaded_game(state)
-	global players, relations, provinces, market, save_game
-	save_game = market.save_game
+	global players, relations, provinces, market
 	players = initial["players"]
 	relations = initial["relations"]
 	provinces = initial["provinces"]
 	market = initial["market"]
+	save_game = market.auto_save
 	human = ""
 	for p in players.values():
 		if type(p) == Human:

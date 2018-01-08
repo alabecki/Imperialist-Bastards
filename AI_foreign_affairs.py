@@ -5,7 +5,6 @@ from combat import*
 from combat2 import*
 from player_class import*
 from globe import*
-
 import queue as queue
 from random import*
 
@@ -139,7 +138,8 @@ def decide_target(player, players, market, provinces, relations):
 		for pl, play in players.items():
 			if pl == player.name:
 				continue
-			relata = frozenset([_opt.owner, play.name])
+			#relata = frozenset([_opt.owner, play.name])
+			relata = frozenset([owner.name, play.name])
 			if len(relata) == 1:
 				continue
 			if relations[relata].relationship >= 2.6:
@@ -551,7 +551,7 @@ def attack_target(player, players, relations, provinces, market):
 		cb = cb[0]	
 		prov = provinces[cb.province]
 		if cb.opponent != prov.owner:
-			del player.CB[cb.opponent]
+			player.CB = {}
 			player.rival_target = []
 			if len(player.CB.keys()) <= 0:
 				return
@@ -666,11 +666,11 @@ def amphib_assult(player, target, annex, players, market, relations, provinces):
 	else:
 		market.landBattle = landBattle
 		landBattle.landCombat(players, market, relations, provinces)
-	defender = players[landBattle.defender]
-	attacker = players[landBattle.attacker]
-	if len(defender.provinces.keys()) == 0:
-		#del players[defender.name]
-		attacker.has_obliterated = defender.name
+		defender = players[landBattle.defender]
+		attacker = players[landBattle.attacker]
+		if len(defender.provinces.keys()) == 0:
+			#del players[defender.name]
+			attacker.has_obliterated = defender.name
 
 def ground_assult(player, target, annex, players, market, relations, provinces):
 	player = players[player]
@@ -689,10 +689,10 @@ def ground_assult(player, target, annex, players, market, relations, provinces):
 		market.landBattle = landBattle
 		landBattle.landCombat(players, market, relations, provinces)
 		#war_after_math(player, target, players, relations)
-	defender = players[landBattle.defender]
-	attacker = players[landBattle.attacker]
-	if len(defender.provinces.keys()) == 0:
-		attacker.has_obliterated = defender.name
+		defender = players[landBattle.defender]
+		attacker = players[landBattle.attacker]
+		if len(defender.provinces.keys()) == 0:
+			attacker.has_obliterated = defender.name
 
 	#	del players[defender.name]
 
@@ -708,12 +708,12 @@ def naval_assult(player, target, annex, players, market, relations, provinces):
 	else:
 		market.seaBattle = seaBattle
 		seaBattle.naval_battle(players, market, relations, provinces)
-	landBattle
-	defender = players[seaBattle.defender]
-	attacker = players[seaBattle.attacker]
-	if len(defender.provinces.keys()) == 0:
-		attacker.has_obliterated = defender.name
-	#	del players[defender.name]
+		
+		defender = players[seaBattle.defender]
+		attacker = players[seaBattle.attacker]
+		if len(defender.provinces.keys()) == 0:
+			attacker.has_obliterated = defender.name
+		#	del players[defender.name]
 
 
 

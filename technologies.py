@@ -31,11 +31,11 @@ technology_dict = {
 	"ironclad": {"requirement": {"breach_loaded_arms", "compound_steam_engine"}, "cost": 5, "min_mid": 8},
 	"electricity": {"requirement": {"chemistry"}, "cost": 5, "min_mid": 6},									#electrical gear factory, rubber
 	"medicine": {"requirement": {"chemistry"}, "cost": 5, "min_mid": 7},
-	"synthetic_dyes": {"requirement": {"fertlizer"}, "cost": 5, "min_mid": 8},					
-	"fertlizer": {"requirement": {"chemistry"}, "cost": 5, "min_mid": 8},
-	"dynamite": {"requirement": {"fertlizer"}, "cost": 5, "min_mid": 8},
+	"synthetic_dyes": {"requirement": {"fertilizer"}, "cost": 5, "min_mid": 8},					
+	"fertilizer": {"requirement": {"chemistry"}, "cost": 5, "min_mid": 8},
+	"dynamite": {"requirement": {"fertilizer"}, "cost": 5, "min_mid": 8},
 	"compound_steam_engine": {"requirement": {"bessemer_process", "chemistry"}, "cost": 5, "min_mid": 8},
-	"telegraph": {"requirement": {"electricity"}, "cost": 5, "min_mid": 9},
+	"telegraph": {"requirement": {"electricity"}, "cost": 5, "min_mid": 7},
 	"radio": {"requirement": {"telephone"}, "cost": 7, "min_mid": 10},									#radio factory
 	"oil_drilling": {"requirement": {"dynamite"}, "cost": 6, "min_mid": 10},				#oil resource
 	#"photography": {"requirement": {"electricity"}, "cost": 3, "min_mid": 1.0},			
@@ -95,10 +95,10 @@ tech_descriptions = {
 	(Requires: chemistry)""",	
 	"medicine": """May use Chemicals if you wish to increase your Pop twice in a single turn. (Requires: chemistry) """,
 	"synthetic_dyes": """Chemicals may be converted into dyes and Chemical factory may be upgraded to Level 2. \
-	Also, Rubber provinces may be developed to Level 2. (Requires: fertlizer)""",					
-	"fertlizer": """May convert a Chemical unit to a Food unit once for each Food producing province. (Requires: chemistry)""",
+	Also, Rubber provinces may be developed to Level 2. (Requires: fertilizer)""",					
+	"fertilizer": """May convert a Chemical unit to a Food unit once for each Food producing province. (Requires: chemistry)""",
 	"dynamite": """May develop Iron provices may be upgraded to Level 2, Gold provinces may be upgraded to Level 1. \
-	 (Requires: fertlizer)""",
+	 (Requires: fertilizer)""",
 	"compound_steam_engine": """Cotton and Wood provinces may be upgraded to Level 2, Dyes provinces may be upgraded to Level 1 \
 	(Requires: chemistry and bessemer_process)""",
 	"telegraph": "Factory throughput +1, Production Modifier +0.15, Organization  factor +0.15. \

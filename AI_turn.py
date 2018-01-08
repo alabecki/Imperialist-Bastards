@@ -30,9 +30,13 @@ def AI_turn(players, player, market, relations, provinces):
 	if player.reputation < 0.6:
 		player.reputation += player.developments["culture"] * 0.15
 
+	for k in player.military.keys():
+		if player.military[k] < 0:
+			player.military[k] = 0
+	
 
 	player.AP += 1
-	#print("AP = %s" % (player.AP))
+	print("AP = %s" % (player.AP))
 
 	player.calculate_access_to_goods(market)
 

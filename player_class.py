@@ -505,7 +505,6 @@ class Player(object):
 	def collect_resources(self, market):
 		stab_rounds = round(self.stability * 2) / 2
 		res_dict = {
-			
 			"gold": 0,
 			"food": 0,
 			"iron": 0,
@@ -516,7 +515,6 @@ class Player(object):
 			"spice": 0,
 			"rubber": 0,
 			"oil": 0,
-		
 		}
 
 		for k, p in self.provinces.items():
@@ -532,7 +530,7 @@ class Player(object):
 						c_mod = 0.70
 				if p.resource == "rubber" and "chemistry" not in self.technologies:
 					gain = stability_map[stab_rounds] * p.quality * c_mod * 0.75
-					res_dict["food"] += gain
+					res_dict["wood"] += gain
 					#self.resources["wood"] += gain
 					continue 
 				if p.resource == "oil" and p.development_level == 0:
@@ -558,7 +556,6 @@ class Player(object):
 					#print(p.resource)
 					res_dict[p.resource] += gain
 		for r, res in res_dict.items():
-			
 			#print(r, res)
 			self.resources[r] += res
 			
@@ -663,6 +660,8 @@ class Player(object):
 
 	def turn(self, market):
 		self.crafted = False
+		for fact in self.factories.keys():
+			self.factories[fact]["used"] = False
 		self.POP_increased = 0
 		if self.stability < -3: 
 			self.stability = - 3
@@ -700,7 +699,7 @@ class Player(object):
 		self.research += research_gain
 		#globe.research.append([self.name, research_gain])
 		#diplo_gain = 0.2 + (self.midPOP["bureaucrats"]["number"] * self.reputation * 2)
-		diplo_gain = 0.2 + (self.developments["government"] * self.reputation * 0.5)
+		diplo_gain = 0.2 + (self.developments["government"] * self.reputation * 0.75)
 		self.diplo_action += diplo_gain
 		#globe.diplomacy.append([self.name, diplo_gain])
 		print("Diplo_action gain: %s " % (diplo_gain))
@@ -1288,7 +1287,7 @@ class Player(object):
 		transport_limit += (self.military["battle_ship"] * 6)
 		return transport_limit 
 
-	def calculate_army_weight(self):
+	def calculate_army_weight(self, forces):
 		weight = 0
 		weight += forces["infantry"]
 		weight += (forces["cavalry"] * 2)

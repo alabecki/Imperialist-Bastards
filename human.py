@@ -125,6 +125,7 @@ class Human(Player):
 	def dev_p(self, prov):
 		self.provinces[prov].development_level += 1
 		self.AP -= 1
+		self.number_developments += 1
 		self.goods["parts"] -= 1
 		self.resources["wood"] -=1
 		self.new_development -=1
