@@ -392,7 +392,7 @@ class LandBattle(Battle):
 		player = players[self.defender]
 		num_units = player.calculate_number_of_units()
 		count = 0
-		while(losses >= 0.5 and num_units >= 0.5 and count < 64):
+		while(losses >= 0.25 and num_units >= 0.5 and count < 64):
 			count += 1
 			pick = uniform(0, 1)
 			num_units -= 0.25
@@ -402,17 +402,17 @@ class LandBattle(Battle):
 			losses -= 0.25
 			print("def loss pick %.2f" % pick)
 			if pick <= 0.30:
-				if(player.military["infantry"] >= 0.25):
+				if player.military["infantry"] >= 0.25:
 					player.military["infantry"] -= 0.25
 				else:
 					continue
 			elif pick > 0.30 and pick <= 0.55:
-				if(player.military["cavalry"] >= 0.25):
+				if player.military["cavalry"] >= 0.25:
 					player.military["cavalry"] -= 0.25
 				else:
 					continue
 			elif pick > 0.55 and pick <= 0.77:
-				if(player.military["tank"] >= 0.25):
+				if player.military["tank"] >= 0.25:
 					player.military["tank"] -= 0.25
 				else:
 					continue

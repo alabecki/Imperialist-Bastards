@@ -365,7 +365,7 @@ def create_auto_save(btn):
 
 
 def saving(bn):
-	global market
+	global players, relations, market, provinces
 	app.hideSubWindow("auto_save_name")
 	save_game(market.auto_save, players, relations, market, provinces)
 	app.showSubWindow("saving")
@@ -1798,9 +1798,8 @@ def update_production_gui():
 		app.enableButton("upgrade_fort")
 
 	app.setLabel("upgrade_shipyard", "shipyard Level: %d" % player.shipyard)
-	if (player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1) \
-	or (player.shipyard == 1 and "ironclad" not in player.technologies) \
-	or (player.shipyard == 2 and oil_powered_ships not in player.technologies):
+	if player.AP < 1 or player.new_development < 1 or player.resources["wood"] < 1 or player.goods["parts"] < 1 \
+	or (player.shipyard == 1 and "ironclad" not in player.technologies) or (player.shipyard == 2 and "oil_powered_ships" not in player.technologies):
 		app.disableButton("upgrade_shipyard")
 	else:
 		app.enableButton("upgrade_shipyard")
@@ -1916,8 +1915,7 @@ def update_military_tab():
 			app.setLabel("HP_" + k, "%.2f" % player.iron_clad["HP"])
 			app.setLabel("ammo_use_" + k, "%.2f" % player.iron_clad["ammo_use"])
 			app.setLabel("oil_use_" + k, "%.2f" % player.iron_clad["oil_use"])
-			if player.shipyard < 2 or player.AP < 1 or player.resources["iron"] < 1 or \
-			player.goods["cannons"] < 1.5 or player.goods["parts"] < 1:				
+			if player.shipyard < 2 or player.AP < 1 or player.resources["iron"] < 1 or player.goods["cannons"] < 1.5 or player.goods["parts"] < 1:				
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
@@ -1926,8 +1924,7 @@ def update_military_tab():
 			app.setLabel("HP_" + k, "%.2f" % player.battle_ship["HP"])
 			app.setLabel("ammo_use_" + k, "%.2f" % player.battle_ship["ammo_use"])
 			app.setLabel("oil_use_" + k, "%.2f" % player.battle_ship["oil_use"])
-			if player.shipyard < 3 or player.AP < 1 or player.goods["cannons"] < 4 \
-			or player.resources["iron"] < 3 or player.goods["parts"] < 1 or player.goods["gear"] < 1:
+			if player.shipyard < 3 or player.AP < 1 or player.goods["cannons"] < 4 or player.resources["iron"] < 3 or player.goods["parts"] < 1 or player.goods["gear"] < 1:
 				app.disableButton("build_" + k)
 			else:
 				app.enableButton("build_"+ k)
@@ -2014,6 +2011,7 @@ def update_military_buttons():
 
 def AI_turnS(auto_save):
 	global players, market, relations, provinces, human_player
+	player = players[human_player]
 	market.report = []
 	market.market_report = " "
 	market.turn +=1
@@ -2037,9 +2035,21 @@ def AI_turnS(auto_save):
 			for k in players[o].goods_produced.keys():
 				players[o].goods_produced[k] = 0
 	gc.collect()
+
+	if market.landBattleAgainstPlayer != 0 or market.seaBattleAgainstPlayer != 0:
+		if market.landBattleAgainstPlayer != 0 and market.seaBattleAgainstPlayer != 0:
+			app.showSubwindow("Naval Intercept")
+		elif market.landBattleAgainstPlayer != 0:
+			land_defense()
+
+	if len(player.provinces.keys()) == 0:
+		message = "My lord, your nation is no longer in possession of any provinces! I am afraid it is not longer possible to continue your global exploits \n"
+		app.setLabel("general_message", message)
+		app.showSubwindow("Message_")
+		#app.removeAllWidgets()
+		return
 	
 	if market.auto_save != "":
-
 		#if market.turn % 2 == 1:
 		app.showSubWindow("saving")
 		print("Saving....\n")
@@ -2052,26 +2062,13 @@ def AI_turnS(auto_save):
 		app.setButtonFg(p.position, owner.colour)
 
 	app.setMessage("turn_report", market.report)
-	app.setMessage("turn_market_report", market.market_report)
-
-	player = players[human_player]
-	
+	app.setMessage("turn_market_report", market.market_report)	
 
 	player.calculate_access_to_goods(market)
 	app.setLabel("t1", "Turn:" +  str(market.turn))
 	update_gui()
 	update_diplomacy_tab()
-	if market.landBattleAgainstPlayer != 0 or market.seaBattleAgainstPlayer != 0:
-		if market.landBattleAgainstPlayer != 0 and market.seaBattleAgainstPlayer != 0:
-			app.showSubwindow("Naval Intercept")
-		elif market.landBattleAgainstPlayer != 0:
-			land_defense()
-	if len(player.provinces.keys()) == 0:
-		message = "My lord, your nation is no longer in possession of any provinces! I am afraid it is not longer possible to continue your global exploits \n"
-		app.setLabel("general_message", message)
-		app.showSubwindow("Message_")
-		#app.removeAllWidgets()
-		return
+	
 	market.landBattleAgainstPlayer = 0
 	market.seaBattleAgainstPlayer = 0
 
@@ -2163,18 +2160,18 @@ def integrate_culture(btn):
 
 def integrate_culture_2(btn):
 	app.hideSubWindow("Message_")
-	global players, human_player
+	global players, human_player, provinces
 	player = players[human_player]
 	app.hideSubWindow("Province to Integrate")
 	prov = app.getOptionBox("prov_to_int")
-	if player.integrate_Culture(prov):
+	if player.integrate_Culture(prov, provinces):
 		message = "The people of %s have been 'integrated' into our superior culture!" % prov
 		update_gui()
 	else:
-		message = "Despite our best efforts, the stubborn populace of %s do not self-identify with \
-		themselves as people of %s" % (prov, player.name)
+		message = "Despite our best efforts, the stubborn populace of %s do not identify themselves as people of %s" % (prov, player.name)
 	app.setLabel("general_message", message)
 	update_diplomacy_tab()
+	app.setLabel("l5", "%.1f" % player.culture_points)
 	app.showSubWindow("Message_")	
 
 
@@ -2638,8 +2635,8 @@ def menuPress(command):
 		del copy_state
 	
 		initial = {"players": players, "provinces": provinces, "relations": relations, "market": market}
-	elif command == "Save":
-		save_game(market.auto_save, players, relations, market, provinces)
+	#elif command == "Save":
+	#	save_game(market.auto_save, players, relations, market, provinces)
 	elif command == "Save as...":
 		print("Please provide a name for the save")
 		name = input()
@@ -2863,16 +2860,23 @@ def load_basic_widgets():
 
 	app.startSubWindow("Land Battle")
 	app.addImage("attacking_nation", "crown.gif", 1, 2)
+	app.setImageTooltip("attacking_nation", "Attacking Nation")
 	app.addImage("defending_nation", "crown.gif", 1, 4)
+	app.setImageTooltip("defending_nation", "Defending Nation")
 	app.addImage("infantry_pic", "infantry.gif", 2, 3)
+	app.setImageTooltip("infantry_pic", "Infantry in Battle")
 	app.shrinkImage("infantry_pic", 2)
 	app.addImage("cavalry_pic", "cavalry.gif", 3, 3)
+	app.setImageTooltip("cavalry_pic", "Cavalry in Battle")
 	app.shrinkImage("cavalry_pic", 2)
 	app.addImage("artillery_pic", "artillery.gif", 4, 3)
+	app.setImageTooltip("artillery_pic", "Artillery in Battle")
 	app.shrinkImage("artillery_pic", 2)
 	app.addImage("fighter_pic", "fighter.gif", 5, 3)
+	app.setImageTooltip("fighter_pic", "Fighters in Battle")
 	app.shrinkImage("fighter_pic", 2)
 	app.addImage("tank_pic", "tank.gif", 6, 3)
+	app.setImageTooltip("tank_pic", "Tanks in Battle")
 	app.shrinkImage("tank_pic", 2)
 	#app.addLabel("total_att_str",  1, 1)
 	#app.addLabel("total_def_str", 1, 5)
@@ -2887,18 +2891,25 @@ def load_basic_widgets():
 	app.addLabel("def_Fighter", " ", 5, 4)
 	app.addLabel("def_Tank", " ", 6, 4)
 	app.addImage("battle_ammo", "ammo.gif", 7, 3)
+	app.setImageTooltip("battle_ammo", "Available Ammunition / Ammunition Needed")
 	app.shrinkImage("battle_ammo", 2)
 	app.addImage("battle_oil", "oil.gif", 8, 3)
+	app.setImageTooltip("battle_oil", "Available Oil / Oil Needed")
 	app.shrinkImage("battle_oil", 2)
 	app.addImage("dog_fight", "dogfight.gif", 9, 3)
+	app.setImageTooltip("dog_fight", "Fighter Losses")
 	app.shrinkImage("dog_fight", 2)
 	app.addImage("recon_", "recon.gif", 10, 3)
+	app.setImageTooltip("recon_", "Reconnaissance" )
 	app.shrinkImage("recon_", 2)
 	app.addImage("barrage", "barrage.gif", 11, 3)
+	app.setImageTooltip("barrage", "Losses from Artillery Barrage")
 	app.shrinkImage("barrage", 2)
 	app.addImage("manouver_", "flank.gif", 12, 3)
+	app.setImageTooltip("manouver_", "Maneuver")
 	app.shrinkImage("manouver_", 2)
 	app.addImage("engagement", "explosion.gif", 13, 3)
+	app.setImageTooltip("engagement", "Main Battle Losses")
 	app.shrinkImage("engagement", 2)
 
 	app.addLabel("att_ammo_info", " ", 7, 1, 2)
@@ -2909,6 +2920,7 @@ def load_basic_widgets():
 	app.addLabel("att_manouver", " ", 12, 1, 2)
 	app.addLabel("att_engagement_losses", " ", 13, 1, 2)
 	app.addImage("battle_winner", "crown.gif", 14, 3)
+	app.setImageTooltip("battle_winner", "Victor")
 
 	app.addLabel("def_ammo_info", " ", 7, 4, 2)
 	app.addLabel("def_oil_info", " ", 8, 4, 2)
@@ -2922,10 +2934,15 @@ def load_basic_widgets():
 
 	app.startSubWindow("Sea Battle")
 	app.addImage("sea_attacking_nation", "crown.gif", 1, 2)
+	app.setImageTooltip("sea_attacking_nation", "Attacking Nation")
 	app.addImage("sea_defending_nation", "crown.gif", 1, 4)
+	app.setImageTooltip("sea_defending_nation", "Defending Nation")
 	app.addImage("frigate_pic", "frigates.gif", 3, 3)
+	app.setImageTooltip("frigate_pic", "Frigates in Battle")
 	app.addImage("iron_clad_pic", "frigates.gif", 4, 3)
+	app.setImageTooltip("iron_clad_pic", "Ironclads in Battle")
 	app.addImage("battle_ship_pic", "battle_ship.gif", 5, 3)
+	app.setImageTooltip("battle_ship_pic", "Battleships in Battle")
 	app.addLabel("att_Frigate", " ", 3, 1, 2)
 	app.addLabel("def_Frigate", " ", 3, 4, 2)
 	app.addLabel("att_Ironclad", " ", 4, 1, 2)
@@ -2934,8 +2951,11 @@ def load_basic_widgets():
 	app.addLabel("def_Battleship", " ", 5, 4, 2)
 
 	app.addImage("sea_battle_ammo", "ammo.gif", 6, 3)
+	app.setImageTooltip("sea_battle_ammo", "Available Ammunition / Ammunition Needed")
 	app.addImage("sea_battle_oil", "oil.gif", 7, 3)
+	app.setImageTooltip("sea_battle_oil", "Available Oil / Oil Needed")
 	app.addImage("sea_battle_losses", "sea_battle.gif", 8, 3)
+	app.setImageTooltip("sea_battle_losses", "Losses")
 	app.addLabel("sea_att_ammo_info", " ", 6, 1, 2)
 	app.addLabel("sea_def_ammo_info", " ", 6, 4, 2)
 	app.addLabel("sea_att_oil_info", " ", 7, 1, 2)
@@ -2943,6 +2963,7 @@ def load_basic_widgets():
 	app.addLabel("sea_att_losses", " ", 8, 1, 2)
 	app.addLabel("sea_def_losses", " ", 8, 4, 2)
 	app.addImage("sea_battle_winner", "crown.gif", 9, 3)
+	app.setImageTooltip("sea_battle_winner", "Victor")
 	app.stopSubWindow()
 
 	app.startSubWindow("Naval Intercept")

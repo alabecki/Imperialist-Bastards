@@ -757,26 +757,27 @@ class Human(Player):
 		self.diplo_action -= 1
 		self.reputation += 0.1
 
-	def integrate_Culture(self, prov):
+	def integrate_Culture(self, prov, provinces):
 		self.culture_points -= 1
 		chance = uniform(0, 1)
+		prov = provinces[prov]
 		print("Roll: %s" % (chance))
-		if opt.type == "uncivilized":
+		if prov.type == "uncivilized":
 			if chance < 0.66:
-				self.accepted_cultures.add(prov)
+				self.accepted_cultures.add(prov.culture)
 				return True
 			else:
 				return False
-		if opt.type == "old":
+		if prov.type == "old":
 			if chance < 0.33:
-				self.accepted_cultures.add(prov)
+				self.accepted_cultures.add(prov.culture)
 				return True 
 			else:
 				return False
 
-		if opt.type == "civilized":
+		if prov.type == "civilized":
 			if chance < 0.25:
-				opt.culture = self.culture
+				prov.culture = self.culture
 				self.accepted_cultures.add(prov)
 				return True
 			else:

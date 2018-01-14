@@ -391,17 +391,17 @@ class Player(object):
 		if self.development_level > 1:
 			requirement.append("furniture")
 		if self.development_level > 2:
-			requirement.append("clothing")
-		if self.development_level > 3:
 			requirement.append("paper")
+		if self.development_level > 3:
+			requirement.append("clothing")
 		if self.development_level > 4:
 			requirement.append("spice")
 		if self.development_level > 5:
 			requirement.append("furniture")
 		if self.development_level > 6:
-			requirement.append("clothing")
-		if self.development_level > 7:
 			requirement.append("paper")
+		if self.development_level > 7:
+			requirement.append("clothing")
 		if self.development_level > 9:
 			requirement.append("telephone")
 			requirement.append("telephone")
@@ -954,6 +954,7 @@ class Player(object):
 					if temp < material_max:
 						material_max = temp
 		amount = min([material_max, max_amount])
+		print("Can currently produce %d %d" % (amount, _type))
 		return amount
 
 
