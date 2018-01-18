@@ -71,13 +71,13 @@ craft = {
 
 class Player(object):
 
-	player_count = 0
-
-	def __init__ (self, _name, _type, number):
+	#player_count = 0
+	def __init__(self, name, kind, number, *args, **kwargs):
+	#def __init__ (self, _name, _type, number):
 		# Basic Attributes
 		self.colour = "white"
-		self.type = _type				# major, old_empire, old_minor, civ_minor
-		self.name = _name	
+		self.type = kind				# major, old_empire, old_minor, civ_minor
+		self.name = name	
 		self.number = number
 		self.stability = 0.0
 		self.government = ""
@@ -954,7 +954,7 @@ class Player(object):
 					if temp < material_max:
 						material_max = temp
 		amount = min([material_max, max_amount])
-		print("Can currently produce %d %d" % (amount, _type))
+		print("Can currently produce %d %s" % (amount, _type))
 		return amount
 
 

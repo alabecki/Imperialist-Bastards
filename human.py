@@ -18,8 +18,6 @@ manufacture = {
 			"auto": {"rubber": 0.5, "gear": 1.0, "parts": 1.0, "iron": 0.5},		#2
 			"tank": {"iron": 1.5, "cannons": 1.5, "rubber": 0.5, "gear": 1, "parts": 1},  #4 
 			#"frigates": {"cannons": 1.0, "wood": 1.0, "cotton": 1.0},
-			#"iron_clad": {"cannons": 1.0, "iron": 1.0, "parts": 1.0},
-			#"battle_ship": {"cannons": 3.0, "iron": 3.0, "parts": 1.0, "gear": 1.0 }  #8 
 		}
 
 craft = {
@@ -48,18 +46,17 @@ pro_input = {
 
 
 class Human(Player):
-	def __init__(self, _name, _type, number, *args, **kwargs):
-		super(Human, self).__init__(_name, _type, number, *args, **kwargs)
-
+	def __init__(self, name, kind, number, *args, **kwargs):
+		super().__init__(name, kind, number, *args, **kwargs)
+		self.type = kind				# major, old_empire, old_minor, civ_minor
+		self.name = name	
+		self.number = number
 
 	def can_improve_prov(self, prov):
 		if self.number_developments < 1 or self.AP < 1 or self.goods["parts"] < 1 or self.resources["wood"] < 1:
 			return False
-
-
 		if(self.provinces[prov].development_level == 2):
 			return False
-
 		elif(self.provinces[prov].resource == "food"):
 			max_dev = 0
 			if("steel_plows" in self.technologies):

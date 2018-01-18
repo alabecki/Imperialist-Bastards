@@ -40,15 +40,17 @@ manufacture = {
 
 
 class AI(Player):
-	def __init__(self, _name, _type, number, *args, **kwargs):
-		super(AI, self).__init__(_name, _type, number, *args, **kwargs)
-
+	def __init__(self, name, kind, number, *args, **kwargs):
+		super().__init__(name, kind, number, *args, **kwargs)
+		self.type = kind				# major, old_empire, old_minor, civ_minor
+		self.name = name	
+		self.number = number
+	
 		self.personality = {
 			"Army": 1.15,
 			"Navy": 0.7,
 			"Offensive": 0.5
 		}
-
 		self.has_obliterated = ""
 
 		self.general_priority = ""

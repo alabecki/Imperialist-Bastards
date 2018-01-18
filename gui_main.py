@@ -1,3 +1,4 @@
+
 from appJar import gui
 
 from pprint import pprint
@@ -14,7 +15,7 @@ from human import*
 from minor_classes import*
 from market import*
 from technologies import*
-from combat import*
+#from combat import*
 from combat2 import*
 from start import*
 from save import*
@@ -280,10 +281,6 @@ def nation_type_press(btn):
 		"Brunei", "Tunisia", "Libya", "Nejd", "Afghanistan", "Bengal", "Hyderabad", "Burma", "Cambodia", "Sulawesi", "Java"]
 	if scen == "Fictional":
 		modern_major = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
-		modern_minors = ["Situs", "Hythen", "Intero", "Kora", "Southo", "Cindra", "Estos", "Lian", "Bulgo" ]
-		old_minors = ["Kaygree", "Kish", "Rabus", "Sparko", "Argos", "Mancha", "Gelder", "Porta", "Norra", \
-		"Wego", "Arbaca", "Egaro"]	
-
 	if nation_type == "Major Power":
 		nation_type = modern_major
 	if nation_type == "Minor Power":
@@ -504,11 +501,11 @@ def start_main_screen():
 		app.setLabelRelief(sz, "ridge")
 		app.setLabelAlign(sz, "left")
 
-	app.addImageButton("New Turn", next_turn, "turn.gif", 2, 13, 2, 2)
+	app.addImageButton("New Turn", next_turn, "turn.gif", 1, 13)
 	app.setButtonTooltip("New Turn", "Next Turn")
 	app.setSticky("w")
 
-	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 4, 13, 2, 2)
+	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 2, 13)
 	app.setButtonTooltip("POP UP", "Increase Population")
 	if(player.POP_increased > 1):
 		app.disableButton("POP UP")
@@ -519,7 +516,7 @@ def start_main_screen():
 	else:
 		app.enableButton("POP UP")
 
-	app.addImageButton("Develop", dev_type, "develop.gif", 4, 15, 2, 2)
+	app.addImageButton("Develop", dev_type, "develop.gif", 2, 15)
 	app.setButtonTooltip("Develop", "Increase Development Level")
 	#app.setPadding(2, 2)
 	#app.setInPadding(2,2)
@@ -536,7 +533,7 @@ def start_main_screen():
 	app.setStretch("all")
 	#app.setExpand("none")
 	global provinces
-	for i in range(1, 17):
+	for i in range(1, 18):
 		for j in range(1, 32):
 			nm = str(i)+ " " + str(j)
 			#app.addLabel(nm, "", i, j)
@@ -549,7 +546,7 @@ def start_main_screen():
 		temp = p.owner
 		owner = players[temp]
 		colour = owner.colour
-
+		print(p.name)
 		app.setButtonBg(p.position, colour)
 		app.setButtonFg(p.position, colour)
 
@@ -1453,7 +1450,7 @@ def get_nation_info(btn):
 	app.showSubWindow("Nation Info")
 
 def update_Nation_Info(other):
-	app.setLabel("Nation_Name", other.name)
+	app.setLabel("Nation_Name", other.name + "   " other.type)
 	fact_level = other.get_fact_level()
 	app.setLabel("PrimaryStats", "Gold: %.2f  DevLevel: %d  Number Tech: %d  ProvinceDevs: %d  Number Factory-Levels: %d" % \
 		(other.resources["gold"], other.development_level, len(other.technologies), other.number_developments, fact_level))
@@ -2710,7 +2707,7 @@ def gui_save_game(btn):
 def load_basic_widgets():
 	
 	#app.playSound("Grand March from Aida.wav", wait=False)
-
+	app.removeAllWidgets()
 	app.startSubWindow("loading new game", modal = False)
 	app.addLabel("nload", " Please wait while the game world is loaded... ")
 	app.stopSubWindow()
@@ -2975,6 +2972,7 @@ def load_basic_widgets():
 	#app.startSubWindow("chem_growth", modal = True)
 	#app.yesNoBox("chem_for_growth", "Increasing Your Pop again this turn will require 1 chemical", parent= None)
 	#app.stopSubWindow()
+#def main(argv):
 
 app = gui("Imperialist Bastards", "960x600")
 app.setIcon("crown.gif")
@@ -2999,3 +2997,6 @@ app.addMenuItem("Menu", "Save Game", func= gui_save_game, shortcut = "S", underl
 app.addMenuItem("Menu", "Exit", func = exit_game, shortcut = None, underline = -1)
 
 app.go()
+
+#if __name__ == "__main__":
+#    main(sys.argv)
