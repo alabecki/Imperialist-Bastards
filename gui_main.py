@@ -1,4 +1,6 @@
 
+
+from tkinter import*
 from appJar import gui
 
 from pprint import pprint
@@ -173,7 +175,7 @@ def update_culture_tab():
 	else:
 		app.enableButton("Increase Stability")
 		app.enableButton("Export Culture")	
-	if player.culture_points < 1 or player.diplo_action < 1:
+	if player.culture_points < 1:
 		app.disableButton("Improve Reputation")
 	else:
 		app.enableButton("Improve Reputation")
@@ -398,7 +400,6 @@ def start_main_screen():
 		app.hideSubWindow("saving")
 	app.showSubWindow("loading new game")
 	#app.setBgImage("simple_background.gif")
-	#app.playSound("Grand March from Aida.wav", wait=False)
 	app.startTabbedFrame("GameGUI")
 	app.startTab("MainTab")
 	app.setPadding(2)
@@ -501,11 +502,11 @@ def start_main_screen():
 		app.setLabelRelief(sz, "ridge")
 		app.setLabelAlign(sz, "left")
 
-	app.addImageButton("New Turn", next_turn, "turn.gif", 1, 13)
+	app.addImageButton("New Turn", next_turn, "turn.gif", 1, 7)
 	app.setButtonTooltip("New Turn", "Next Turn")
 	app.setSticky("w")
 
-	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 2, 13)
+	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 1, 8)
 	app.setButtonTooltip("POP UP", "Increase Population")
 	if(player.POP_increased > 1):
 		app.disableButton("POP UP")
@@ -516,18 +517,14 @@ def start_main_screen():
 	else:
 		app.enableButton("POP UP")
 
-	app.addImageButton("Develop", dev_type, "develop.gif", 2, 15)
+	app.addImageButton("Develop", dev_type, "develop.gif", 1, 9)
 	app.setButtonTooltip("Develop", "Increase Development Level")
-	#app.setPadding(2, 2)
-	#app.setInPadding(2,2)
-	#app.setButtonBg("Develop", "dark violet")
+
 	if player.check_development() == False:
 		app.disableButton("Develop")
 	else:
 		app.enableButton("Develop")
-
 	app.startPanedFrameVertical("map")
-	
 	app.startScrollPane("map_scroll")
 	app.setExpand("all")
 	app.setStretch("all")
@@ -619,9 +616,9 @@ def start_main_screen():
 
 	i = 1
 	app.addLabel("resources_", "Invent  |   Market   |   Price", 0, 1, 3, 1)
-	for k, v in player.resources.items():
-		if k in ["gold", "/", "//"]:
-			continue
+	resources = ["food", "iron", "wood", "coal", "cotton", "spice", "dyes", "rubber", "oil"]
+	for k in resources:
+		
 		app.addLabel("i_" + k, " ",  i, 0,)
 		app.setLabelBg("i_" + k, "blue")
 		app.addImage("i_" + k, k+".gif", i, 0)
@@ -651,8 +648,11 @@ def start_main_screen():
 			app.enableButton(k + "_sell")
 		i = i + 1
 	i = 1
+	goods = [	"parts", "clothing", "paper", "cannons", "furniture", "chemicals", "gear", "radio", "telephone", \
+	"tank", "auto", "fighter"] 
+		
 	app.addLabel("goods_", "Invent  |   Market   |   Price", 0, 9, 4, 1)
-	for k, v in player.goods.items():
+	for k in goods:
 		app.addLabel("blank_" + k, "   ", i, 7)
 		app.addLabel("i_" + k, " ", i, 8, 1, 1)
 		app.addImage("i_" + k, k +".gif", i, 8, 1, 1)
@@ -721,7 +721,7 @@ def start_main_screen():
 	fact_options = player.factory_optons()
 	app.startLabelFrame("Manufacture Goods")
 	app.addLabel("production_"," Fact. Type  Level Used?  Upgrade    Invent. Can Prod. Producing  Produce", 1, 0, 9)
-	for f in player.goods.keys():
+	for f in market.goods:
 		app.addLabel("p_" + f, " ", i, 0, 1, 1)
 		app.addImage("p_" + f, f +".gif", i, 0, 1, 1)
 		app.shrinkImage("p_" + f, 2)
@@ -967,120 +967,111 @@ def start_main_screen():
 	app.startLabelFrame("Army")
 	row = 1
 	app.addLabel("army_breakdown", " Type        Number     Att.      Def.   Man.  AmmoUse  OilUse", 0, 0, 9, 1)
-	for k in player.military.keys():
+	for k in ["infantry", "cavalry", "artillery", "fighter", "tank"]:
+		app.addLabel("build_" + k, "", row, 0, 1)
+		app.addImage("build_" + k, k +".gif", row, 0, 1)
+		app.shrinkImage("build_" + k, 2)
+		app.setImageTooltip("build_" + k, k.title())
+		app.addLabel("num_" + k, player.military[k], row, 1, 1)
+		app.setLabelRelief("num_" + k, "sunken")
 		if k == "irregulars":
-			continue
-		
-		elif k in ["frigates", "iron_clad", "battle_ship"]:
-			continue
-		else:
-			app.addLabel("build_" + k, "", row, 0, 1)
-			app.addImage("build_" + k, k +".gif", row, 0, 1)
-			app.shrinkImage("build_" + k, 2)
-			app.setImageTooltip("build_" + k, k.title())
-			app.addLabel("num_" + k, player.military[k], row, 1, 1)
-			app.setLabelRelief("num_" + k, "sunken")
-			if k == "irregulars":
-				app.addLabel("att_" + k, "%.1f" % player.irregulars["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.irregulars["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.irregulars["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.irregulars["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.irregulars["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				#app.addNamedButton(" Build ", "build_" + k, build_army, row, 7, 1)
-				if player.freePOP < 0.2 or player.goods["cannons"] < 1:
-					app.disableButton("build_" + k)
+			app.addLabel("att_" + k, "%.1f" % player.irregulars["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.irregulars["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.irregulars["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.irregulars["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.irregulars["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			#app.addNamedButton(" Build ", "build_" + k, build_army, row, 7, 1)
+			if player.freePOP < 0.2 or player.goods["cannons"] < 1:
+				app.disableButton("build_" + k)
 
-			if k == "infantry":
-				app.addLabel("att_" + k, "%.1f" % player.infantry["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.infantry["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.infantry["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.infantry["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.infantry["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
-				if player.freePOP < 0.2 or player.goods["cannons"] < 1.5:
-					app.disableButton("build_" + k)
-				else:
-					app.enableButton("build_"+ k)
-
-			if k == "cavalry":
-				app.addLabel("att_" + k, "%.1f" % player.cavalry["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.cavalry["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.cavalry["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.cavalry["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.cavalry["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
-				if player.freePOP < 0.2 or player.goods["cannons"] < 1.5 or player.resources["food"] < 2:
-					app.disableButton("build_" + k)
-				else:
-					app.enableButton("build_"+ k)
-			if k == "artillery":
-				app.addLabel("att_" + k, "%.1f" % player.artillery["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.artillery["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.artillery["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.artillery["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.artillery["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				if player.freePOP < 0.2 or player.goods["cannons"] < 2.5:
-					app.disableButton("build_" + k)
-				else:
-					app.enableButton("build_"+ k)
-
-			if k == "tank":
-				app.addLabel("att_" + k, "%.1f" % player.tank["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.tank["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.tank["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.tank["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.tank["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				if player.freePOP < 0.2 or player.goods[k] < 1:
-					app.disableButton("build_" + k)
-				else:
-					app.enableButton("build_"+ k)
-
-			if k == "fighter":
-				app.addLabel("att_" + k, "%.1f" % player.fighter["attack"], row, 2, 1)
-				app.addLabel("def_" + k, "%.1f" % player.fighter["defend"], row, 3, 1)
-				app.addLabel("man_" + k, "%.1f" % player.fighter["manouver"], row, 4, 1)
-				app.addLabel("ammo_use_" + k, "%.1f" % player.fighter["ammo_use"], row, 5, 1)
-				app.addLabel("oil_use_" + k, "%.1f" % player.fighter["oil_use"], row, 6, 1)
-				app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
-				app.setButtonTooltip("build_" + k, "Build " + k)
-				if player.freePOP < 0.2 or player.goods[k] < 1:
-					app.disableButton("build_" + k)
-				else:
-					app.enableButton("build_"+ k)
-			#app.addNamedButton("Disband", "disband_" + k, disband_army, row, 8, 1)
-			app.addImageButton("disband_" + k, disband_army, "red_x.gif", row, 8, 1)
-			app.setButtonTooltip("disband_" + k, "Disband " + k)
-			if player.military[k] < 1:
-				app.disableButton("disband_" + k)
+		if k == "infantry":
+			app.addLabel("att_" + k, "%.1f" % player.infantry["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.infantry["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.infantry["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.infantry["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.infantry["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
+			if player.freePOP < 0.2 or player.goods["cannons"] < 1.5:
+				app.disableButton("build_" + k)
 			else:
-				app.enableButton("disband_" + k)
-			row += 1
+				app.enableButton("build_"+ k)
+
+		if k == "cavalry":
+			app.addLabel("att_" + k, "%.1f" % player.cavalry["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.cavalry["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.cavalry["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.cavalry["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.cavalry["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			#app.addNamedButton("Build", "build_" + k, build_army, row, 7, 1)
+			if player.freePOP < 0.2 or player.goods["cannons"] < 1.5 or player.resources["food"] < 2:
+				app.disableButton("build_" + k)
+			else:
+				app.enableButton("build_"+ k)
+		if k == "artillery":
+			app.addLabel("att_" + k, "%.1f" % player.artillery["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.artillery["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.artillery["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.artillery["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.artillery["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			if player.freePOP < 0.2 or player.goods["cannons"] < 2.5:
+				app.disableButton("build_" + k)
+			else:
+				app.enableButton("build_"+ k)
+
+		if k == "tank":
+			app.addLabel("att_" + k, "%.1f" % player.tank["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.tank["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.tank["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.tank["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.tank["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			if player.freePOP < 0.2 or player.goods[k] < 1:
+				app.disableButton("build_" + k)
+			else:
+				app.enableButton("build_"+ k)
+
+		if k == "fighter":
+			app.addLabel("att_" + k, "%.1f" % player.fighter["attack"], row, 2, 1)
+			app.addLabel("def_" + k, "%.1f" % player.fighter["defend"], row, 3, 1)
+			app.addLabel("man_" + k, "%.1f" % player.fighter["manouver"], row, 4, 1)
+			app.addLabel("ammo_use_" + k, "%.1f" % player.fighter["ammo_use"], row, 5, 1)
+			app.addLabel("oil_use_" + k, "%.1f" % player.fighter["oil_use"], row, 6, 1)
+			app.addImageButton("build_" + k, build_army, "add.gif", row, 7, 1)
+			app.setButtonTooltip("build_" + k, "Build " + k)
+			if player.freePOP < 0.2 or player.goods[k] < 1:
+				app.disableButton("build_" + k)
+			else:
+				app.enableButton("build_"+ k)
+		#app.addNamedButton("Disband", "disband_" + k, disband_army, row, 8, 1)
+		app.addImageButton("disband_" + k, disband_army, "red_x.gif", row, 8, 1)
+		app.setButtonTooltip("disband_" + k, "Disband " + k)
+		if player.military[k] < 1:
+			app.disableButton("disband_" + k)
+		else:
+			app.enableButton("disband_" + k)
+		row += 1
 	app.stopLabelFrame()
 
 	app.startLabelFrame("Navy")
 	row = 1
 	app.addLabel("navy_breakdown", " Type      Number    Att.      HP    AmmoUse   OilUse", 0, 0, 8)
 
-	for k in player.military.keys():
-		if 	k not in ["frigates", "iron_clad", "battle_ship"]:
-				continue
-		else:
-			app.addLabel("build_" + k, " ", row, 0, 1, 1)
-			app.addImage("build_" + k, k +".gif", row, 0, 1, 1)
-			app.shrinkImage("build_" + k, 2)
-			app.setImageTooltip("build_" + k, k.title())
-			app.addLabel("num_" + k, player.military[k], row, 1, 1, 1)
-			app.setLabelRelief("num_" + k, "sunken")
+	for k in ["frigates", "iron_clad", "battle_ship"]:
+		app.addLabel("build_" + k, " ", row, 0, 1, 1)
+		app.addImage("build_" + k, k +".gif", row, 0, 1, 1)
+		app.shrinkImage("build_" + k, 2)
+		app.setImageTooltip("build_" + k, k.title())
+		app.addLabel("num_" + k, player.military[k], row, 1, 1, 1)
+		app.setLabelRelief("num_" + k, "sunken")
 		if k == "frigates":
 			app.addLabel("att_" + k, "%.1f" % player.frigates["attack"], row, 2, 1, 1)
 			app.addLabel("HP_" + k, "%.1f" % player.frigates["HP"], row, 3, 1, 1)
@@ -1160,12 +1151,15 @@ def start_main_screen():
 	app.startScrollPane("diplomacy")
 	app.startLabelFrame("Nations")
 	count = 1
-	for k, v in players.items():
+	playerList = market.modern_major + market.modern_minors + market.old_empires + market.old_minors
+	for k in playerList:
 		if k == player.name:
+			continue
+		if k not in players.keys():
 			continue
 		app.addImage(k + " flag", k + ".gif", count, 1)
 		app.setImageTooltip(k + " flag", k)
-		relata = frozenset([player.name, v.name])
+		relata = frozenset([player.name, players[k].name])
 		app.addLabel("relations_with_" + k, "Relations: %.2f" % relations[relata].relationship, count, 2)
 		app.setLabelFg("relations_with_" + k, "white")
 		app.setLabelBg("relations_with_" + k, "black")
@@ -1228,6 +1222,8 @@ def start_main_screen():
 
 
 	app.stopLabelFrame()
+
+
 	app.stopScrollPane()
 	app.stopTab()
 
@@ -1321,7 +1317,7 @@ def gain_casus_belli(btn):
 	other = btn[3:]
 	opts = player.check_for_claims(other, provinces)
 	if len(opts) == 0:
-		message = "We have no claims to any of territory currently belonging to %s but can still wage war for loot" % other
+		message = "We have no claims to any territory currently belonging to %s but can still wage war for loot" % other
 		app.setLabel("general_message", message)
 		app.showSubWindow("Message_")
 		player.gain_CB(other, "", provinces)
@@ -1345,6 +1341,7 @@ def cb_2(btn):
 	global players, human_player, provinces
 	player = players[human_player]
 	prov = app.getOptionBox("prov_to_annex")
+	print(prov)
 	prov = provinces[prov]
 	#other = provinces[prov].owner
 	player.gain_CB(prov.owner, prov.name, provinces)
@@ -1450,7 +1447,7 @@ def get_nation_info(btn):
 	app.showSubWindow("Nation Info")
 
 def update_Nation_Info(other):
-	app.setLabel("Nation_Name", other.name + "   " other.type)
+	app.setLabel("Nation_Name", other.name + "   " + other.type)
 	fact_level = other.get_fact_level()
 	app.setLabel("PrimaryStats", "Gold: %.2f  DevLevel: %d  Number Tech: %d  ProvinceDevs: %d  Number Factory-Levels: %d" % \
 		(other.resources["gold"], other.development_level, len(other.technologies), other.number_developments, fact_level))
@@ -1517,11 +1514,15 @@ def wage_war(btn):
 	global players, human_player, provinces, market, relations
 	app.hideSubWindow("Message_")
 	player = players[human_player]
+	print(btn)
 	other = btn[6:]
+	print(other)
 	cb = player.CB[other]
 	annex = cb.province
-	annex = provinces[annex]
+	if (annex != ""):
+		annex = provinces[annex]
 	owner = players[other]
+	print(owner.name)
 	if owner.type == "major" and annex.colony == True:
 		if player.check_for_border(owner.name, players):
 			message = "Since %s is a colony and you border %s, you may take it\
@@ -1569,11 +1570,15 @@ def wage_war(btn):
 				app.showSubWindow("Select Land Forces")
 		else:
 			print("Since we border %s, we may attack by land!" % (owner.name))
+			ID = "%d %s %s" % (market.turn, player.name, owner.name)
+			landBattle = LandBattle(ID, player.name, owner.name, annex.name)
+			market.landBattle = landBattle
 			app.setScaleRange("Infantry", 0, player.military["infantry"])
 			app.setScaleRange("Cavalry", 0, player.military["cavalry"])
 			app.setScaleRange("Artillery", 0, player.military["artillery"])
 			app.setScaleRange("Fighter", 0, player.military["fighter"])
 			app.setScaleRange("Tank", 0, player.military["tank"])
+			app.setLabel("carry_limit", 1000) 
 			app.showSubWindow("Select Land Forces")
 
 	
@@ -1642,7 +1647,8 @@ def attack1b(btn):
 		defender = players[landBattle.defender]
 		def_nav_str = defender.calculate_naval_strength()
 		att_nav_str = player.calculate_naval_strength()
-		if def_nav_str >= att_nav_str:
+		print(weight)
+		if def_nav_str >= att_nav_str and limit < 999:
 			message = "%s is intercepting your navy. Prepare for a naval battle!" % (defender.name)
 			app.setLabel("general_message", message)
 			app.showSubWindow("Message_")
@@ -1810,7 +1816,7 @@ def update_production_gui():
 		app.disableButton("Fertilize Soil")
 	else:
 		app.enableButton("Fertilize Soil")
-	if "synthetic_rubber" not in player.technologies or player.goods["chemicals"] < 1 or player.goods["oil"] < 1:
+	if "synthetic_rubber" not in player.technologies or player.goods["chemicals"] < 1 or player.resources["oil"] < 1:
 		app.disableButton("Synthetic Rubber")
 	else:
 		app.enableButton("Synthetic Rubber")
@@ -2618,6 +2624,9 @@ def menuPress(command):
 			if type(v) == Province:
 				provinces[k] = v
 			if type(v) == Relation:
+				k = list(k)
+				k = tuple(k)
+				k = frozenset(k)
 				relations[k] = v
 			if k == "relations":
 				relations = v
@@ -2706,8 +2715,10 @@ def gui_save_game(btn):
 
 def load_basic_widgets():
 	
-	#app.playSound("Grand March from Aida.wav", wait=False)
+	app.playSound("Grand March from Aida.wav", wait=False)
 	app.removeAllWidgets()
+	app.setBgImage("BG2.gif")
+
 	app.startSubWindow("loading new game", modal = False)
 	app.addLabel("nload", " Please wait while the game world is loaded... ")
 	app.stopSubWindow()
@@ -2790,7 +2801,7 @@ def load_basic_widgets():
 
 	app.startSubWindow("Province to Annex", modal = True)
 	app.addLabel("prov_to_annex", "Which Province would you like to annex?")
-	app.addLabel("(If list is empty, you may still go to war for general spoils (33\%\ of opponent's gold")
+	app.addLabel("(If list is empty, you may still go to war for general spoils (33 percent of opponent's gold)")
 	app.addOptionBox("prov_to_annex", [])
 	app.addNamedButton("OK", "prov_to_annex_", cb_2)
 	app.stopSubWindow()
@@ -2981,19 +2992,19 @@ app.setLocation("CENTER")
 app.setExpand("all")
 app.setPadding([1, 1])
 app.setInPadding([2, 2])
-
 app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 app.setImageLocation("Images")
 app.setSoundLocation("Sounds")
 app.setBgImage("IB.png")
+app.playSound("Grand March from Aida.wav", wait=False)
 
 
 fileMenus = ["New Game", "Load Game", "Save", "Save as...", "Exit Game", "Close"]
 app.createMenu("Menu")
 app.addMenuItem("Menu", "New Game", func = new_game, shortcut=None, underline=-1)
 app.addMenuItem("Menu", "Load Game", func = gui_load_game, shortcut = None, underline = -1)
-app.addMenuItem("Menu", "Save Game", func= gui_save_game, shortcut = "S", underline = -1)
+app.addMenuItem("Menu", "Save Game", func= gui_save_game, shortcut = None, underline = -1)
 app.addMenuItem("Menu", "Exit", func = exit_game, shortcut = None, underline = -1)
 
 app.go()

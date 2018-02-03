@@ -66,6 +66,13 @@ class MarketItem(object):
 # It will decide who do buy from based on their relations with that player.
 # For each player there is a list of players with whom he does not wish to trad
 
+class FinishedGood(object):
+	def __init__(self, kind, maker, owner):
+		self.kind = kind
+		self.maker = maker
+		self.owner = owner
+		self.sold = False
+
 class CB(object):
 	def __init__ (self, owner, opponent, action, province, time):
 		self.owner = owner

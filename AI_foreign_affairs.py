@@ -217,7 +217,8 @@ def total_war(player, target, players, market, relations):
 			if forces["infantry"] == 0:
 				return
 			forces = ai_select_ground_forces(player, target)
-			amph_combat(player, target, forces, "total", players, market, relations)	
+			landBattle.landCombat(players, market, relations, provinces)
+			#landCombat(player, target, forces, "total", players, market, relations)	
 			return
 
 				
@@ -535,9 +536,9 @@ def attack_target(player, players, relations, provinces, market):
 		player.ai_buy("oil", 6, market, relations, players)
 	if player.resources["oil"] < (oil_needed * 1.5):
 		return
-	if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
-		try_total_war(player, players, market, relations, provinces)
-		return
+	#if player.military["fighter"] >= 4 and player.military["tank"] >= 4:
+	#	try_total_war(player, players, market, relations, provinces)
+	#	return
 	#if player.colonization < player.num_colonies * 1.5:
 	#	return
 	if len(player.CB.keys()) <= 0:

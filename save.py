@@ -36,7 +36,7 @@ def save_game(save_path, players, relations, market, provinces):
 	for p, player in players.items():
 		state[p] = player
 	for re, rel in relations.items():
-		state[re] = rel
+		state[str(re)] = rel
 	#state["relations"] = relations
 	for p, prov in provinces.items():
 		state[prov.name] = prov
@@ -84,6 +84,20 @@ def compile_loaded_game(state):
 		if type(v) == Province:
 			provinces[k] = v
 		if type(v) == Relation:
+			print("k before %s" % k)
+		#	k = list(k.split(","))
+			#k = tuple(k)
+			frozenset({'Two Sicilies', 'Persia'})
+			k = k[11:]
+			k = k[:-2]
+			k = k.replace("'", "")
+			#k = k.replace(" ", "")
+			k = k
+			print(k)
+			k = list(k.split(","))
+			k[1] = k[1].strip(" ")
+			k = frozenset(list(k))
+			print(k)
 			relations[k] = v
 		if k == "relations":
 			relations = v

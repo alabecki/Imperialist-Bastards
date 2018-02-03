@@ -9,6 +9,11 @@ from minor_classes import*
 class Market(object):
 	def __init__ (self):
 
+		self.modern_major = []
+		self.modern_minors = []
+		self.old_empires = []
+		self.old_minors = []
+
 		self.turn = 0
 		self.auto_save = ""
 
@@ -52,14 +57,10 @@ class Market(object):
 			"fighter": [],
 			"tank": [],
 			"auto": [],
-			"/": [],
-			"//": [],
-			"///": [],
 		}
 
 		self.global_factories = {
 
-	
 			"parts": 0,
 			"clothing": 0,
 			"furniture": 0,

@@ -126,7 +126,7 @@ def initialize_oldempire(player):
 
 	player.reputation = 0.5
 
-	player.colonization = -5.0
+	#player.colonization = -5.0
 
 
 def initialize_old_minor(player):
@@ -152,7 +152,7 @@ def initialize_old_minor(player):
 
 	player.reputation = 0.5
 
-	player.colonization = -5.0
+	#player.colonization = -5.0
 
 
 def initilize_uncivilized(player):
@@ -169,7 +169,7 @@ def initilize_uncivilized(player):
 	player.military["infantry"] = 1.0
 	player.techModifier = 0.5
 	player.reputation = 0.6
-	player.colonization = -8.0
+	#player.colonization = -8.0
 
 
 

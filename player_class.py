@@ -26,10 +26,16 @@ stability_map = {
 }
 
 development_map = {
-	0.0: 1.0,
-	1.0: 1.75,
-	2.0: 2.5
+	0: 1.0,
+	1: 1.75,
+	2: 2.5
 }
+
+# Alt dev_map:
+# 0: 0.75
+# 1: 1
+# 2: 1.75
+# 3: 2.5
 
 
 government_map = {
@@ -137,9 +143,7 @@ class Player(object):
 			"dyes": 0.0,
 			"rubber": 0.0,
 			"oil": 0.0,
-			"/": 0.0,
-			"//": 0.0,
-			#"///": 0.0
+		
 		}
 
 		self.goods = {
@@ -181,9 +185,7 @@ class Player(object):
 			"auto": 0.0,
 			"fighter": 0.0,
 			"tank": 0.0,
-			"/": 0.0,
-			"//": 0.0,
-			"///": 0.0
+	
 		}
 
 		self.embargo = set()

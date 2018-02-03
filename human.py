@@ -751,7 +751,7 @@ class Human(Player):
 
 	def improve_Reputation(self):
 		self.culture_points -= 1
-		self.diplo_action -= 1
+		#self.diplo_action -= 1
 		self.reputation += 0.1
 
 	def integrate_Culture(self, prov, provinces):
@@ -835,16 +835,21 @@ class Human(Player):
 
 
 	def gain_CB(self, other, annex, provinces):
-		if annex in provinces:
+		if annex in provinces.keys():
 			annex = provinces[annex]
 			new = CB(self, annex.owner, "annex", annex.name, 5)
 			self.CB[annex.owner] = new
+			print("841")
+			print(new.province)
 		else:
 			new = CB(self, other, "punish", "", 5)
 			self.CB[annex.owner] = new
+			print("847")
 		print(len(self.CB))
 		self.diplo_action -= 1
 		self.reputation -= 0.025
+		if self.reputation < 0:
+			self.reputation = 0
 
 
 	def destabilize_Nation(self, other, players, relations):
@@ -859,6 +864,10 @@ class Human(Player):
 			other.stability = -3.0
 		self.diplo_action -=1
 		self.reputation -= 0.033
+		if self.reputation < 0:
+			self.reputation = 0
+
+
 		relata = frozenset([self.name, other.name])
 		relations[relata].relationship -= 0.2
 
@@ -878,6 +887,9 @@ class Human(Player):
 			(other1.name, other2.name, modifier, relations[relata].relationship))
 		self.diplo_action -= 1
 		self.reputation -= 0.025
+		if self.reputation < 0:
+			self.reputation = 0
+
 
 	def embargo_Nation(self, other, players, relations):
 		other = players[other]
