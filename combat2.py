@@ -62,6 +62,7 @@ def war_after_math(player, target, players, relations, prov, provinces, market):
 	#	self.CB.remove(target)
 	if target.type == "old_minor":
 		player.reputation -= 0.1
+
 		player.stability += 0.1
 	if target.type == "old_empire":
 		player.reputation -= 0.15
@@ -107,6 +108,8 @@ def war_after_math(player, target, players, relations, prov, provinces, market):
 			if target.check_for_border(v, players) == True:
 				p2_borders.add(k)
 		target.borders = p2_borders
+	if player.reputation < 0:
+			player.reputation = 0
 
 	
 class Battle(object):
