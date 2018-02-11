@@ -174,7 +174,7 @@ def initilize_uncivilized(player):
 
 
 
-def start_game():
+def _start_game():
 
 	print("____________________________________________________________________________________________ \n")
 	print ("Welcome to Imperialist Bastards! \n")

@@ -394,6 +394,8 @@ def show_player_gains(gains):
 
 
 def start_main_screen():
+	app.removeAllWidgets()
+	load_basic_widgets()
 	global market, players, human_player, market, relations
 	player = players[human_player]
 	if market.auto_save != "":
@@ -833,8 +835,8 @@ def start_main_screen():
 		app.setLabelBg("used_"+f, "gainsboro")
 		app.addImageButton("upgrade_" + f, build_fact, "upgrade2.gif", 5, i, 1, 1, align = "none")
 		app.setButtonTooltip("upgrade_" + f, "Upgrade " + f)
-		#app.addNamedButton("Upgrade", "upgrade_" + f, build_fact, i, 3, 1, 1)
-		#app.setButtonBg("upgrade_" + f, "dark olive green")
+		app.addNamedButton("Upgrade", "upgrade_" + f, build_fact, i, 3, 1, 1)
+		app.setButtonBg("upgrade_" + f, "dark olive green")
 		if f not in fact_options:
 			app.disableButton("upgrade_" + f)
 		else:
@@ -1069,6 +1071,7 @@ def start_main_screen():
 	app.startTab("Military")
 	app.setStretch("all")
 	app.setBg("indian red")
+	app.setAlign("left")
 	app.startScrollPane("military")
 
 	app.addLabel("total_strength", "Total Strength", 0, 0)
@@ -1083,7 +1086,6 @@ def start_main_screen():
 	app.getLabelWidget("army_").config(font=("Sans Serif", "12", "bold"))
 	row = 2
 	#app.addLabel("army_breakdown", " Type        Number     Att.      Def.   Man.  AmmoUse  OilUse", 0, 0, 9, 1)
-	app.align("left")
 	app.addLabel("army_unit_type", "Type:", 4, 0)
 	app.addLabel("army_unit_number", "Number:", 5, 0)
 	app.addLabel("army_unit_att", "Attack:", 6, 0)
@@ -1182,7 +1184,7 @@ def start_main_screen():
 		row += 1
 
 
-	app.addVerticalSeparator(0, row, 1, 11)
+	app.addVerticalSeparator(0, row, 1, 13)
 	app.addLabel("total_naval_str", "Naval Strength: %.2f" % (naval), 1, row + 1)
 
 	#app.startLabelFrame("Navy")
@@ -1291,7 +1293,8 @@ def start_main_screen():
 	app.setBg("RoyalBlue1")
 	
 	app.startScrollPane("diplomacy")
-	app.startLabelFrame("Nations")
+	app.addLabel("diplo_header", "Nations", 0, 1)
+	app.getLabelWidget("diplo_header").config(font = ("Sans Serif", "14", "bold"))
 	count = 1
 	playerList = market.modern_major + market.modern_minors + market.old_empires + market.old_minors
 	for k in playerList:
@@ -1362,8 +1365,24 @@ def start_main_screen():
 			app.enableButton("war_on" + k)
 		count += 1
 
+	
 
-	app.stopLabelFrame()
+	app.addVerticalSeparator(0, 12, 1, 30)
+
+	app.addLabel("other_report", "Report", 0, 13)
+	app.getLabelWidget("other_report").config(font = ("Sans Serif", "14", "bold"))
+	app.addLabel("Nation_Name", " ", 2, 13)
+	app.getLabelWidget("Nation_Name").config(font="Times 13 bold underline")
+	app.addLabel("PrimaryStats", " ", 3, 13)
+	app.addLabel("OtherDemographics", " ", 4, 13)
+	app.addLabel("other_other_stuff", " ", 5, 13)
+	app.addLabel("other_objectives", " ", 6, 13)
+	#Primary Stats: Gold, DevelopmentLevel, NumTechnologies, NumDevelopments, NumFactories
+	app.addLabel("NationMiddleCLass", " ", 7, 13)
+	app.addLabel("factories_1", " ", 8, 13)
+	app.addLabel("factories_2", " ", 9, 13)
+	app.addMessage("NationInventory", """ """, 10, 13, 4, 10)
+	app.addMessage("NationMilitary", """ """, 20, 13, 4, 10)
 
 
 	app.stopScrollPane()
@@ -1586,7 +1605,7 @@ def get_nation_info(btn):
 	other = btn[4:]
 	other = players[other]
 	update_Nation_Info(other)
-	app.showSubWindow("Nation Info")
+	#app.showSubWindow("Nation Info")
 
 def update_Nation_Info(other):
 	app.setLabel("Nation_Name", other.name + "   " + other.type)
@@ -1983,9 +2002,10 @@ def update_military_tab():
 		addition = "%s: %s, %d" % (cb.opponent, cb.province, cb.time)
 		cb_list.append(addition)
 	if len(player.CB.keys()) == 0:
-		app.changeOptionBox("CB List:", [" "])
+		app.updateListBox("Casus Belli: ", [" "])
 	else:
-		app.changeOptionBox("CB List:", cb_list)
+		app.updateListBox("Casus Belli: ", cb_list)
+
 
 	for k in player.military.keys():
 		if k == "irregulars":
@@ -2206,7 +2226,7 @@ def AI_turnS(auto_save):
 		app.setButtonBg(p.position, owner.colour)
 		app.setButtonFg(p.position, owner.colour)
 
-	#app.setMessage("turn_report", market.report)
+	app.setMessage("turn_report", market.report)
 	app.setMessage("turn_market_report", market.market_report)	
 
 	player.calculate_access_to_goods(market)
@@ -2734,8 +2754,82 @@ def sell(btn):
 
 def new_game(btn):
 	load_basic_widgets()
-	app.showSubWindow("Scenario_Choice")
+	app.setBg("khaki", override = "false")
+	app.addLabel("Scenario_Choice", "Which Scenario Would You Like to Play?")
+	app.addRadioButton("Scen", "None")
+	app.addRadioButton("Scen", "Semi-Historical")
+	app.addRadioButton("Scen", "Fictional")
+	app.addButton("Cont", scen_press)
+	app.addRadioButton("nation_type", "Major Power")
+	app.addRadioButton("nation_type", "Minor Power")
+	app.addRadioButton("nation_type", "Old Empire")
+	app.addButton("Cont.", nation_type_press)
 
+
+
+
+def game_option_screen(btn):
+	app.removeAllWidgets()
+	app.setBg("khaki", override=False, tint=False)
+	app.setBgImage("simple_background.gif")
+
+	app.setFont("13")
+	app.startLabelFrame("Scenarios")
+	app.addRadioButton("Scenario:", "Semi-Historical")
+	app.addRadioButton("Scenario:", "Fictional")
+	app.setRadioButtonChangeFunction("Scenario:", pick_scenario)
+	app.stopLabelFrame()
+
+	app.startLabelFrame("AutoSave")
+	app.addRadioButton("Auto Save:", "On")
+	app.addRadioButton("Auto Save:", "Off")
+	app.stopLabelFrame()
+
+	app.addLabelOptionBox("Nation:", [])
+
+	app.startLabelFrame("Sound")
+	app.addRadioButton("Sound:", "On")
+	app.addRadioButton("Sound:", "Off")
+	app.stopLabelFrame()
+
+	app.addImageButton("Start Game", start_game, "Start Game.gif", )
+
+
+def pick_scenario(btn):
+	scenario = app.getRadioButton("Scenario:")
+	nation_choices = []
+	if scenario == "Semi-Historical":
+		nation_choices = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Ottoman", "Spain", \
+		"Netherlands", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", "China", "India", "Japan", "Persia"]
+
+	if scenario == "Fictional":
+		nation_choices = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
+	app.changeOptionBox("Nation:", nation_choices, callFunction=False)
+
+
+def start_game(btn):
+	player = app.getOptionBox("Nation:")
+	scenario = app.getRadioButton("Scenario:")
+	global initial, human_player
+	human_player = player
+
+	print("Human Nation %s" % (player))
+	if scenario == "Semi-Historical":
+		initial = historical(player)
+	if scenario == "Fictional":
+		initial = balance(player)
+	global players
+	global provinces
+	global relations
+	global market
+	players = initial["players"]
+	provinces = initial["provinces"]
+	relations = initial["relations"]
+	market = initial["market"]
+	isAutoSaving = app.getRadioButton("Auto Save:")
+	if isAutoSaving == "On":
+		market.auto_save = app.getEntry("auto_save")
+	start_main_screen()
 
 def menuPress(command):
 	if command == "New Game":
@@ -2859,7 +2953,8 @@ def load_basic_widgets():
 	
 	#app.playSound("Grand March from Aida.wav", wait=False)
 	app.removeAllWidgets()
-	app.setBgImage("IB.png")
+	#app.setBgImage("IB.png")
+	app.setBgImage("Main Menu.png")
 
 	app.startSubWindow("loading new game", modal = False)
 	app.addLabel("nload", " Please wait while the game world is loaded... ")
@@ -2954,22 +3049,6 @@ def load_basic_widgets():
 	app.addNamedButton("OK", "other_player", sab_rel_2)
 	app.stopSubWindow()
 
-	app.startSubWindow("Nation Info", modal = False)
-	app.startLabelFrame("Report")
-	app.addLabel("Nation_Name", " ")
-	app.getLabelWidget("Nation_Name").config(font="Times 13 bold underline")
-	app.addLabel("PrimaryStats", " ")
-	app.addLabel("OtherDemographics", " ")
-	app.addLabel("other_other_stuff", " ")
-	app.addLabel("other_objectives", " ")
-	#Primary Stats: Gold, DevelopmentLevel, NumTechnologies, NumDevelopments, NumFactories
-	app.addLabel("NationMiddleCLass", " ")
-	app.addLabel("factories_1", " ")
-	app.addLabel("factories_2", " ")
-	app.stopLabelFrame()
-	app.addMessage("NationInventory", """ """)
-	app.addMessage("NationMilitary", """ """)
-	app.stopSubWindow()
 
 	app.startSubWindow("Message_")
 	app.addLabel("general_message", " ")
@@ -3128,20 +3207,39 @@ def load_basic_widgets():
 #def main(argv):
 
 app = gui("Imperialist Bastards", "960x600")
+app.setImageLocation("Images")
+app.setSoundLocation("Sounds")
+app.setBgImage("Main Menu.png")
 app.showSplash("A Play Drive Production", fill='khaki', stripe='goldenrod3', fg='dark green', font= 30)
 #app.setTtkTheme("black")
 app.setIcon("crown.gif")
 app.setFont("11", "arial")
 app.setLocation("CENTER")
-#app.setExpand("all")
+app.setExpand("all")
 #app.setPadding([1, 1])
 #app.setInPadding([2, 2])
 app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
-app.setImageLocation("Images")
-app.setSoundLocation("Sounds")
-app.setBgImage("IB.png")
+
+app.setBgImage("Main Menu.png")
 #app.playSound("Grand March from Aida.wav", wait=False)
+
+app.setStretch("none")
+
+app.setSticky("sw")
+app.addLabel("just_taking_space0", "", 0, 1, 1, 1)
+app.addLabel("just_taking_space1", "", 1, 1, 1, 1)
+app.addLabel("just_taking_space2", "", 2, 1, 1, 1)
+app.addLabel("just_taking_space3", "", 3, 1, 1, 1)
+app.addLabel("just_taking_space4", "", 4, 1, 1, 1)
+app.addImageButton("new_game",  game_option_screen, "New Game.gif", 5, 1, 3,   align = "none")
+app.addLabel("just_taking_space5", "", 6, 1, 1, 1)
+
+app.addImageButton("load_game",  do_nothing, "Load Game.gif", 7, 1, 3, align = "none")
+app.addLabel("just_taking_space6", "", 8, 1, 1, 1)
+
+app.addImageButton("exit_game",  do_nothing, "Exit Game.gif", 9, 1, 3, align = "none")
+
 
 
 fileMenus = ["New Game", "Load Game", "Save", "Save as...", "Exit Game", "Close"]
