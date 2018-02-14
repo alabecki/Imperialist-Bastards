@@ -337,10 +337,10 @@ def ask_auto_save():
 
 
 
-def get_auto_save_name(bn):
-	app.hideSubWindow("auto_save?")
-	temp = app.getRadioButton("?auto_save?")
-	if temp == "Yes":
+def get_auto_save_name():
+	#app.hideSubWindow("auto_save?")
+	temp = app.getRadioButton("Auto Save:")
+	if temp == "On":
 		app.startSubWindow("auto_save_name", modal = True)
 		app.addLabel("ask save name", "Please enter a name for your saved game:")
 		app.addEntry("auto_save")
@@ -415,7 +415,7 @@ def start_main_screen():
 	app.setStretch("none")
 	#app.setSticky("")
 
-	app.addImage("player_flag", player.name + ".gif", 0, 0, 1)
+	app.addImage("player_flag", player.name + ".gif", 0, 0)
 	app.addLabel("l0", player.name, 0, 1, 3)
 	app.getLabelWidget("l0").config(font="Times 15 bold underline")
 	app.setLabelFg("l0", player.colour)
@@ -426,11 +426,11 @@ def start_main_screen():
 
 
 
-	app.addImageButton("New Turn", next_turn, "turn.gif", 0, 22,  align = "none")
+	app.addImageButton("New Turn", next_turn, "turn.gif", 0, 24, 2, 2, align = "none")
 	app.setButtonTooltip("New Turn", "Next Turn")
 	#app.setSticky("w")
 
-	app.addImageButton("POP UP", increase_population, "pop_growth.gif", 0, 20, align = "none")
+	app.addImageButton("POP UP", increase_population, "baby.gif", 0, 20, 2, 2, align = "none")
 	app.setButtonTooltip("POP UP", "Increase Population")
 	if(player.POP_increased > 1):
 		app.disableButton("POP UP")
@@ -441,7 +441,7 @@ def start_main_screen():
 	else:
 		app.enableButton("POP UP")
 
-	app.addImageButton("Develop", dev_type, "develop.gif", 1, 20, 2, align = "none")
+	app.addImageButton("Develop", dev_type, "develop.gif", 0, 22, 2, 2, align = "none")
 	app.setButtonTooltip("Develop", "Increase Development Level")
 
 	if player.check_development() == False:
@@ -589,7 +589,7 @@ def start_main_screen():
 	
 	app.setExpand("all")
 	app.setStretch("all")
-	app.startScrollPane("map_scroll", 3, 0, 25, 25)
+	app.startScrollPane("map_scroll", 3, 0, 26, 25)
 	
 	#app.setExpand("none")
 	global provinces
@@ -659,7 +659,7 @@ def start_main_screen():
 	#app.startPanedFrameVertical("report_pane")
 	#app.addHorizontalSeparator(19, 0, 20, 1)
 
-	app.startScrollPane("general_report", 32, 0, 25, 2)
+	app.startScrollPane("general_report", 32, 0, 26, 2)
 	app.setBg("goldenrod3")
 	app.setFont(9)
 	app.setSticky("ne")
@@ -835,7 +835,7 @@ def start_main_screen():
 		app.setLabelBg("used_"+f, "gainsboro")
 		app.addImageButton("upgrade_" + f, build_fact, "upgrade2.gif", 5, i, 1, 1, align = "none")
 		app.setButtonTooltip("upgrade_" + f, "Upgrade " + f)
-		app.addNamedButton("Upgrade", "upgrade_" + f, build_fact, i, 3, 1, 1)
+		#app.addNamedButton("Upgrade", "upgrade_" + f, build_fact, i, 3, 1, 1)
 		app.setButtonBg("upgrade_" + f, "dark olive green")
 		if f not in fact_options:
 			app.disableButton("upgrade_" + f)
@@ -1036,7 +1036,7 @@ def start_main_screen():
 	#app.startLabelFrame("Culture Commands")
 	app.addLabel("CultureCommands", "Culture Commands", 5, 7, 3)
 	app.getLabelWidget("CultureCommands").config(font=("Sans Serif", "15", "bold"))
-	app.addImage("culture_tab", "culture_tab.gif", 6, 7, 3, 2)
+	app.addImage("culture_tab", "culture_tab.gif", 6, 7, 3, 3)
 	app.shrinkImage("culture_tab", 2)
 	app.addButton("Increase Stability", increase_stability, 6, 10, 2)
 	app.addButton("Improve Reputation", improve_reputation, 7, 10, 2)
@@ -1081,6 +1081,8 @@ def start_main_screen():
 	naval = player.calculate_naval_strength()
 	app.addLabel("total_attack_str", "Land Attack Strength: %.2f" % (attack), 1, 0, 3)
 	app.addLabel("total_defense_str", "Land Defense Strength: %.2f" % (defense), 2, 0, 3)
+	app.getLabelWidget("total_attack_str").config(font="Helvetica 11 underline")
+	app.getLabelWidget("total_defense_str").config(font="Helvetica 11 underline")
 
 	app.addLabel("army_", "Army", 3, 0)
 	app.getLabelWidget("army_").config(font=("Sans Serif", "12", "bold"))
@@ -1388,6 +1390,8 @@ def start_main_screen():
 	app.stopScrollPane()
 	app.stopTab()
 
+	##########################################################################################################
+	app.startTab("Rankings")
 	app.stopTabbedFrame()
 	app.hideSubWindow("loading new game")
 
@@ -2770,40 +2774,80 @@ def new_game(btn):
 
 def game_option_screen(btn):
 	app.removeAllWidgets()
-	app.setBg("khaki", override=False, tint=False)
-	app.setBgImage("simple_background.gif")
+	app.setStretch("none")
+	myColour = '#%02x%02x%02x' % (212, 227, 140)
+	app.setBg(myColour, override=False, tint=False)
+	app.setBgImage("textureBackground.gif")
 
-	app.setFont("13")
-	app.startLabelFrame("Scenarios")
+	app.setFont("14")
+	app.startLabelFrame("Scenarios", 1, 1, 2, 2)
 	app.addRadioButton("Scenario:", "Semi-Historical")
 	app.addRadioButton("Scenario:", "Fictional")
 	app.setRadioButtonChangeFunction("Scenario:", pick_scenario)
 	app.stopLabelFrame()
 
-	app.startLabelFrame("AutoSave")
+	app.addImage("scenario", "historicalFiction.gif", 2, 3, 3, 1)
+	app.shrinkImage("scenario", 2)
+
+	app.startLabelFrame("Auto Save", 3, 1, 2, 2)
 	app.addRadioButton("Auto Save:", "On")
 	app.addRadioButton("Auto Save:", "Off")
 	app.stopLabelFrame()
 
-	app.addLabelOptionBox("Nation:", [])
+	nation_choices = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Ottoman", "Spain", \
+		"Netherlands", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", "China", "India", "Japan", "Persia"]
 
-	app.startLabelFrame("Sound")
+	app.addLabelOptionBox("Nation:", [], 5, 1)
+	app.changeOptionBox("Nation:", nation_choices, callFunction=False)
+	app.setOptionBoxFunction("Nation:", nation_flag)
+
+
+	app.addImage("nationChoiceFlag", "England.gif", 5, 3, 1, 1)
+	
+	app.startLabelFrame("Sound", 6, 1, 2, 2)
 	app.addRadioButton("Sound:", "On")
 	app.addRadioButton("Sound:", "Off")
+	app.setRadioButtonChangeFunction("Sound:", sound_change)
 	app.stopLabelFrame()
 
-	app.addImageButton("Start Game", start_game, "Start Game.gif", )
+	app.addImage("music?", "musicPlayer.gif", 6, 3, 3, 2)
+	app.shrinkImage("music?", 2)
+
+
+
+	app.addImageButton("Start Game", start_game, "play.gif", 13, 2, 2, 1)
+
+	app.addImage("Options Page", "optionsPage.gif", 2, 7, 16, 16)
+
+def nation_flag(btn):
+	nation = app.getOptionBox("Nation:")
+	app.setImage("nationChoiceFlag", nation + ".gif")
+
+def sound_change(btn):
+	if app.getRadioButton("Sound:") == "On":
+		app.setImage("music?", "musicPlayer.gif")
+		app.shrinkImage("music?", 2)
+
+	if app.getRadioButton("Sound:") == "Off":
+		app.setImage("music?", "noSound.gif")
+		app.shrinkImage("music?", 2)
+
 
 
 def pick_scenario(btn):
 	scenario = app.getRadioButton("Scenario:")
-	nation_choices = []
+	#nation_choices = []
 	if scenario == "Semi-Historical":
 		nation_choices = ["England", "France", "Russia", "Germany", "Austria", "Italy", "Ottoman", "Spain", \
 		"Netherlands", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", "China", "India", "Japan", "Persia"]
+		app.setImage("scenario", "historicalFiction.gif")
+		app.shrinkImage("scenario", 2)
 
 	if scenario == "Fictional":
 		nation_choices = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
+		app.setImage("scenario", "fiction.gif")
+		app.shrinkImage("scenario", 2)
+
 	app.changeOptionBox("Nation:", nation_choices, callFunction=False)
 
 
@@ -2827,9 +2871,10 @@ def start_game(btn):
 	relations = initial["relations"]
 	market = initial["market"]
 	isAutoSaving = app.getRadioButton("Auto Save:")
-	if isAutoSaving == "On":
-		market.auto_save = app.getEntry("auto_save")
-	start_main_screen()
+	#if isAutoSaving == "On":
+	get_auto_save_name()
+	#market.auto_save = app.getEntry("auto_save")
+	#start_main_screen()
 
 def menuPress(command):
 	if command == "New Game":
@@ -2938,6 +2983,7 @@ def start_game_tread():
 	print("Game should have started now \n")
 
 def exit_game(btn):
+	app.stop()
 	sys.exit(0)
 
 def gui_save_game(btn):
@@ -3222,7 +3268,7 @@ app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 
 app.setBgImage("Main Menu.png")
-#app.playSound("Grand March from Aida.wav", wait=False)
+app.playSound("Beethoven.wav", wait=False)
 
 app.setStretch("none")
 
@@ -3232,22 +3278,23 @@ app.addLabel("just_taking_space1", "", 1, 1, 1, 1)
 app.addLabel("just_taking_space2", "", 2, 1, 1, 1)
 app.addLabel("just_taking_space3", "", 3, 1, 1, 1)
 app.addLabel("just_taking_space4", "", 4, 1, 1, 1)
-app.addImageButton("new_game",  game_option_screen, "New Game.gif", 5, 1, 3,   align = "none")
-app.addLabel("just_taking_space5", "", 6, 1, 1, 1)
+app.addLabel("just_taking_space7", "", 5, 1, 1, 1)
+app.addImageButton("new_game",  game_option_screen, "New Game.gif", 6, 1, 3,   align = "none")
+app.addLabel("just_taking_space5", "", 7, 1, 1, 1)
 
-app.addImageButton("load_game",  do_nothing, "Load Game.gif", 7, 1, 3, align = "none")
-app.addLabel("just_taking_space6", "", 8, 1, 1, 1)
+app.addImageButton("load_game",  gui_load_game, "Load Game.gif", 8, 1, 3, align = "none")
+app.addLabel("just_taking_space6", "", 9, 1, 1, 1)
 
-app.addImageButton("exit_game",  do_nothing, "Exit Game.gif", 9, 1, 3, align = "none")
+app.addImageButton("exit_game",  exit_game, "Exit Game.gif", 10, 1, 3, align = "none")
 
 
 
-fileMenus = ["New Game", "Load Game", "Save", "Save as...", "Exit Game", "Close"]
-app.createMenu("Menu")
-app.addMenuItem("Menu", "New Game", func = new_game, shortcut=None, underline=-1)
-app.addMenuItem("Menu", "Load Game", func = gui_load_game, shortcut = None, underline = -1)
-app.addMenuItem("Menu", "Save Game", func= gui_save_game, shortcut = None, underline = -1)
-app.addMenuItem("Menu", "Exit", func = exit_game, shortcut = None, underline = -1)
+#fileMenus = ["New Game", "Load Game", "Save", "Save as...", "Exit Game", "Close"]
+#app.createMenu("Menu")
+#app.addMenuItem("Menu", "New Game", func = game_option_screen, shortcut=None, underline=-1)
+#app.addMenuItem("Menu", "Load Game", func = gui_load_game, shortcut = None, underline = -1)
+#app.addMenuItem("Menu", "Save Game", func= gui_save_game, shortcut = None, underline = -1)
+#app.addMenuItem("Menu", "Exit", func = exit_game, shortcut = None, underline = -1)
 
 app.go()
 

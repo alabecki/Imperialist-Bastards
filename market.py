@@ -19,7 +19,7 @@ class Market(object):
 
 		self.defeated = []
 
-		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil", "/", "//", "///"]
+		self.resources = ["food", "cotton", "iron", "wood", "coal", "spice", "dyes", "rubber", "oil"]
 		self.goods = ["parts", "cannons", "paper", "furniture", "clothing", "chemicals", "gear", "radio", "telephone", "fighter", "tank", "auto"]
 
 		self.landBattle = 0
@@ -40,7 +40,7 @@ class Market(object):
 			"dyes": [],
 			"rubber": [],
 			"oil": [],
-			"gold": [],
+			"gold": [],p
 
 			"parts": [],
 			"clothing": [],
