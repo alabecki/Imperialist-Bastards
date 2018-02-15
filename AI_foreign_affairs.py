@@ -4,7 +4,7 @@ from AI import*
 from combat import*
 from combat2 import*
 from player_class import*
-from globe import*
+#from globe import*
 import queue as queue
 from random import*
 
