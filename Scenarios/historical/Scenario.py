@@ -30,15 +30,15 @@ def historical(human_player):
 
 	for p in provinces.values():
 		p.position = str(p.x) + " " + str(p.y)
-		print(p.position)
+		#print(p.position)
 
 	players = dict()
 	i = 1
-	new = Human(human_player, "major", i)
-	players[human_player] = new
-	player = players[human_player]
-
-	if player.name in modern_major:
+	print("human_player: %s" % human_player)
+	if human_player in modern_major:
+		new = Human(human_player, "major", i)
+		players[human_player] = new
+		player = players[human_player]
 		initialize_major_power(player)
 		if player.name == "England":
 			england(player, provinces)
@@ -54,16 +54,21 @@ def historical(human_player):
 			italy(player, provinces)
 		if player.name == "Ottoman":
 			ottoman(player, provinces)
-		if player.name == "8":
+		if player.name == "Spain":
 			spain(player, provinces)
 		if player.name == "Netherlands":
 			netherlands(player, provinces)
 
-	if player.name in modern_minors:
+	if human_player in modern_minors:
+		new = Human(human_player, "minor", i)
+		players[human_player] = new
+		player = players[human_player]
 		initialize_modern_minor(player)
+		print("Player name: %s" % player.name)
 		if player.name == "Denmark":
 			denmark(player, provinces)
 		if player.name == "Sweden":
+			print("Sweden")
 			sweden(player, provinces)
 		if player.name == "Portugal":
 			portugal(player, provinces)
@@ -72,10 +77,22 @@ def historical(human_player):
 		if player.name == "Switzerland":
 			switzerland(player, provinces) 
 
-	uncivilized_minors = dict()
-	
+	if human_player in old_empires:
+		new = Human(human_player, "old_empire", i)
+		players[human_player] = new
+		player = players[human_player]
+		initialize_oldempire(player)
+		if player.name == "China":
+			china(player, provinces)
+		if player.name == "India":
+			india(player, provinces)
+		if player.name ==  "Japan":
+			japan(player, provinces)
+		if player.name == "Persia":
+			persia(player, provinces)
 
-	
+
+	uncivilized_minors = dict()
 	
 
 	print("Initializing AI Players....\n")
@@ -282,9 +299,22 @@ def historical(human_player):
 	for p1 in players.values():
 		borders = set()
 		for p2 in players.values():
-			if p1.check_for_border(p2) == True:
+			if p1.check_for_border(p2, players) == True:
 				borders.add(p2.name)
 		p1.borders = borders
+
+	for p in players.values():
+		if "professional_armies" in p.technologies:
+			p.infantry["attack"] += 0.15
+			p.infantry["defend"] += 0.15
+			p.infantry["manouver"] += 0.2
+			p.cavalry["attack"] += 0.15
+			p.cavalry["defend"] += 0.15
+			p.cavalry["manouver"] += 0.2
+			p.cavalry["recon"] += 0.2
+			p.artillery["attack"] += 0.15
+			p.artillery["defend"] += 0.15
+			p.frigates["attack"] += 0.2
 
 #	for p1 in players.values():
 	#	print(p1.name)
@@ -375,6 +405,16 @@ def historical(human_player):
 	relations[frozenset({"Portugal", "Spain"})].relationship = 2
 	relations[frozenset({"Portugal", "France"})].relationship = 1
 
+	relations[frozenset({"Switzerland", "France"})].relationship = 2
+	relations[frozenset({"Switzerland", "Netherlands"})].relationship = 2
+	relations[frozenset({"Switzerland", "Germany"})].relationship = 2
+	relations[frozenset({"Switzerland", "England"})].relationship = 2
+	relations[frozenset({"Switzerland", "Italy"})].relationship = 1.2
+	relations[frozenset({"Switzerland", "Austria"})].relationship = 1.2
+	relations[frozenset({"Switzerland", "Russia"})].relationship = 1
+	relations[frozenset({"Switzerland", "Spain"})].relationship = 0.5
+	relations[frozenset({"Switzerland", "Sweden"})].relationship = 1
+
 
 	
 	#new0 = CB("Germany", "Austria", "annex", "_Austria", 18)
@@ -391,8 +431,8 @@ def historical(human_player):
 	new5 = CB("Italy", "Papal States", "annex", "Lazio", 20)
 	#new6 = CB("Italy", "Two Sicilies", "annex", "Naples", 20)
 	#new7 = CB("Italy", "Two Sicilies", "annex", "Sicily", 20)
-	players["Italy"].CB.add(new4)
-	players["Italy"].CB.add(new5)
+	players["Italy"].CB["Austria"] = new4
+	players["Italy"].CB["Papal States"] = new5
 	#players["Italy"].CB.add(new6)
 	#players["Italy"].CB.add(new7)
 
@@ -406,6 +446,11 @@ def historical(human_player):
 	market = Market()
 
 	market_items = dict()
+
+	market.modern_major = modern_major
+	market.modern_minors = modern_minors
+	market.old_empires = old_empires
+	market.old_minors = old_minors
 		
 
 	#globe = Globe()
@@ -422,18 +467,14 @@ def historical(human_player):
 	return initial
 
 		
-
-
 def AI_values(player):
 	if player.type != "major":
 		return
-	if player.name in ["Germany", "Italy", "Austria", "Russia"]:
+	if player.name in ["Germany", "Italy", "Austria", "Russia", "Ottoman"]:
 		player.general_priority = "army"
 	else:
 		player.general_priority = "expansion"
 
-
-		player.general_priority = "expansion"
 	if "power_loom" in player.technologies or "bessemer_process" in player.technologies:
 		if player.name != "Netherlands":
 			player.general_priority = "industrialize"
