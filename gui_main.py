@@ -3268,7 +3268,7 @@ app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 
 app.setBgImage("Main Menu.png")
-app.playSound("Beethoven.wav", wait=False)
+#app.playSound("Beethoven.wav", wait=False)
 
 app.setStretch("none")
 
