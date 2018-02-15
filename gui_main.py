@@ -22,7 +22,7 @@ from start import*
 from save import*
 from AI import*
 from AI_turn import*
-from globe import*
+#from globe import*
 #from GUI_functions import*
 #import Scenarios.historical.Scenario 
 #import Scenarios.BalanceScenario.Scenario
