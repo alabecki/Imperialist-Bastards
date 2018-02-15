@@ -3,7 +3,7 @@
 from random import*
 from minor_classes import*
 from technologies import technology_dict
-from globe import*
+#from globe import*
 from queue import*
 from copy import deepcopy
 
