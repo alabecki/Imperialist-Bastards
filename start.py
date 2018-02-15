@@ -5,7 +5,7 @@ from itertools import product, combinations
 from name_generator import*
 
 
-from cheat import*
+#from cheat import*
 from player_class import*
 from minor_classes import*
 from market import Market
