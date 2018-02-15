@@ -10,6 +10,7 @@ def bambaki(player, provinces):
 	player.technologies.add("pre_industry_3")
 #	player.technologies.add("high_pressure_steam_engine")
 	player.culture = "Bambaki"
+	player.colour = "blue"
 
 
 	player.provinces["Fonie"] = provinces["Fonie"]
@@ -33,6 +34,8 @@ def bambaki(player, provinces):
 def hyle(player, provinces):
 
 	player.culture = "Hyle"
+	player.colour = "green"
+
 	
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
@@ -54,6 +57,8 @@ def trope(player, provinces):
 	player.culture = "Trope"
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
+	player.colour = "yellow"
+
 
 
 	player.provinces["Niten"] = provinces["Niten"]
@@ -71,6 +76,8 @@ def sidero(player, provinces):
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
+	player.colour = "red"
+
 
 	player.provinces["Seele"] = provinces["Seele"]
 	player.provinces["Sitwee"] = provinces["Sitwee"]
@@ -89,6 +96,8 @@ def sidero(player, provinces):
 def isorropia(player, provinces):
 
 	player.culture = "Isorropia"
+	player.colour = "orange"
+
 
 
 	player.technologies.add("pre_industry_2")
@@ -114,6 +123,8 @@ def karbouno(player, provinces): #major
 
 	player.technologies.add("pre_industry_2")
 	player.technologies.add("pre_industry_3")
+	player.colour = "brown"
+
 
 
 	player.provinces["Sevteeve"] = provinces["Sevteeve"]
@@ -122,6 +133,7 @@ def karbouno(player, provinces): #major
 	player.provinces["Sartarva"] = provinces["Sartarva"]	
 	player.provinces["Sifoto"] = provinces["Sifoto"]
 	player.provinces["Sisivo"] = provinces["Sisivo"]
+	print("Should have provinces")
 	if type(player) == AI:
 		player.mid_class_priority["research"] += 0.2
 		player.build_factory_priority["chemicals"] = 1.4

@@ -221,7 +221,7 @@ def create_provinces():
 
 	Tennini = Province("Tennini", "Situs", "food", 1.1, "civilized", "Situs")
 	Tennini.x = 9
-	Tennini.y = 10
+	Tennini.y = 9
 	Tennini.ocean = False
 	provinces["Tennini"] = Tennini
 	
@@ -304,13 +304,13 @@ def create_provinces():
 
 
 	Garia = Province("Garia", "Bulgo", "wood", 1.0, "civilized", "Bulgo")
-	Garia.x = 4
-	Garia.x = 10
+	Garia.x = 2
+	Garia.y = 10
 	provinces["Garia"] = Garia
 
 	Sebia = Province("Sebia", "Bulgo", "food", 1.0, "civilized", "Bulgo")
 	Sebia.x = 3
-	Sebia.y = 10
+	Sebia.y = 11
 	provinces["Sebia"] = Sebia
 
 
@@ -368,7 +368,7 @@ def create_provinces():
 	provinces["NorthMancha"] = NorthMancha
 
 	SouthMancha = Province("SouthMancha", "Mancha", "dyes", 0.9, "old", "Mancha")
-	SouthMancha.x = 16
+	SouthMancha.x = 17
 	SouthMancha.y = 10
 	provinces["SouthMancha"] = SouthMancha
 

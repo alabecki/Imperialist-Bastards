@@ -7,61 +7,44 @@ from random import*
 from Scenarios.BalanceScenario.ScenarioNations import*
 from Scenarios.BalanceScenario.Scenario_provinces import*
 
-def get_name_from_major_choice(pick):
-	if pick == "1":
-		name = "Bambaki"
-	if pick == "4":
-		name = "Hyle"
-	if pick == "2":
-		name = "Trope"
-	if pick == "3":
-		name = "Sidero"
-	if pick == "5":
-		name = "Isorropia"
-	if pick == "6":
-		name = "Karbouno"
-
-def get_name_from_minor_choice(pick):
-	if pick == "1":
-		name = "Situs"
-	if pick == "2":
-		name = "Hythen"
-	if pick == "3":
-		name = "Intero"
-	if pick == "4":
-		name = "Kora"
-	if pick == "5":
-		name = "Southo"
-	if pick == "6":
-		name = "Cindra"
-	if pick == "7":
-		name = "Estos"
-	if pick == "8":
-		name = "Lian"
-	if pick == "9":
-		name = "Bulgo"
-
 
 def balance(human_player):
 
 	provinces = create_provinces()
 
 	for p in provinces.values():
-		p.position = str(p.x + 8) + " " + str(p.y)
+		p.position = str(p.x) + " " + str(p.y)
 
 
 	players = dict()
 	i = 1
 
 	modern_major = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
+	old_empires = []
 	modern_minors = ["Situs", "Hythen", "Intero", "Kora", "Southo", "Cindra", "Estos", "Lian", "Bulgo" ]
-	#old_empires = ["China", "India", "Japan", "Persia"]
 	old_minors = ["Kaygree", "Kish", "Rabus", "Sparko", "Argos", "Mancha", "Gelder", "Porta", "Norra", \
 	"Wego", "Arbaca", "Egaro"]
-	#unciv = ["Mozambique", "Tanzania", "Kenya", "Ethiopia", "New South Whales", "Queensland", "West Australia",
-	#"South Australia", "New Zealand", "Zululand"]
-	#unciv_rough = ["Mauritania", "Liberia", "Mali", "Ghana", "Niger", "Nigeria", "Cameroon", "Angola", "Nambia", \
-	#"Congo", "Madagascar"] 
+
+
+	print("human_player: %s" % human_player)
+	new = Human(human_player, "major", i)
+	players[human_player] = new
+	player = players[human_player]
+	initialize_major_power(player)
+	if player.name == "Bambaki":
+		bambaki(player, provinces)
+	if player.name == "Hyle":
+		hyle(player, provinces)
+	if player.name == "Trope":
+		trope(player, provinces)
+	if player.name == "Sidero":
+		sidero(player, provinces)
+	if player.name == "Isorropia":
+		isorropia(player, provinces)
+	if player.name == "Karbouno":
+		karbouno(player, provinces)
+	i += 1
+
 
 	
 	print("Initializing AI Players....\n")
@@ -158,7 +141,8 @@ def balance(human_player):
 	for p, play in players.items():
 		if len(play.capital) == 0:
 			provs = list(play.provinces.keys())
-			cap = choice(provs)
+			print("%s has %d provinces" % (p, len(play.provinces.keys())))
+			cap = choice(list(play.provinces.keys()))
 			#for k, v in play.provinces.items():
 			play.capital.add(cap)
 
@@ -173,7 +157,7 @@ def balance(human_player):
 		#print("p1 capital: %s" % (p1.capital))
 		for p2 in players.values():
 			#print("p2 capital: %s" % (p2.capital))
-			if p1.check_for_border(p2) == True:
+			if p1.check_for_border(p2, players) == True:
 				borders.add(p2)
 		p1.borders = borders 
 
@@ -205,6 +189,11 @@ def balance(human_player):
 			pl.objectives = old_provs
 
 	market = Market()
+
+	market.modern_major = modern_major
+	market.modern_minors = modern_minors
+	market.old_empires = old_empires
+	market.old_minors = old_minors
 
 	#globe = Globe()
 
