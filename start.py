@@ -13,7 +13,7 @@ from technologies import*
 from combat import*
 from human import*
 from AI import*
-from globe import*
+#from globe import*
 
 
 #constants
