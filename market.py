@@ -40,7 +40,7 @@ class Market(object):
 			"dyes": [],
 			"rubber": [],
 			"oil": [],
-			"gold": [],p
+			"gold": [],
 
 			"parts": [],
 			"clothing": [],
