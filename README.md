@@ -1,5 +1,8 @@
 Imperialist-Bastards (Prototype-Beta Phase)
 
+(More information can be found in the Imperialist-Bastards.pdf file)
+
+
 Prototype of a turn-based strategy game based on the Industrial Revolution and its aftermath. As one of the major nations, colonize or exploit less developed nations, develop rail-lines and factories, trade goods on the World Market, build a great army and navy, and develop a thriving middle class.
 
 1. Install 
@@ -24,11 +27,14 @@ The GUI is made using appJar, which is a Tk wrapper. To install Appjar, simply t
     
 Once all dependencies have been installed, you can run Imperialist Bastards from the commandline by going to the folder to which you installed it, then going into the "game" folder and typing:
 
-      python gui_main.py
+      python ImperialistBastards.py
 
 If this leads to an error try
 
-    python3 gui_main.py
+    python3 ImperialistBastards.py
+    
+ Alternatively, a folder with an .exe can found at:
+ https://drive.google.com/drive/folders/17fzNj5QSq95JL5EEaHik_u0mXod6A2Em?usp=sharing
     
   
 2. Starting a Game
