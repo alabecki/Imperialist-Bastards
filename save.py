@@ -15,29 +15,28 @@ from human import*
 
 
 
-def create_new_save_game(game_name, players, relations, market, provinces):
+def create_new_save_game(save_path, players, relations, market, provinces):
 	jsonpickle.set_preferred_backend('simplejson')
 	#save_name = input("Please provide a name of the save file \n")
-	cur_path = os.path.dirname(__file__)
-	save_path = os.path.join(cur_path, game_name)
+	#cur_path = os.path.dirname(__file__)
+	#save_path = os.path.join(cur_path, game_name)
 	#save_path = os.path.relpath('../Saved Games/' + game_name, cur_path)
 	
-
 	#save_file = shelve.open(save_name)
 	save_game(save_path, players, relations, market, provinces)
 	return save_path
 	
-
 def save_game(save_path, players, relations, market, provinces):
 
 	state = dict()
 	jsonpickle.set_preferred_backend('simplejson')
+	save_path = save_path
 	#save = shelve.open(file_name, flag = "n", writeback = False)
 	for p, player in players.items():
 		state[p] = player
 	for re, rel in relations.items():
 		state[str(re)] = rel
-	#state["relations"] = relations
+	state["relations"] = relations
 	for p, prov in provinces.items():
 		state[prov.name] = prov
 	#for uc, unciv in uncivilized_minors.items():
@@ -87,7 +86,7 @@ def compile_loaded_game(state):
 			print("k before %s" % k)
 		#	k = list(k.split(","))
 			#k = tuple(k)
-			frozenset({'Two Sicilies', 'Persia'})
+			#({'Two Sicilies', 'Persia'})
 			k = k[11:]
 			k = k[:-2]
 			k = k.replace("'", "")

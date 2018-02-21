@@ -279,7 +279,7 @@ class Player(object):
 		self.infantry = {
 			"attack": 1.0,
 			"defend": 1.2,
-			"manouver": 0.5,
+			"manouver": 0.4,
 			"recon": 0.2,
 			"ammo_use": 0.05,
 			"oil_use": 0.0,
@@ -287,7 +287,7 @@ class Player(object):
 			}
 
 		self.artillery = {
-			"attack": 1.0,
+			"attack": 1.1,
 			"defend": 1.8,
 			"manouver": 0.0,
 			"recon": 0.0,
@@ -311,7 +311,7 @@ class Player(object):
 			"defend": 1.5,
 			"manouver": 1.0,
 			"recon": 2.0,
-			"ammo_use": 0.75,
+			"ammo_use": 0.075,
 			"oil_use": 0.1,
 			"weight": 3
 		}
@@ -321,7 +321,7 @@ class Player(object):
 			"defend": 2.0,
 			"manouver": 1.0,
 			"recon": 0.2,
-			"ammo_use": 0.75,
+			"ammo_use": 0.075,
 			"oil_use": 0.1,
 			"weight": 3
 		}

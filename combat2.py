@@ -447,6 +447,8 @@ class LandBattle(Battle):
 		(defender.military["cavalry"] * defender.cavalry["manouver"]) +
 		(defender.military["tank"] * defender.tank["manouver"] * self.defender_oil_penalty)) * DefManRoll
 
+		AttManouver = AttManouver/(self.attacker_forces["infantry"] + self.attacker_forces["cavalry"] + self.attacker_forces["tank"])
+		DefManouver = DefManouver/(defender.military["infantry"] + defender.military["cavalry"] + defender.military["tank"])
 		self.att_manouver = AttManouver/(AttManouver + DefManouver)
 		self.def_manouver = DefManouver/(AttManouver + DefManouver)
 
@@ -601,8 +603,8 @@ class SeaBattle(Battle):
 		 * self.defender_oil_penalty))
 		market.report.append("%s has naval strength of %s, %s has naval strength of %s \n" % (p1.name, att_str, p2.name, def_str))
 
-		self.att_str = att_str/(att_str + def_str)
-		self.def_str = def_str/(att_str + def_str)
+		self.att_str = att_str/(att_str + def_str + 0.001)
+		self.def_str = def_str/(att_str + def_str + 0.001)
 
 		total_losses = (att_number_units_navy + def_number_units_navy)/3.33
 	
