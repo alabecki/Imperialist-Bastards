@@ -36,9 +36,9 @@ def save_game(save_path, players, relations, market, provinces):
 		state[p] = player
 	for re, rel in relations.items():
 		state[str(re)] = rel
-	state["relations"] = relations
+	#state["relations"] = relations
 	for p, prov in provinces.items():
-		state[prov.name] = prov
+		state[p] = prov
 	#for uc, unciv in uncivilized_minors.items():
 	#	state[uc] = unciv
 	state["market"] = market

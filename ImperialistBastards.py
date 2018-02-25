@@ -2880,10 +2880,8 @@ def start_game(btn):
 	provinces = initial["provinces"]
 	relations = initial["relations"]
 	market = initial["market"]
-	isAutoSaving = app.getRadioButton("Auto Save:")
-	if isAutoSaving == "On":
-		get_auto_save_name()
-		market.auto_save = app.getEntry("auto_save")
+	get_auto_save_name()
+		#market.auto_save = app.getEntry("auto_save")
 	#start_main_screen()
 
 
@@ -3285,7 +3283,7 @@ app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 
 app.setBgImage("Main Menu.png")
-app.playSound("FlyingDucthmenBeginning.wav", wait=False)
+#app.playSound("FlyingDucthmenBeginning.wav", wait=False)
 
 app.setStretch("none")
 
