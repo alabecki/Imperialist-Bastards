@@ -39,6 +39,7 @@ relations = dict()
 human_player = ""
 PRODUCE = ""
 OTHER = ""
+AUTO_SAVE_SUB_MADE = False
 
 manufacture = {
 	"parts": {"iron": 0.67, "coal": 0.33},
@@ -338,17 +339,13 @@ def ask_auto_save():
 
 
 def get_auto_save_name():
-	#app.hideSubWindow("auto_save?")
+	global AUTO_SAVE_SUB_MADE
+	#app.load_basic_widgets()
 	temp = app.getRadioButton("Auto Save:")
 	if temp == "On":
-		app.startSubWindow("auto_save_name", modal = True)
-		app.addLabel("ask save name", "Please enter a name for your saved game:")
-		app.addEntry("auto_save")
-		app.addButton("Onwards!", create_auto_save)
-		app.stopSubWindow()
 		app.showSubWindow("auto_save_name")
-		
 	else:
+		#app.removeAllWidgets()
 		start_main_screen()
 		#start_game_tread()
 
@@ -399,7 +396,6 @@ def show_player_gains(gains):
 
 
 def start_main_screen():
-	app.removeAllWidgets()
 	load_basic_widgets()
 	global market, players, human_player, market, relations
 	player = players[human_player]
@@ -2784,6 +2780,7 @@ def new_game(btn):
 
 def game_option_screen(btn):
 	app.removeAllWidgets()
+	load_basic_widgets()
 	app.setStretch("none")
 	myColour = '#%02x%02x%02x' % (212, 227, 140)
 	app.setBg(myColour, override=False, tint=False)
@@ -2852,16 +2849,22 @@ def pick_scenario(btn):
 		"Netherlands", "Sweden", "Portugal", "Two Sicilies", "Switzerland", "Saxony", "China", "India", "Japan", "Persia"]
 		app.setImage("scenario", "historicalFiction.gif")
 		app.shrinkImage("scenario", 2)
+		app.setImage("nationChoiceFlag", "England.gif")
+
 
 	if scenario == "Fictional":
 		nation_choices = ["Bambaki", "Hyle", "Trope", "Sidero", "Isorropia", "Karbouno"]
 		app.setImage("scenario", "fiction.gif")
 		app.shrinkImage("scenario", 2)
+		app.setImage("nationChoiceFlag", "Bambaki.gif")
+
 
 	app.changeOptionBox("Nation:", nation_choices, callFunction=False)
 
 
 def start_game(btn):
+	#app.removeAllWidgets()
+	#app.load_basic_widgets()
 	player = app.getOptionBox("Nation:")
 	scenario = app.getRadioButton("Scenario:")
 	global initial, human_player
@@ -3011,32 +3014,20 @@ def gui_save_game(btn):
 
 
 def load_basic_widgets():
+	app.removeAllWidgets()
 	
 	#app.playSound("Grand March from Aida.wav", wait=False)
-	app.removeAllWidgets()
 	#app.setBgImage("IB.png")
-	app.setBgImage("Main Menu.png")
+	#app.setBgImage("Main Menu.png")
+
+	app.startSubWindow("auto_save_name", modal = True)
+	app.addLabel("ask save name", "Please enter a name for your saved game:")
+	app.addEntry("auto_save")
+	app.addButton("Onwards!", create_auto_save)
+	app.stopSubWindow()	
 
 	app.startSubWindow("loading new game", modal = False)
 	app.addLabel("nload", " Please wait while the game world is loaded... ")
-	app.stopSubWindow()
-
-	app.startSubWindow("Scenario_Choice", modal=True)
-	app.addLabel("Scenario_Choice", "Which Scenario Would You Like to Play?")
-	app.addRadioButton("Scen", "None")
-	app.addRadioButton("Scen", "Semi-Historical")
-	app.addRadioButton("Scen", "Fictional")
-	#app.setRadioButton("Scen", "None", callFunction = True)
-	#app.setRadioButtonFunction("Scen", gameChoice)   # call this function, whenever the RadioButton changes
-	#app.setRadioButtonChangeFunction("Scen", gameChoice)
-	app.addButton("Cont", scen_press)
-	app.stopSubWindow()
-
-	app.startSubWindow("Choose_Type", modal= True)
-	app.addRadioButton("nation_type", "Major Power")
-	app.addRadioButton("nation_type", "Minor Power")
-	app.addRadioButton("nation_type", "Old Empire")
-	app.addButton("Cont.", nation_type_press)
 	app.stopSubWindow()
 
 
@@ -3283,7 +3274,7 @@ app.setBg("khaki", override=False, tint=False)
 #app.setGeometry("fullscreen")
 
 app.setBgImage("Main Menu.png")
-#app.playSound("FlyingDucthmenBeginning.wav", wait=False)
+app.playSound("FlyingDucthmenBeginning.wav", wait=False)
 
 app.setStretch("none")
 
